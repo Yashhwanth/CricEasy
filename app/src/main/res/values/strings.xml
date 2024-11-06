@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">CricEasy</string>
+    <string name="new_match_button">New Match</string>
+    <string name="past_matches">Past Matches</string>
+
+
+</resources>
