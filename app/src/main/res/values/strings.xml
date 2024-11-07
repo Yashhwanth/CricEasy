@@ -1,7 +1,16 @@
 <resources>
     <string name="app_name">CricEasy</string>
+    <string name="app_logo">CricEasy</string>
     <string name="new_match_button">New Match</string>
     <string name="past_matches">Past Matches</string>
+    <string name="match_type">Match Type</string>
+    <string name="limited_overs">Limited Overs</string>
+    <string name="box_cricket">Box Cricket</string>
+    <string name="no_of_overs">No. of Overs</string>
+    <string name="no_of_overs_input">Enter your text here</string>
+    <string name="ball_type">Type of Ball</string>
+    <string name="leather_ball">Leather</string>
+    <string name="Tennis_ball">Tennis</string>
 
 
 </resources>

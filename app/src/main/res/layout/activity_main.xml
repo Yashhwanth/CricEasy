@@ -5,29 +5,33 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/design_default_color_secondary"
+    android:background="@color/icon_default"
+    android:padding="16dp"
+    android:scaleType="centerCrop"
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/newmatchbtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/new_match_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.437" />
+        app:layout_constraintVertical_bias="0.419" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/pastmatchesbtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/past_matches"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.543" />
+        app:layout_constraintVertical_bias="0.529" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

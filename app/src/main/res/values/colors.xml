@@ -2,4 +2,34 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="primary">#6200EE</color> <!-- Purple -->
+    <color name="primary_variant">#3700B3</color> <!-- Darker Purple -->
+    <color name="secondary">#03DAC6</color> <!-- Teal -->
+    <!-- Background & Text Colors -->
+    <color name="background">#F5F5F5</color> <!-- Light Gray Background -->
+    <color name="text_primary">#212121</color> <!-- Dark Text -->
+    <color name="text_secondary">#757575</color> <!-- Lighter Text -->
+    <color name="text_disabled">#BDBDBD</color> <!-- Disabled Text -->
+
+    <!-- Accent Colors -->
+    <color name="accent">#FF4081</color> <!-- Pink -->
+    <color name="error">#B00020</color> <!-- Red Error -->
+
+    <!-- Button & Icon Colors -->
+    <color name="button_primary">#6200EE</color> <!-- Button Background -->
+    <color name="button_text">#FFFFFF</color> <!-- Button Text Color -->
+    <color name="icon_default">#FFFFFF</color> <!-- Icon Color -->
+
+    <!-- Gray Shades -->
+    <color name="gray_light">#E0E0E0</color>
+    <color name="gray_medium">#9E9E9E</color>
+    <color name="gray_dark">#616161</color>
+
+    <!-- Success and Info -->
+    <color name="success">#4CAF50</color> <!-- Green Success -->
+    <color name="info">#2196F3</color> <!-- Blue Info -->
+
+    <!-- Custom Colors -->
+    <color name="primary_background">#303F9F</color> <!-- Custom Dark Blue -->
+    <color name="highlight">#FFEB3B</color> <!-- Yellow Highlight -->
 </resources>
