@@ -146,6 +146,8 @@
         android:layout_width="409dp"
         android:layout_height="50dp"
         android:orientation="horizontal"
+        android:divider="@android:drawable/divider_horizontal_bright"
+        android:showDividers="middle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

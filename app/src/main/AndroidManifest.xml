@@ -34,6 +34,10 @@
             android:name=".MatchInfoActivity"
             android:exported="true" />
 
+        <activity android:name=".TeamCreationActivity"
+            android:exported="true"  />
+
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCSmIkxI3RiSMTa9DtLKrHSza-JW_4OjX0"/>

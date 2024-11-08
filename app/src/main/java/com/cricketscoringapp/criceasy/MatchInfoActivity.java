@@ -5,10 +5,14 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
 
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -34,6 +38,28 @@ public class MatchInfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_match_info);
 
+        Button backButton = findViewById(R.id.backButton);
+        Button nextButton = findViewById(R.id.nextButton);
+
+        // Back Button Action
+        backButton.setOnClickListener(v -> {
+            // Go back to the main activity (or previous activity)
+            Intent intent = new Intent(MatchInfoActivity.this, MainActivity.class); // Replace with your actual main activity
+            startActivityWithClearTop(intent);
+            startActivity(intent);
+            finish(); // Optional: Close this activity to prevent navigating back to it
+        });
+
+        // Next Button Action
+        nextButton.setOnClickListener(v -> {
+            if (validateInputs()) {
+                // Proceed to the next activity if all inputs are valid
+                Intent intent = new Intent(MatchInfoActivity.this, TeamCreationActivity.class);
+                startActivityWithClearTop(intent);
+                startActivity(intent);
+            }
+        });
+
         // Initialize the Places API
         if (!Places.isInitialized()) {
             Places.initialize(getApplicationContext(), "AIzaSyCj9F32bLGwchttu-tdFnBfJkv9mzfPYSQ");
@@ -51,6 +77,67 @@ public class MatchInfoActivity extends AppCompatActivity {
         calendar = Calendar.getInstance();
     }
 
+
+    //clears the previous activity stack
+    public void startActivityWithClearTop(Intent intent) {
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
+    }
+
+    //Method to validate inputs
+    private boolean validateInputs() {
+        // Get references to the required fields
+        AppCompatAutoCompleteTextView placeAutoComplete = findViewById(R.id.placeAutocomplete);
+        EditText dateTimeEditText = findViewById(R.id.dateTimeEditText);
+        EditText noOfOversEditText = findViewById(R.id.noOfOversEditText);
+        RadioGroup oversTypeRadioGroup = findViewById(R.id.oversTypeRadioGroup);
+        RadioGroup ballTypeRadioGroup = findViewById(R.id.ballTypeRadioGroup);
+
+        // Validate place input
+        if (placeAutoComplete.getText().toString().trim().isEmpty()) {
+            showToast("Please enter the match location");
+            placeAutoComplete.requestFocus();
+            return false;
+        }
+
+        // Validate date and time input
+        if (dateTimeEditText.getText().toString().trim().isEmpty()) {
+            showToast("Please enter the match date and time");
+            dateTimeEditText.requestFocus();
+            return false;
+        }
+
+        // Validate number of overs input
+        if (noOfOversEditText.getText().toString().trim().isEmpty()) {
+            showToast("Please enter the number of overs");
+            noOfOversEditText.requestFocus();
+            return false;
+        }
+
+        // Validate match type selection
+        if (oversTypeRadioGroup.getCheckedRadioButtonId() == -1) {
+            showToast("Please select the match type");
+            oversTypeRadioGroup.requestFocus();
+            return false;
+        }
+
+        // Validate ball type selection
+        if (ballTypeRadioGroup.getCheckedRadioButtonId() == -1) {
+            showToast("Please select the type of ball");
+            ballTypeRadioGroup.requestFocus();
+            return false;
+        }
+
+        // All validations passed
+        return true;
+    }
+
+
+    // Method to show a Toast message
+    private void showToast(String message) {
+        Toast.makeText(MatchInfoActivity.this, message, Toast.LENGTH_SHORT).show();
+    }
     // Method to open the Google Places Autocomplete activity
     private void openAutocompleteActivity() {
         List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS);
