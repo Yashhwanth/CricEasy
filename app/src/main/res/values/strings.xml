@@ -12,7 +12,11 @@
     <string name="tennis_ball">Tennis</string>
     <string name="other_ball">Other</string>
     <string name="place">City / Town</string>
-    <string name="place_input">Enter City / Town</string>
+    <string name="place_input">Select location</string>
+    <string name="date_input">Select Date &amp; Time</string>
+    <string name="back_button">Back</string>
+    <string name="next_button">Next</string>
+    <string name="overs_input">Type Overs : </string>
 
 
 
