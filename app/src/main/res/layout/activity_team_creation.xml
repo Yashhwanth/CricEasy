@@ -3,13 +3,114 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
-    <ImageButton
-        android:id="@+id/imageButton"
+    <!-- Select Team A Button -->
+    <LinearLayout
+        android:id="@+id/linearLayoutA"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:layout_editor_absoluteX="129dp"
-        tools:layout_editor_absoluteY="111dp"
-        tools:srcCompat="@tools:sample/avatars" />
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.2"
+        tools:layout_editor_absoluteX="16dp">
+
+        <ImageView
+            android:id="@+id/imgAddTeamA"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:contentDescription="@string/select_team_a"
+            android:src="@drawable/ic_add_circle" />
+
+        <Button
+            android:id="@+id/btnSelectTeamA"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/select_team_a"/>
+    </LinearLayout>
+
+    <!-- VS Separator -->
+
+    <!-- Select Team B Button -->
+    <TextView
+        android:id="@+id/txtVs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:text="@string/versus"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/bottomButtons"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/linearLayoutA"
+        app:layout_constraintVertical_bias="0.069" />
+
+    <LinearLayout
+        android:id="@+id/linearLayoutB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@+id/bottomButtons"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/imgAddTeamB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:contentDescription="@string/select_team_b"
+            android:src="@drawable/ic_add_circle" />
+
+        <Button
+            android:id="@+id/btnSelectTeamB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/select_team_b"/>
+    </LinearLayout>
+
+    <!-- Back and Next Buttons at the Bottom -->
+    <LinearLayout
+        android:id="@+id/bottomButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:divider="@android:drawable/divider_horizontal_bright"
+        android:showDividers="middle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintVertical_bias="0.995">
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/square_button"
+            android:text="@string/back_button"
+            android:onClick="goBack"/>
+
+        <Button
+            android:id="@+id/btnNext"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/square_button"
+            android:text="@string/next_button"
+            android:onClick="goToNext"/>
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

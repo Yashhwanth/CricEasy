@@ -17,6 +17,9 @@
     <string name="back_button">Back</string>
     <string name="next_button">Next</string>
     <string name="overs_input">Type Overs : </string>
+    <string name="select_team_a">Select Team A</string>
+    <string name="select_team_b">Select Team B</string>
+    <string name="versus">VS</string>
 
 
 
