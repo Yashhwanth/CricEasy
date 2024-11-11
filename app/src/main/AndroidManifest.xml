@@ -40,6 +40,9 @@
         <activity android:name=".TossActivity"
             android:exported="true"  />
 
+        <activity android:name=".TeamSelectionActivity"
+            android:exported="true"  />
+
 
 
         <meta-data

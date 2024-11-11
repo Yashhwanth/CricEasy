@@ -32,7 +32,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/select_team_a"/>
+            android:text="@string/select_team_a"
+            android:onClick="teamsinput"/>
     </LinearLayout>
 
     <!-- VS Separator -->
@@ -75,7 +76,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/select_team_b"/>
+            android:text="@string/select_team_b"
+            android:onClick="teamsinput"/>
     </LinearLayout>
 
     <!-- Back and Next Buttons at the Bottom -->

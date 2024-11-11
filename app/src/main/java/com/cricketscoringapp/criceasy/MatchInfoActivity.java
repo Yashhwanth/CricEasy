@@ -82,7 +82,7 @@ public class MatchInfoActivity extends AppCompatActivity {
     public void startActivityWithClearTop(Intent intent) {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
-        finish();
+        //finish();
     }
 
     //Method to validate inputs

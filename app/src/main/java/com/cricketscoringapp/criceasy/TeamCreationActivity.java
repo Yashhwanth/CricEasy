@@ -18,7 +18,7 @@ public class TeamCreationActivity extends AppCompatActivity {
         // Navigate back to MatchInfoActivity
         Intent intent = new Intent(this, MatchInfoActivity.class);
         startActivity(intent);
-        finish(); // Close the current activity
+        //finish(); // Close the current activity
     }
 
     // Method to handle Next button click
@@ -26,5 +26,12 @@ public class TeamCreationActivity extends AppCompatActivity {
         // Navigate to TossActivity
         Intent intent = new Intent(this, TossActivity.class); // Replace with your next activity
         startActivity(intent);
+    }
+
+    public void teamsinput(View view) {
+        // Navigate back to MatchInfoActivity
+        Intent intent = new Intent(this, TeamSelectionActivity.class);
+        startActivity(intent);
+        //finish(); // Close the current activity
     }
 }
