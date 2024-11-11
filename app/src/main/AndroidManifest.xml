@@ -19,6 +19,7 @@
         <activity
             android:name=".SplashActivity"
             android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -27,20 +28,29 @@
         <!-- MainActivity as a regular activity -->
         <activity
             android:name=".MainActivity"
+            android:launchMode="singleTask"
             android:exported="true" />
 
         <!-- Additional activities -->
         <activity
             android:name=".MatchInfoActivity"
+            android:launchMode="singleTask"
             android:exported="true" />
 
         <activity android:name=".TeamCreationActivity"
+            android:launchMode="singleTask"
             android:exported="true"  />
 
         <activity android:name=".TossActivity"
+            android:launchMode="singleTask"
             android:exported="true"  />
 
         <activity android:name=".TeamSelectionActivity"
+            android:launchMode="singleTask"
+            android:exported="true"  />
+
+        <activity android:name=".SelectingSrNsBowActivity"
+            android:launchMode="singleTask"
             android:exported="true"  />
 
 

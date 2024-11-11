@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
     android:background="@color/white"
+    android:padding="16dp"
     tools:context=".TossActivity">
 
     <!-- Back Button -->
@@ -84,7 +84,7 @@
         android:id="@+id/img_coin"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:src="@drawable/bg"
+        android:src="@drawable/coin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.451"
@@ -96,6 +96,7 @@
         android:id="@+id/btn_help"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:onClick="back"
         android:text="NEED HELP?"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -108,6 +109,7 @@
         android:id="@+id/btn_play"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:onClick="letsplay"
         android:text="LET'S PLAY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -118,61 +120,76 @@
 
     <RadioGroup
         android:id="@+id/radioGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="274dp"
+        android:layout_height="151dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.23000002">
 
-        <Button
-            android:id="@+id/btn_team1"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:background="@drawable/bg"
-            android:text="MG"
+        <RadioButton
+            android:id="@+id/radioButton2"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/radio_button_selector"
+            android:button="@null"
+            android:gravity="center"
+            android:text="Team 1"
             android:textColor="@android:color/white"
             android:textSize="20sp" />
 
-        <Button
-            android:id="@+id/btn_team2"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:background="@drawable/bg"
-            android:text="GM"
+        <RadioButton
+            android:id="@+id/radioButton3"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/radio_button_selector"
+            android:button="@null"
+            android:gravity="center"
+            android:text="Team 2"
             android:textColor="@android:color/white"
             android:textSize="20sp" />
     </RadioGroup>
 
     <RadioGroup
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/radioGroup1"
+        android:layout_width="274dp"
+        android:layout_height="151dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.53">
+        app:layout_constraintVertical_bias="0.55">
 
-        <Button
-            android:id="@+id/btn_bat"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:background="@drawable/bg"
-            android:text="BAT"
+        <RadioButton
+            android:id="@+id/radioButton4"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/radio_button_selector"
+            android:button="@null"
+            android:gravity="center"
+            android:text="bat"
             android:textColor="@android:color/white"
-            android:textSize="18sp" />
+            android:textSize="20sp" />
 
-        <Button
-            android:id="@+id/btn_bowl"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:background="@drawable/bg"
-            android:text="BOWL"
+        <RadioButton
+            android:id="@+id/radioButton5"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/radio_button_selector"
+            android:button="@null"
+            android:gravity="center"
+            android:text="bowl"
             android:textColor="@android:color/white"
-            android:textSize="18sp" />
+            android:textSize="20sp" />
     </RadioGroup>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
