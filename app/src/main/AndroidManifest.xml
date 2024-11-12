@@ -61,6 +61,30 @@
             android:launchMode="singleTask"
             android:exported="true"  />
 
+        <activity android:name=".MatchActivity"
+            android:launchMode="singleTask"
+            android:exported="true"  />
+
+        <activity android:name=".MpInfoActivity"
+            android:launchMode="singleTask"
+            android:exported="true"  />
+
+        <activity android:name=".MpScorecardActivity"
+            android:launchMode="singleTask"
+            android:exported="true"  />
+
+        <activity android:name=".MpSummaryActivity"
+            android:launchMode="singleTask"
+            android:exported="true"  />
+
+        <activity android:name=".MpCommentaryActivity"
+            android:launchMode="singleTask"
+            android:exported="true"  />
+
+        <activity android:name=".MpTeamsActivity"
+            android:launchMode="singleTask"
+            android:exported="true"  />
+
 
 
         <meta-data
