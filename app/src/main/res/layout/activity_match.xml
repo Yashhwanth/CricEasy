@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:ignore="ExtraText">
 
     <TextView
         android:id="@+id/textView11"
@@ -38,6 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+
                 android:text="Button" />
 
             <Button
@@ -71,6 +73,13 @@
     </HorizontalScrollView>
 
     <FrameLayout
+        android:layout_width="385dp"
+        android:layout_height="438dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.621">
         android:layout_width="412dp"
         android:layout_height="573dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -78,6 +87,33 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"/>
+        app:layout_constraintVertical_bias="1.0"
+
+        <include
+            android:id="@+id/lay1"
+
+            android:layout="@layout/activity_mp_info"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/lay2"
+            layout="@layout/activity_mp_summary"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/lay3"
+            layout="@layout/activity_mp_scorecard"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/lay4"
+            layout="@layout/activity_mp_commentary"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/lay5"
+            layout="@layout/activity_mp_teams"
+            android:visibility="gone" />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

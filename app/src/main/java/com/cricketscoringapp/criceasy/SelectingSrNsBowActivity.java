@@ -29,7 +29,7 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
 
     public void lets_play(View view) {
         // Navigate back to MatchInfoActivity
-        Intent intent = new Intent(this, ScoringActivity.class);
+        Intent intent = new Intent(this, MatchActivity.class);
         startActivity(intent);
         //finish(); // Close the current activity
     }
