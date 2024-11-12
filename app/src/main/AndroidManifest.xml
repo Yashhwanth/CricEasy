@@ -53,7 +53,11 @@
             android:launchMode="singleTask"
             android:exported="true"  />
 
-        <activity android:name=".SelectingPlayers"
+        <activity android:name=".SelectingPlayersActivity"
+            android:launchMode="singleTask"
+            android:exported="true"  />
+
+        <activity android:name=".ScoringActivity"
             android:launchMode="singleTask"
             android:exported="true"  />
 

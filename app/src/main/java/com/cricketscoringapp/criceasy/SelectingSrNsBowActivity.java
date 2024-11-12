@@ -15,7 +15,7 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
 
     public void select_striker(View view) {
         // Navigate back to MatchInfoActivity
-        Intent intent = new Intent(this, SelectingPlayers.class);
+        Intent intent = new Intent(this, SelectingPlayersActivity.class);
         startActivity(intent);
         //finish(); // Close the current activity
     }
@@ -23,6 +23,13 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
     public void back(View view) {
         // Navigate back to MatchInfoActivity
         Intent intent = new Intent(this, TossActivity.class);
+        startActivity(intent);
+        //finish(); // Close the current activity
+    }
+
+    public void lets_play(View view) {
+        // Navigate back to MatchInfoActivity
+        Intent intent = new Intent(this, ScoringActivity.class);
         startActivity(intent);
         //finish(); // Close the current activity
     }
