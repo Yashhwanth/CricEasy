@@ -66,4 +66,10 @@ public class MatchActivity extends AppCompatActivity {
                 break;
         }
     }
+    public void popup(View view) {
+        // Navigate back to MatchInfoActivity
+        Intent intent = new Intent(this, ScoringActivity.class);
+        startActivity(intent);
+        //finish(); // Close the current activity
+    }
 }

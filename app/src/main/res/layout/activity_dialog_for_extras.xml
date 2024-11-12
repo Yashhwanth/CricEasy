@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- Text field to show the type of ball -->
+    <TextView
+        android:id="@+id/ball_type_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingBottom="10dp"
+        android:text="Ball Type"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <!-- Input field for entering the extra runs -->
+    <EditText
+        android:id="@+id/extra_runs_input"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:hint="Enter extra runs"
+        android:inputType="number"
+        android:padding="10dp" />
+
+    <!-- Buttons for Cancel and Submit -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:orientation="horizontal"
+        android:paddingTop="20dp">
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel" />
+
+        <Button
+            android:id="@+id/btn_submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:text="Submit" />
+    </LinearLayout>
+</LinearLayout>
