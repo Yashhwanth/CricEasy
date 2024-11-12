@@ -73,15 +73,14 @@
     </HorizontalScrollView>
 
     <FrameLayout
-        android:layout_width="385dp"
-        android:layout_height="438dp"
+        android:layout_width="306dp"
+        android:layout_height="366dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.621">
-        android:layout_width="412dp"
-        android:layout_height="573dp"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -92,7 +91,7 @@
         <include
             android:id="@+id/lay1"
 
-            android:layout="@layout/activity_mp_info"
+            layout="@layout/activity_mp_info"
             android:visibility="gone" />
 
         <include

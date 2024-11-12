@@ -15,7 +15,7 @@ public class MatchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_match); // Make sure this layout file exists
 
-        /*btnLayout1 = findViewById(R.id.button5);
+        btnLayout1 = findViewById(R.id.button5);
         btnLayout2 = findViewById(R.id.button6);
         btnLayout3 = findViewById(R.id.button7);
         btnLayout4 = findViewById(R.id.button8);
@@ -28,7 +28,11 @@ public class MatchActivity extends AppCompatActivity {
         layout5 = findViewById(R.id.lay5);
 
         btnLayout1.setOnClickListener(view -> showLayout(1));
-        //btnLayout2.setOnClickListener(view -> showLayout(2));
+        btnLayout2.setOnClickListener(view -> showLayout(2));
+        btnLayout3.setOnClickListener(view -> showLayout(3));
+        btnLayout4.setOnClickListener(view -> showLayout(4));
+        btnLayout5.setOnClickListener(view -> showLayout(5));
+
     }
 
     public void info_page(View view) {
@@ -60,6 +64,6 @@ public class MatchActivity extends AppCompatActivity {
             case 5:
                 layout5.setVisibility(View.VISIBLE);
                 break;
-        }*/
+        }
     }
 }
