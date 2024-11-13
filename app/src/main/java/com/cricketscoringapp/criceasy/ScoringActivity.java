@@ -47,5 +47,11 @@ public class ScoringActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    public void scorebutton(View view) {
+        // Navigate back to MatchInfoActivity
+        Intent intent = new Intent(this, MatchActivity.class);
+        startActivity(intent);
+        //finish(); // Close the current activity
+    }
 
 }
