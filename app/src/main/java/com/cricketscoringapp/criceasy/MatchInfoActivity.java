@@ -14,6 +14,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
 
+import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
@@ -32,11 +33,19 @@ public class MatchInfoActivity extends AppCompatActivity {
     private AutoCompleteTextView placeAutoComplete;
     private EditText dateTimeEditText;
     private Calendar calendar;
+    private EditText noOfOversEditText; // Added to get number of overs input
+    private RadioGroup oversTypeRadioGroup; // Added to get match type selection
+    private RadioGroup ballTypeRadioGroup; // Added to get ball type selection
+    private DatabaseHelper databaseHelper; // Added DatabaseHelper instance
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_match_info);
+
+        // Initialize DatabaseHelper
+        databaseHelper = new DatabaseHelper(this); // Highlighted line added
 
         Button backButton = findViewById(R.id.backButton);
         Button nextButton = findViewById(R.id.nextButton);
@@ -53,6 +62,9 @@ public class MatchInfoActivity extends AppCompatActivity {
         // Next Button Action
         nextButton.setOnClickListener(v -> {
             if (validateInputs()) {
+
+                saveMatchInfoToDatabase();
+
                 // Proceed to the next activity if all inputs are valid
                 Intent intent = new Intent(MatchInfoActivity.this, TeamCreationActivity.class);
                 startActivityWithClearTop(intent);
@@ -72,6 +84,11 @@ public class MatchInfoActivity extends AppCompatActivity {
         // Initialize EditText for date and time selection
         dateTimeEditText = findViewById(R.id.dateTimeEditText);
         dateTimeEditText.setOnClickListener(v -> showDateTimePicker());
+
+        // Initialize EditText and RadioGroups for number of overs and match settings
+        noOfOversEditText = findViewById(R.id.noOfOversEditText); // Highlighted line added
+        oversTypeRadioGroup = findViewById(R.id.oversTypeRadioGroup); // Highlighted line added
+        ballTypeRadioGroup = findViewById(R.id.ballTypeRadioGroup); // Highlighted line added
 
         // Initialize Calendar instance
         calendar = Calendar.getInstance();
@@ -187,6 +204,31 @@ public class MatchInfoActivity extends AppCompatActivity {
 
         // Show the TimePickerDialog
         timePickerDialog.show();
+    }
+
+    // Method to save match information into the database
+    private void saveMatchInfoToDatabase() { // Highlighted line added // Extract values from UI components
+        String matchType = getRadioButtonText(oversTypeRadioGroup);
+        String noOfOvers = noOfOversEditText.getText().toString().trim();
+        String ballType = getRadioButtonText(ballTypeRadioGroup);
+        String place = placeAutoComplete.getText().toString().trim();
+        String dateTime = dateTimeEditText.getText().toString().trim();
+
+        // Save the match information into the database
+        boolean isInserted = databaseHelper.insertMatchBasicInfo(matchType, noOfOvers, ballType, place, dateTime ); // Highlighted line added
+
+        if (isInserted) {
+            showToast("Match Info Saved Successfully!"); // Highlighted line added
+        } else {
+            showToast("Failed to Save Match Info."); // Highlighted line added
+        }
+    }
+
+    // Helper method to get the selected radio button text
+    private String getRadioButtonText(RadioGroup radioGroup) {
+        int selectedId = radioGroup.getCheckedRadioButtonId();
+        RadioButton selectedRadioButton = findViewById(selectedId);
+        return selectedRadioButton != null ? selectedRadioButton.getText().toString() : "";
     }
 
     @Override
