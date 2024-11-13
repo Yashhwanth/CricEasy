@@ -85,6 +85,10 @@
             android:launchMode="singleTask"
             android:exported="true"  />
 
+        <activity android:name=".TypeofWicketActivity"
+            android:launchMode="singleTask"
+            android:exported="true"  />
+
 
 
 

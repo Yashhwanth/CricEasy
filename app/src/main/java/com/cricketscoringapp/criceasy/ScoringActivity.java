@@ -54,4 +54,11 @@ public class ScoringActivity extends AppCompatActivity {
         //finish(); // Close the current activity
     }
 
+    public void wicketbutton(View view) {
+        // Navigate back to MatchInfoActivity
+        Intent intent = new Intent(this, TypeofWicketActivity.class);
+        startActivity(intent);
+        //finish(); // Close the current activity
+    }
+
 }
