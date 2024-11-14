@@ -42,6 +42,7 @@ public class MatchInfoActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_match_info);
 
@@ -71,6 +72,7 @@ public class MatchInfoActivity extends AppCompatActivity {
 
                 // Proceed to the next activity if all inputs are valid
                 Intent intent = new Intent(MatchInfoActivity.this, TeamCreationActivity.class);
+                intent.putExtra("MATCH_ID", matchId);
                 startActivityWithClearTop(intent);
                 startActivity(intent);
             }
