@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class MatchInfoActivity extends AppCompatActivity {
-
+    private long matchId;
     private static final int AUTOCOMPLETE_REQUEST_CODE = 1;
     private AutoCompleteTextView placeAutoComplete;
     private EditText dateTimeEditText;
@@ -39,6 +39,7 @@ public class MatchInfoActivity extends AppCompatActivity {
     private DatabaseHelper databaseHelper; // Added DatabaseHelper instance
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +47,9 @@ public class MatchInfoActivity extends AppCompatActivity {
 
         // Initialize DatabaseHelper
         databaseHelper = new DatabaseHelper(this); // Highlighted line added
+
+        // Retrieve matchId from the Intent
+        matchId = getIntent().getLongExtra("MATCH_ID", -1); // Default value is -1 if not passed
 
         Button backButton = findViewById(R.id.backButton);
         Button nextButton = findViewById(R.id.nextButton);
@@ -214,13 +218,20 @@ public class MatchInfoActivity extends AppCompatActivity {
         String place = placeAutoComplete.getText().toString().trim();
         String dateTime = dateTimeEditText.getText().toString().trim();
 
-        // Save the match information into the database
-        boolean isInserted = databaseHelper.insertMatchBasicInfo(matchType, noOfOvers, ballType, place, dateTime ); // Highlighted line added
+        // Use matchId that was already retrieved in onCreate
+        // Default value for is_completed (0 means not completed)
+        int isCompleted = 0;  // You can update this based on the match status
+
+        // Call the function to save the match info to the database
+        boolean isInserted = databaseHelper.insertMatchBasicInfo(matchId,
+                null, null, matchType,
+                noOfOvers, ballType, place,
+                dateTime, null, null, isCompleted);
 
         if (isInserted) {
-            showToast("Match Info Saved Successfully!"); // Highlighted line added
+            showToast("Match Info Saved Successfully!");
         } else {
-            showToast("Failed to Save Match Info."); // Highlighted line added
+            showToast("Failed to Save Match Info.");
         }
     }
 
