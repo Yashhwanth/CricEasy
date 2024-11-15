@@ -26,18 +26,18 @@ public class TeamCreationActivity extends AppCompatActivity {
         teamA.setOnClickListener(v -> {
             // Navigate back to MatchInfoActivity
             Intent intent = new Intent(this, TeamSelectionActivity.class);
-            startActivity(intent);
             intent.putExtra("MATCH_ID", matchId);
             intent.putExtra("TEAM_TYPE", "A");
-            teamsInput();
+            startActivity(intent);
+            //teamsInput();
         });
         teamB.setOnClickListener(v -> {
             // Navigate back to MatchInfoActivity
             Intent intent = new Intent(this, TeamSelectionActivity.class);
-            startActivity(intent);
             intent.putExtra("MATCH_ID", matchId);
             intent.putExtra("TEAM_TYPE", "B");
-            teamsInput();
+            startActivity(intent);
+            //teamsInput();
         });
     }
 
