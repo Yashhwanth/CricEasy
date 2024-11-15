@@ -225,10 +225,7 @@ public class MatchInfoActivity extends AppCompatActivity {
         int isCompleted = 0;  // You can update this based on the match status
 
         // Call the function to save the match info to the database
-        boolean isInserted = databaseHelper.insertMatchBasicInfo(matchId,
-                null, null, matchType,
-                noOfOvers, ballType, place,
-                dateTime, null, null, isCompleted);
+        boolean isInserted = databaseHelper.insertMatchBasicInfo1(matchId, matchType, noOfOvers, ballType, place, dateTime, isCompleted);
 
         if (isInserted) {
             showToast("Match Info Saved Successfully!");

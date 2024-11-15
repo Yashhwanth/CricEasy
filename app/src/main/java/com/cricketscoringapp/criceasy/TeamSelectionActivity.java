@@ -64,15 +64,11 @@ public class TeamSelectionActivity extends AppCompatActivity {
         // Save the team name based on teamType (either "A" or "B")
         boolean isInserted;
         if ("A".equals(teamType)) {
-            isInserted = databaseHelper.insertMatchBasicInfo(matchId,
-                    teamName, null, null,
-                    null, null, null,
-                    null, null, null, isCompleted);
+            isInserted = databaseHelper.insertMatchBasicInfo2(matchId,
+                    teamName, isCompleted);
         } else if ("B".equals(teamType)) {
-            isInserted = databaseHelper.insertMatchBasicInfo(matchId,
-                    null, teamName, null,
-                    null, null, null,
-                    null, null, null, isCompleted);
+            isInserted = databaseHelper.insertMatchBasicInfo3(matchId,
+                     teamName, isCompleted);
         } else {
             showToast("Invalid team type");
             return;

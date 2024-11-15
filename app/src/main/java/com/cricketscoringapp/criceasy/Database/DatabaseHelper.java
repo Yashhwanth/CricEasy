@@ -85,9 +85,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return COLUMN_ID;
     }
 
-    public boolean insertMatchBasicInfo(long matchId, String teamA, String teamB, String matchType,
+    public boolean insertMatchBasicInfo1(long matchId, String matchType,
                                         String overs, String ballType, String place, String time,
-                                        String tossBy, String matchResult, int isCompleted) {
+                                        int isCompleted) {
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -95,13 +95,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Insert match_id (this is always passed)
         values.put("match_id", matchId);
 
-        // Add other columns conditionally (if values are provided)
-        if (teamA != null && !teamA.isEmpty()) {
-            values.put("team_a", teamA);
-        }
-        if (teamB != null && !teamB.isEmpty()) {
-            values.put("team_b", teamB);
-        }
         if (matchType != null && !matchType.isEmpty()) {
             values.put("match_type", matchType);
         }
@@ -117,20 +110,72 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (time != null && !time.isEmpty()) {
             values.put("time", time);
         }
-        if (tossBy != null && !tossBy.isEmpty()) {
-            values.put("toss_by", tossBy);
+
+        // Insert the "is_completed" value, using the default value (0) if not provided
+        values.put("is_completed", isCompleted);
+
+        // Check if the row exists
+        int rowsUpdated = db.update("match_details", values, "match_id=?", new String[]{String.valueOf(matchId)});
+
+        // If no rows were updated, insert a new row
+        if (rowsUpdated == 0) {
+            values.put("match_id", matchId);
+            long result = db.insert("match_details", null, values);
+            return result != -1;
         }
-        if (matchResult != null && !matchResult.isEmpty()) {
-            values.put("match_result", matchResult);
+        return true;
+    }
+
+    public boolean insertMatchBasicInfo2(long matchId, String teamA, int isCompleted) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        // Insert match_id (this is always passed)
+        values.put("match_id", matchId);
+
+        // Add other columns conditionally (if values are provided)
+        if (teamA != null && !teamA.isEmpty()) {
+            values.put("team_a", teamA);
         }
 
         // Insert the "is_completed" value, using the default value (0) if not provided
         values.put("is_completed", isCompleted);
 
-        // Insert into the database (use CONFLICT_REPLACE to update if the match_id already exists)
-        long result = db.insertWithOnConflict("match_details", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        int rowsUpdated = db.update("match_details", values, "match_id=?", new String[]{String.valueOf(matchId)});
 
-        return result != -1;
+        if (rowsUpdated == 0) {
+            values.put("match_id", matchId);
+            long result = db.insert("match_details", null, values);
+            return result != -1;
+        }
+        return true;
+    }
+
+    public boolean insertMatchBasicInfo3(long matchId, String teamB, int isCompleted) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        // Insert match_id (this is always passed)
+        values.put("match_id", matchId);
+
+        // Add other columns conditionally (if values are provided)
+        if (teamB != null && !teamB.isEmpty()) {
+            values.put("team_b", teamB);
+        }
+
+        // Insert the "is_completed" value, using the default value (0) if not provided
+        values.put("is_completed", isCompleted);
+
+        int rowsUpdated = db.update("match_details", values, "match_id=?", new String[]{String.valueOf(matchId)});
+
+        if (rowsUpdated == 0) {
+            values.put("match_id", matchId);
+            long result = db.insert("match_details", null, values);
+            return result != -1;
+        }
+        return true;
     }
 
 
