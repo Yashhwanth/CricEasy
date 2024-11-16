@@ -3,6 +3,7 @@ package com.cricketscoringapp.criceasy;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -14,7 +15,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
 
-import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
+import com.cricketscoringapp.criceasy.Database.MatchesTableDBH;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
@@ -36,7 +37,7 @@ public class MatchInfoActivity extends AppCompatActivity {
     private EditText noOfOversEditText; // Added to get number of overs input
     private RadioGroup oversTypeRadioGroup; // Added to get match type selection
     private RadioGroup ballTypeRadioGroup; // Added to get ball type selection
-    private DatabaseHelper databaseHelper; // Added DatabaseHelper instance
+    private MatchesTableDBH databaseHelper; // Added DatabaseHelper instance
 
 
 
@@ -47,10 +48,12 @@ public class MatchInfoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_match_info);
 
         // Initialize DatabaseHelper
-        databaseHelper = new DatabaseHelper(this); // Highlighted line added
+        databaseHelper = new MatchesTableDBH(this); // Highlighted line added
 
-        // Retrieve matchId from the Intent
-        matchId = getIntent().getLongExtra("MATCH_ID", -1); // Default value is -1 if not passed
+        // Retrieve match_id from Sharedpref
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        final long matchId = sharedPreferences.getLong("match_id", -1L); // -1 is the default value if match_id is not found
+
 
         Button backButton = findViewById(R.id.backButton);
         Button nextButton = findViewById(R.id.nextButton);
@@ -72,7 +75,7 @@ public class MatchInfoActivity extends AppCompatActivity {
 
                 // Proceed to the next activity if all inputs are valid
                 Intent intent = new Intent(MatchInfoActivity.this, TeamCreationActivity.class);
-                intent.putExtra("MATCH_ID", matchId);
+                //intent.putExtra("MATCH_ID", matchId);
                 startActivityWithClearTop(intent);
                 startActivity(intent);
             }
