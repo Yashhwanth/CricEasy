@@ -12,34 +12,39 @@ public class MatchesTableDBH extends SQLiteOpenHelper{
     private static final int DATABASE_VERSION = 3;
     // Table schema
     public static final String TABLE_NAME = "Matches";
-    public static final String COL_MATCH_ID = "match_id";
-    public static final String COL_TEAM_A = "team_a";
-    public static final String COL_TEAM_B = "team_b";
-    public static final String COL_MATCH_TYPE = "match_type";
-    public static final String COL_OVERS = "overs";
-    public static final String COL_BALL_TYPE = "ball_type";
-    public static final String COL_LOCATION = "location";
-    public static final String COL_DATE_TIME = "date_time";
-    public static final String COL_TOSS_WON_BY = "toss_won_by";
-    public static final String COL_TOSS_WON_TEAM_CHOOSER = "toss_won_team_choose_to";
-    public static final String COL_MATCH_WON_BY = "match_won_by";
-    public static final String COL_MATCH_RESULT = "match_result";
-    public static final String COL_IS_MATCH_COMPLETED = "is_match_completed";
+    public static final String COLUMN_MATCH_ID = "match_id";
+    public static final String COLUMN_TEAM_A = "team_a";
+    public static final String COLUMN_TEAM_B = "team_b";
+    public static final String COLUMN_MATCH_TYPE = "match_type";
+    public static final String COLUMN_OVERS = "overs";
+    public static final String COLUMN_BALL_TYPE = "ball_type";
+    public static final String COLUMN_LOCATION = "location";
+    public static final String COLUMN_DATE_TIME = "date_time";
+    public static final String COLUMN_TOSS = "toss";
+    public static final String COLUMN_IS_MATCH_COMPLETED = "is_match_completed";
+    public static final String COLUMN_MATCH_WON_BY = "match_won_by";
+    public static final String COLUMN_MATCH_RESULT = "match_result";
+
     // Create table SQL query
-    public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
-            COL_MATCH_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            COL_TEAM_A + " TEXT, " +
-            COL_TEAM_B + " TEXT, " +
-            COL_MATCH_TYPE + " TEXT, " +
-            COL_OVERS + " INTEGER, " +
-            COL_BALL_TYPE + " TEXT, " +
-            COL_LOCATION + " TEXT, " +
-            COL_DATE_TIME + " TEXT, " +
-            COL_TOSS_WON_BY + " TEXT, " +
-            COL_TOSS_WON_TEAM_CHOOSER + " TEXT, " +
-            COL_MATCH_WON_BY + " TEXT, " +
-            COL_MATCH_RESULT + " TEXT, " +
-            COL_IS_MATCH_COMPLETED + " INTEGER)";
+    public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " ("
+            + COLUMN_MATCH_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + COLUMN_TEAM_A + " INTEGER, "
+            + COLUMN_TEAM_B + " INTEGER, "
+            + COLUMN_MATCH_TYPE + " TEXT, "
+            + COLUMN_OVERS + " INTEGER, "
+            + COLUMN_BALL_TYPE + " TEXT, "
+            + COLUMN_LOCATION + " INTEGER, "
+            + COLUMN_DATE_TIME + " DATETIME, "
+            + COLUMN_TOSS + " INTEGER, "
+            + COLUMN_IS_MATCH_COMPLETED + " BOOLEAN, "
+            + COLUMN_MATCH_WON_BY + " INTEGER, "
+            + COLUMN_MATCH_RESULT + " TEXT, "
+            + "FOREIGN KEY(" + COLUMN_TEAM_A + ") REFERENCES Teams(id), "
+            + "FOREIGN KEY(" + COLUMN_TEAM_B + ") REFERENCES Teams(id), "
+            + "FOREIGN KEY(" + COLUMN_LOCATION + ") REFERENCES Places(id), "
+            + "FOREIGN KEY(" + COLUMN_TOSS + ") REFERENCES Toss(id), "
+            + "FOREIGN KEY(" + COLUMN_MATCH_WON_BY + ") REFERENCES Teams(id)"
+            + ")";
     // SQL to drop the old table
     private static final String DROP_OLD_TABLE_QUERY = "DROP TABLE IF EXISTS math_details";
     public MatchesTableDBH(Context context) {
@@ -69,21 +74,21 @@ public class MatchesTableDBH extends SQLiteOpenHelper{
     // Check if there is an ongoing match
     public Cursor getOngoingMatch() {
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery(" SELECT " + COL_MATCH_ID + " FROM " + TABLE_NAME + " WHERE " + COL_IS_MATCH_COMPLETED + "=0", null);
+        return db.rawQuery(" SELECT " + COLUMN_MATCH_ID + " FROM " + TABLE_NAME + " WHERE " + COLUMN_IS_MATCH_COMPLETED + "=0", null);
     }
 
     // Insert a new match if no ongoing match exists
     public long insertNewMatch() {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(COL_IS_MATCH_COMPLETED, 0); // Match is not completed initially
+        values.put(COLUMN_IS_MATCH_COMPLETED, 0); // Match is not completed initially
         long matchId = db.insert(TABLE_NAME, null, values);
         db.close();
         return matchId;
     }
 
     public static String getColumnId() {
-        return COL_MATCH_ID;
+        return COLUMN_MATCH_ID;
     }
 
     public boolean insertMatchBasicInfo1(long matchId, String matchType,
