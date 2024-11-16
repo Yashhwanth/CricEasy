@@ -20,6 +20,7 @@ public class BallsTableDBH extends SQLiteOpenHelper {
     private static final String COLUMN_STRIKER = "striker";
     private static final String COLUMN_NON_STRIKER = "non_striker";
     private static final String COLUMN_BOWLER = "bowler";
+    private static final String COLUMN_IS_SYNCED = "bowler";
 
     // SQL command to create the balls table
     private static final String CREATE_TABLE_BALLS = "CREATE TABLE " + TABLE_BALLS + " (" +
@@ -31,11 +32,13 @@ public class BallsTableDBH extends SQLiteOpenHelper {
             COLUMN_STRIKER + " INTEGER, " +
             COLUMN_NON_STRIKER + " INTEGER, " +
             COLUMN_BOWLER + " INTEGER, " +
+            COLUMN_IS_SYNCED + "INTEGER DEFAULT 0, " + // New column to track sync status (0 = not synced, 1 = synced)
             "FOREIGN KEY(" + COLUMN_OVER_ID + ") REFERENCES overs(over_id) ON DELETE CASCADE, " +
             "FOREIGN KEY(" + COLUMN_STRIKER + ") REFERENCES batsman(batsman_id) ON DELETE CASCADE, " +
             "FOREIGN KEY(" + COLUMN_NON_STRIKER + ") REFERENCES batsman(batsman_id) ON DELETE CASCADE, " +
             "FOREIGN KEY(" + COLUMN_BOWLER + ") REFERENCES bowlers(bowler_id) ON DELETE CASCADE" +
             ");";
+
 
     // Constructor
     public BallsTableDBH(Context context) {
