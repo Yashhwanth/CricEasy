@@ -5,6 +5,7 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,9 +13,11 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
 
+import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
 import com.cricketscoringapp.criceasy.Database.MatchesTableDBH;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -37,7 +40,7 @@ public class MatchInfoActivity extends AppCompatActivity {
     private EditText noOfOversEditText; // Added to get number of overs input
     private RadioGroup oversTypeRadioGroup; // Added to get match type selection
     private RadioGroup ballTypeRadioGroup; // Added to get ball type selection
-    private MatchesTableDBH databaseHelper; // Added DatabaseHelper instance
+    private DatabaseHelper databaseHelper; // Added DatabaseHelper instance
 
 
 
@@ -45,14 +48,17 @@ public class MatchInfoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_match_info);
 
         // Initialize DatabaseHelper
-        databaseHelper = new MatchesTableDBH(this); // Highlighted line added
+        databaseHelper = new DatabaseHelper(this); // Highlighted line added
 
         // Retrieve match_id from Sharedpref
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
         final long matchId = sharedPreferences.getLong("match_id", -1L); // -1 is the default value if match_id is not found
+        Log.d("DatabaseDebug", "Updating match with ID: " + matchId);
+
 
 
         Button backButton = findViewById(R.id.backButton);
@@ -226,6 +232,9 @@ public class MatchInfoActivity extends AppCompatActivity {
         // Use matchId that was already retrieved in onCreate
         // Default value for is_completed (0 means not completed)
         int isCompleted = 0;  // You can update this based on the match status
+
+        // Call the method to get the place_id (or insert if not found)
+        //long placeId = databaseHelper.getOrInsertPlaceId(place);
 
         // Call the function to save the match info to the database
         boolean isInserted = databaseHelper.insertMatchBasicInfo1(matchId, matchType, noOfOvers, ballType, place, dateTime, isCompleted);

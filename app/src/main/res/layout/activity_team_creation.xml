@@ -38,6 +38,7 @@
     <!-- VS Separator -->
 
     <!-- Select Team B Button -->
+
     <TextView
         android:id="@+id/txtVs"
         android:layout_width="wrap_content"
@@ -50,7 +51,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/linearLayoutA"
-        app:layout_constraintVertical_bias="0.069" />
+        app:layout_constraintVertical_bias="0.25" />
 
     <LinearLayout
         android:id="@+id/linearLayoutB"
@@ -60,7 +61,8 @@
         app:layout_constraintBottom_toBottomOf="@+id/bottomButtons"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.63">
 
         <ImageView
             android:id="@+id/imgAddTeamB"
@@ -112,5 +114,28 @@
             android:text="@string/next_button"
             android:onClick="goToNext"/>
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/textView22"
+        android:layout_width="58dp"
+        android:layout_height="23dp"
+        android:textColor="#673AB7"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.367" />
+
+    <TextView
+        android:id="@+id/textView23"
+        android:layout_width="70dp"
+        android:layout_height="29dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.758" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

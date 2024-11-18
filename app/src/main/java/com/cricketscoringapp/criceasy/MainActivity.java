@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
@@ -15,12 +17,13 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 
+import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
 import com.cricketscoringapp.criceasy.Database.MatchesTableDBH;
 
 public class MainActivity extends AppCompatActivity {
-    private MatchesTableDBH databaseHelper;
+    private DatabaseHelper databaseHelper;
     private long currentMatchId = -1;
-    private static final String PREFS_NAME = "MatchPrefs"; // SharedPreferences name
+    private static final String PREFS_NAME = "MatchPreferences"; // SharedPreferences name
     private static final String KEY_MATCH_ID = "match_id";  // Key to store match ID
 
 
@@ -32,7 +35,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Initialize database helper
-        databaseHelper = new MatchesTableDBH(this);
+        databaseHelper = new DatabaseHelper(this);
+
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -53,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
 
             // Proceed to the MatchInfoActivity
             Intent intent = new Intent(MainActivity.this, MatchInfoActivity.class);
-            //intent.putExtra("MATCH_ID", currentMatchId);
             startActivity(intent);
         });
     }
@@ -62,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             cursor = databaseHelper.getOngoingMatch();
             if (cursor != null && cursor.moveToFirst()) {
-                int matchIdIndex = cursor.getColumnIndex(MatchesTableDBH.getColumnId());
+                int matchIdIndex = cursor.getColumnIndex(DatabaseHelper.getColumnId());
                 if (matchIdIndex != -1) {
                     currentMatchId = cursor.getLong(matchIdIndex);
                     Toast.makeText(this, "Resuming existing match", Toast.LENGTH_SHORT).show();

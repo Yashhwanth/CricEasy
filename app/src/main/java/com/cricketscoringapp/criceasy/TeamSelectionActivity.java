@@ -1,6 +1,7 @@
 package com.cricketscoringapp.criceasy;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -8,23 +9,28 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
+
 public class TeamSelectionActivity extends AppCompatActivity {
     private long matchId;
     private EditText teamAEditText;
-    //private DatabaseHelper databaseHelper;
+    private DatabaseHelper databaseHelper;
     private String teamType; // To differentiate between Team A and Team B
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_team_selection); // Make sure this layout file exists4
 
-        // Initialize DatabaseHelper
-        //databaseHelper = new DatabaseHelper(this); // Highlighted line added
+        // Initialize SharedPreferences
+        sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
 
-        // Retrieve matchId from the Intent
-        matchId = getIntent().getLongExtra("MATCH_ID", -1); // Default value is -1 if not passed
-        teamType = getIntent().getStringExtra("TEAM_TYPE"); // "A" or "B"
+        // Initialize DatabaseHelper
+        databaseHelper = new DatabaseHelper(this); // Highlighted line added
+
+        // Retrieve team type from SharedPreferences
+        teamType = sharedPreferences.getString("TEAM_TYPE", "");
 
         //UI Components
         Button SubmitButton = findViewById(R.id.button);
@@ -33,7 +39,7 @@ public class TeamSelectionActivity extends AppCompatActivity {
 
         //UI Onclicks
         SubmitButton.setOnClickListener(v -> {
-            saveMatchInfoToDatabase();
+            saveTeamName();
             goback();
         });
     }
@@ -45,40 +51,28 @@ public class TeamSelectionActivity extends AppCompatActivity {
         finish(); // Close the current activity
     }
 
-    // Method to save match information into the database
-    private void saveMatchInfoToDatabase() { // Highlighted line added // Extract values from UI components
+    // Method to show a Toast message
+    private void showToast(String message) {
+        Toast.makeText(TeamSelectionActivity.this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private void saveTeamName() {
         String teamName = teamAEditText.getText().toString().trim();
-        // Validate input
+
         if (teamName.isEmpty()) {
             showToast("Please enter a team name.");
             return;
         }
 
-        // Use matchId that was already retrieved in onCreate
-        // Default value for is_completed (0 means not completed)
-        int isCompleted = 0;  // You can update this based on the match status
-
-        // Save the team name based on teamType (either "A" or "B")
-        boolean isInserted;
+        // Save team name based on teamType
+        SharedPreferences.Editor editor = sharedPreferences.edit();
         if ("A".equals(teamType)) {
-            //isInserted = databaseHelper.insertMatchBasicInfo2(matchId,
-                    //teamName, isCompleted);
+            editor.putString("A", teamName);
         } else if ("B".equals(teamType)) {
-            //isInserted = databaseHelper.insertMatchBasicInfo3(matchId,
-                     //teamName, isCompleted);
-        } else {
-            showToast("Invalid team type");
-            return;
+            editor.putString("B", teamName);
         }
+        editor.apply();
 
-        /*if (isInserted) {
-            showToast("Match Info Saved Successfully!");
-        } else {
-            showToast("Failed to Save Match Info.");
-        }*/
-    }
-    // Method to show a Toast message
-    private void showToast(String message) {
-        Toast.makeText(TeamSelectionActivity.this, message, Toast.LENGTH_SHORT).show();
+        showToast("Team name saved successfully!");
     }
 }

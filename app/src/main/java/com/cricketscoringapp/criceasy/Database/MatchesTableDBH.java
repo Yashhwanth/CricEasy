@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 
-public class MatchesTableDBH extends SQLiteOpenHelper{
+public class MatchesTableDBH {
     private static final String DATABASE_NAME = "cricket_match.db";
     private static final int DATABASE_VERSION = 3;
     // Table schema
@@ -47,39 +47,22 @@ public class MatchesTableDBH extends SQLiteOpenHelper{
             + ")";
     // SQL to drop the old table
     private static final String DROP_OLD_TABLE_QUERY = "DROP TABLE IF EXISTS math_details";
-    public MatchesTableDBH(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-    }
 
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
+    //@Override
+    public static void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE);
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-        // Check if the database version is being upgraded from version 1 to version 2
-        if (oldVersion < 3) {
-            db.execSQL(DROP_OLD_TABLE_QUERY);  // Drop the old table with the previous schema
-            onCreate(db); // Create the new table with the updated schema
-        }
-    }
-    @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        super.onDowngrade(db, oldVersion, newVersion);
-    }
-
     // Check if there is an ongoing match
-    public Cursor getOngoingMatch() {
-        SQLiteDatabase db = this.getReadableDatabase();
+    public Cursor getOngoingMatch(SQLiteDatabase db) {
+        //SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery(" SELECT " + COLUMN_MATCH_ID + " FROM " + TABLE_NAME + " WHERE " + COLUMN_IS_MATCH_COMPLETED + "=0", null);
     }
 
     // Insert a new match if no ongoing match exists
-    public long insertNewMatch() {
-        SQLiteDatabase db = this.getWritableDatabase();
+    public long insertNewMatch(SQLiteDatabase db) {
+        //SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_IS_MATCH_COMPLETED, 0); // Match is not completed initially
         long matchId = db.insert(TABLE_NAME, null, values);
@@ -91,11 +74,11 @@ public class MatchesTableDBH extends SQLiteOpenHelper{
         return COLUMN_MATCH_ID;
     }
 
-    public boolean insertMatchBasicInfo1(long matchId, String matchType,
+    public boolean insertMatchBasicInfo1(SQLiteDatabase db, long matchId, String matchType,
                                          String overs, String ballType, String place, String time,
                                          int isCompleted) {
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        //SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 
         // Insert match_id (this is always passed)
