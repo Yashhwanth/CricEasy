@@ -2,6 +2,7 @@ package com.cricketscoringapp.criceasy.Database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -9,8 +10,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 4; // Update version
     private static final String DATABASE_NAME = "CricketDB";
-
-
 
 
     // Table schema
@@ -410,5 +409,79 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Return the place_id (newly inserted)
         return placeId;
     }
+    public void addTeamNames(long match_id, String teamAName, String teamBName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction(); // Start a transaction for atomicity
+
+        try {
+            // Check if Team A exists, insert if not, and get its ID
+            long teamAId = getOrInsertTeam(db, teamAName);
+
+            // Check if Team B exists, insert if not, and get its ID
+            long teamBId = getOrInsertTeam(db, teamBName);
+
+            // Insert into Matches_Teams table
+            insertMatchTeamPair(db, match_id, teamAId);
+            insertMatchTeamPair(db, match_id, teamBId);
+
+            db.setTransactionSuccessful(); // Mark transaction as successful
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction(); // End the transaction
+            db.close(); // Close the database
+        }
+    }
+
+    // Helper method to check if a team exists or insert it and return the team ID
+    private long getOrInsertTeam(SQLiteDatabase db, String teamName) {
+        // Query to check if the team exists
+        String query = "SELECT " + COLUMN_TEAM_ID + " FROM " + TABLE_TEAMS + " WHERE " + COLUMN_TEAM_NAME + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{teamName});
+        long teamId = -1;
+
+        try {
+            if (cursor.moveToFirst()) {
+                // Check if COLUMN_TEAM_ID index is valid
+                int columnIndex = cursor.getColumnIndex(COLUMN_TEAM_ID);
+                if (columnIndex != -1) {
+                    teamId = cursor.getLong(columnIndex);
+                } else {
+                    throw new IllegalStateException("COLUMN_TEAM_ID does not exist in the result set.");
+                }
+            } else {
+                // Team does not exist, insert it
+                ContentValues values = new ContentValues();
+                values.put(COLUMN_TEAM_NAME, teamName);
+                teamId = db.insert(TABLE_TEAMS, null, values);
+            }
+        } finally {
+            cursor.close(); // Always close the cursor to avoid memory leaks
+        }
+
+        if (teamId == -1) {
+            throw new IllegalStateException("Failed to retrieve or insert team.");
+        }
+
+        return teamId;
+    }
+
+
+    // Helper method to insert match and team ID pair into Matches_Teams table
+    private void insertMatchTeamPair(SQLiteDatabase db, long matchId, long teamId) {
+        // Check if the pair already exists
+        String query = "SELECT 1 FROM " + TABLE_MATCHES_TEAMS + " WHERE " + COLUMN_MATCH_ID + " = ? AND " + COLUMN_TEAM_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(matchId), String.valueOf(teamId)});
+
+        if (!cursor.moveToFirst()) {
+            // Pair does not exist, insert it
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_MATCH_ID, matchId);
+            values.put(COLUMN_TEAM_ID, teamId);
+            db.insert(TABLE_MATCHES_TEAMS, null, values);
+        }
+        cursor.close();
+    }
+
 
 }

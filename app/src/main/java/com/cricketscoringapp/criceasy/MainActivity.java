@@ -23,7 +23,7 @@ import com.cricketscoringapp.criceasy.Database.MatchesTableDBH;
 public class MainActivity extends AppCompatActivity {
     private DatabaseHelper databaseHelper;
     private long currentMatchId = -1;
-    private static final String PREFS_NAME = "MatchPreferences"; // SharedPreferences name
+    private static final String PREFS_NAME = "match_prefs"; // SharedPreferences name
     private static final String KEY_MATCH_ID = "match_id";  // Key to store match ID
 
 

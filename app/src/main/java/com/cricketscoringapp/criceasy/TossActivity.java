@@ -40,8 +40,8 @@ public class TossActivity extends AppCompatActivity {
 
     public void back(View view) {
         // Navigate back to MatchInfoActivity
-        Intent intent = new Intent(this, TeamCreationActivity.class);
-        startActivity(intent);
+//        Intent intent = new Intent(this, TeamCreationActivity.class);
+//        startActivity(intent);
         //finish(); // Close the current activity
     }
 

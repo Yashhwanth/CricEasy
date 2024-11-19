@@ -9,15 +9,21 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
+
 public class TeamCreationActivity extends AppCompatActivity {
     private long matchId;
     private SharedPreferences sharedPreferences;
     private TextView team1TextView, team2TextView;
+    private DatabaseHelper databaseHelper; // Added DatabaseHelper instance
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_team_creation);
+
+        // Initialize DatabaseHelper
+        databaseHelper = new DatabaseHelper(this); // Highlighted line added
 
         // Initialize SharedPreferences
         sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
@@ -83,8 +89,17 @@ public class TeamCreationActivity extends AppCompatActivity {
     // Method to handle Next button click
     public void goToNext(View view) {
         // Navigate to TossActivity
+        validateTeamsAndSavetoDB();
         Intent intent = new Intent(this, TossActivity.class); // Replace with your next activity
         startActivity(intent);
+    }
+    public void validateTeamsAndSavetoDB(){
+        String team1Name = sharedPreferences.getString("A", null);
+        String team2Name = sharedPreferences.getString("B", null);
+        long match_id = sharedPreferences.getLong("match_id",-1);
+        if(team1Name != null && team2Name != null){
+            databaseHelper.addTeamNames(match_id,team1Name,team2Name);
+        }
     }
 
 }
