@@ -7,6 +7,7 @@ import android.database.Cursor;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private long currentMatchId = -1;
     private static final String PREFS_NAME = "match_prefs"; // SharedPreferences name
     private static final String KEY_MATCH_ID = "match_id";  // Key to store match ID
+    private static final String KEY_CURRENT_ACTIVITY = "current_activity"; // Key for current activity
 
 
 
@@ -33,6 +35,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
+
+
+        // Retrieve the last saved activity
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+
 
         // Initialize database helper
         databaseHelper = new DatabaseHelper(this);
@@ -44,6 +52,13 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        // Check if there's a current activity saved and navigate accordingly
+//        if (navigateToLastActivityIfOngoingMatch()) {
+//            return; // Skip MainActivity logic if navigating to the last activity
+//        }
+
+        updateCurrentActivityInPreferences();
+
         // Load saved match ID from SharedPreferences (if any)
         loadMatchIdFromPreferences();
 
@@ -51,19 +66,22 @@ public class MainActivity extends AppCompatActivity {
         Button newMatchButton = findViewById(R.id.newmatchbtn);
         newMatchButton.setOnClickListener(view ->{
             handleNewMatch();
-
             // Save the match ID to SharedPreferences after creating or resuming a match
             saveMatchIdToPreferences();
-
             // Proceed to the MatchInfoActivity
             Intent intent = new Intent(MainActivity.this, MatchInfoActivity.class);
             startActivity(intent);
         });
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Update current activity in SharedPreferences
+        updateCurrentActivityInPreferences();
+    }
     private void handleNewMatch() {
-        Cursor cursor = null;
-        try {
-            cursor = databaseHelper.getOngoingMatch();
+        try (Cursor cursor = databaseHelper.getOngoingMatch()) {
             if (cursor != null && cursor.moveToFirst()) {
                 int matchIdIndex = cursor.getColumnIndex(DatabaseHelper.getColumnId());
                 if (matchIdIndex != -1) {
@@ -74,11 +92,12 @@ public class MainActivity extends AppCompatActivity {
                 // No existing match, create a new one
                 createNewMatch();
             }
-        } finally {
-            if (cursor != null) {
-                cursor.close(); // Ensure cursor is closed to avoid memory leaks
-            }
+        }catch (Exception e) {
+            e.printStackTrace();
+            // Handle any potential exceptions (optional, for safety)
+            Toast.makeText(this, "Error handling match!", Toast.LENGTH_SHORT).show();
         }
+        // Ensure cursor is closed to avoid memory leaks
     }
 
     private void createNewMatch() {
@@ -101,4 +120,38 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         currentMatchId = sharedPreferences.getLong(KEY_MATCH_ID, -1);
     }
+    private void updateCurrentActivityInPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("current_activity", getClass().getSimpleName()); // Store the current activity name
+        editor.apply(); // Save changes asynchronously
+    }
+
+    private boolean navigateToLastActivityIfOngoingMatch() {
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        String lastActivity = sharedPreferences.getString(KEY_CURRENT_ACTIVITY, null);
+        long matchId = sharedPreferences.getLong(KEY_MATCH_ID, -1);
+
+        // Check if there's an ongoing match and a last activity
+        if (lastActivity != null && matchId != -1) {
+            try {
+                // Dynamically load the last activity class and navigate
+                Class<?> activityClass = Class.forName("com.cricketscoringapp.criceasy." + lastActivity);
+                Intent intent = new Intent(this, activityClass);
+                startActivity(intent);
+                finish(); // Close MainActivity
+                return true;
+            } catch (ClassNotFoundException e) {
+                // Use robust logging instead of printStackTrace
+                Log.e("MainActivity", "Error resuming last activity. Class not found: " + lastActivity, e);
+                Toast.makeText(this, "Error resuming last activity!", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Log.w("MainActivity", "No ongoing match or last activity not found.");
+        }
+
+        return false; // No navigation occurred
+    }
+
+
 }

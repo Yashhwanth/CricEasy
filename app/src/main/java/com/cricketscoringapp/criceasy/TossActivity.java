@@ -1,6 +1,7 @@
 package com.cricketscoringapp.criceasy;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -20,6 +21,7 @@ public class TossActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_toss); // Make sure this layout file exists
+        updateCurrentActivityInPreferences();
 
         coinImage = findViewById(R.id.img_coin);
         random = new Random();
@@ -30,6 +32,14 @@ public class TossActivity extends AppCompatActivity {
                 flipCoin();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Update current activity in SharedPreferences
+        updateCurrentActivityInPreferences();
     }
     public void letsplay(View view) {
         // Navigate back to MatchInfoActivity
@@ -68,5 +78,12 @@ public class TossActivity extends AppCompatActivity {
 
             isFlipping = false; // Reset flipping state
         }, 800); // Animation duration in milliseconds
+    }
+    // Method to update SharedPreferences with the current activity
+    private void updateCurrentActivityInPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("current_activity", getClass().getSimpleName()); // Store the current activity name
+        editor.apply(); // Save changes asynchronously
     }
 }

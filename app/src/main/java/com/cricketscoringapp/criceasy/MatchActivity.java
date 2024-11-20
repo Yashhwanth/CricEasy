@@ -1,6 +1,7 @@
 package com.cricketscoringapp.criceasy;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -14,6 +15,7 @@ public class MatchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_match); // Make sure this layout file exists
+        updateCurrentActivityInPreferences();
 
         btnLayout1 = findViewById(R.id.button5);
         btnLayout2 = findViewById(R.id.button6);
@@ -33,6 +35,13 @@ public class MatchActivity extends AppCompatActivity {
         btnLayout4.setOnClickListener(view -> showLayout(4));
         btnLayout5.setOnClickListener(view -> showLayout(5));
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Update current activity in SharedPreferences
+        updateCurrentActivityInPreferences();
     }
 
     public void info_page(View view) {
@@ -71,5 +80,12 @@ public class MatchActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ScoringActivity.class);
         startActivity(intent);
         //finish(); // Close the current activity
+    }
+
+    private void updateCurrentActivityInPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("current_activity", getClass().getSimpleName()); // Store the current activity name
+        editor.apply(); // Save changes asynchronously
     }
 }

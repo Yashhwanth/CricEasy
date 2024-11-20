@@ -50,6 +50,8 @@ public class MatchInfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_match_info);
+        updateCurrentActivityInPreferences();
+
 
         // Initialize DatabaseHelper
         databaseHelper = new DatabaseHelper(this); // Highlighted line added
@@ -57,7 +59,6 @@ public class MatchInfoActivity extends AppCompatActivity {
         // Retrieve match_id from Sharedpref
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
         final long matchId = sharedPreferences.getLong("match_id", -1L); // -1 is the default value if match_id is not found
-        Log.d("DatabaseDebug", "Updating match with ID: " + matchId);
 
 
 
@@ -81,7 +82,6 @@ public class MatchInfoActivity extends AppCompatActivity {
 
                 // Proceed to the next activity if all inputs are valid
                 Intent intent = new Intent(MatchInfoActivity.this, TeamCreationActivity.class);
-                //intent.putExtra("MATCH_ID", matchId);
                 startActivityWithClearTop(intent);
                 startActivity(intent);
             }
@@ -109,6 +109,12 @@ public class MatchInfoActivity extends AppCompatActivity {
         calendar = Calendar.getInstance();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Update current activity in SharedPreferences
+        updateCurrentActivityInPreferences();
+    }
 
     //clears the previous activity stack
     public void startActivityWithClearTop(Intent intent) {
@@ -277,5 +283,13 @@ public class MatchInfoActivity extends AppCompatActivity {
                 Toast.makeText(this, "Error: Unable to fetch location", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    // Method to update SharedPreferences with the current activity
+    private void updateCurrentActivityInPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("current_activity", getClass().getSimpleName()); // Store the current activity name
+        editor.apply(); // Save changes asynchronously
     }
 }

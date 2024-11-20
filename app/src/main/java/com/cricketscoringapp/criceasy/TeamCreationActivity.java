@@ -21,6 +21,8 @@ public class TeamCreationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_team_creation);
+        updateCurrentActivityInPreferences();
+
 
         // Initialize DatabaseHelper
         databaseHelper = new DatabaseHelper(this); // Highlighted line added
@@ -62,6 +64,8 @@ public class TeamCreationActivity extends AppCompatActivity {
         super.onResume();
         // Refresh team names when coming back from TeamSelectionActivity
         loadTeamNames();
+        // Update current activity in SharedPreferences
+        updateCurrentActivityInPreferences();
     }
 
     // Method to load team names from SharedPreferences
@@ -100,6 +104,12 @@ public class TeamCreationActivity extends AppCompatActivity {
         if(team1Name != null && team2Name != null){
             databaseHelper.addTeamNames(match_id,team1Name,team2Name);
         }
+    }
+    private void updateCurrentActivityInPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("current_activity", getClass().getSimpleName()); // Store the current activity name
+        editor.apply(); // Save changes asynchronously
     }
 
 }
