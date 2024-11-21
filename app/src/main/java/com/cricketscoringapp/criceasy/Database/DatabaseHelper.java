@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 4; // Update version
+    private static final int DATABASE_VERSION = 5; // Update version
     private static final String DATABASE_NAME = "CricketDB";
 
 
@@ -305,6 +305,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS Teams");
         db.execSQL("DROP TABLE IF EXISTS Places");
         db.execSQL("DROP TABLE IF EXISTS Toss");
+        db.execSQL("DROP TABLE IF EXISTS Matches_Teams");
+        db.execSQL("DROP TABLE IF EXISTS Players_Teams");
         db.execSQL("DROP TABLE IF EXISTS Players");
         db.execSQL("DROP TABLE IF EXISTS Partnerships");
         db.execSQL("DROP TABLE IF EXISTS Innings");
@@ -411,6 +413,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Return the place_id (newly inserted)
         return placeId;
     }
+
+
+
+
+
+    //                           ***TEAM CREATION PAGE ****
     public void addTeamNames(long match_id, String teamAName, String teamBName) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction(); // Start a transaction for atomicity
@@ -485,7 +493,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
     }
 
-
+    //                         *******TOSS PAGE METHODS********
     public void saveOrUpdateTossDetails(Context context, Long tossId, String teamCalling, String tossWinner, String tossDecision) {
         SQLiteDatabase db = this.getWritableDatabase();
         Log.d("DatabaseHelper", "Toss received with ID: " + tossId);
@@ -595,6 +603,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return -1; // If no team found or error occurred, return -1
     }
+
 
 
 

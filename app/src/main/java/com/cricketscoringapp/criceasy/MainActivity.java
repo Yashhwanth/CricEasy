@@ -37,9 +37,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-
         // Retrieve the last saved activity
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+
 
 
         // Initialize database helper
