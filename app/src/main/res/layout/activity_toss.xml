@@ -36,6 +36,8 @@
 
     <!-- Coin Image for Toss -->
 
+    <!-- Bottom Buttons -->
+
     <TextView
         android:id="@+id/tv_toss_winner"
         android:layout_width="wrap_content"
@@ -49,9 +51,7 @@
         app:layout_constraintHorizontal_bias="0.088"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.121" />
-
-    <!-- Bottom Buttons -->
+        app:layout_constraintVertical_bias="0.334" />
 
     <TextView
         android:id="@+id/tv_decision"
@@ -62,10 +62,10 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.092"
+        app:layout_constraintHorizontal_bias="0.142"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.402" />
+        app:layout_constraintVertical_bias="0.53" />
 
     <TextView
         android:id="@+id/tv_flip_coin"
@@ -109,7 +109,6 @@
         android:id="@+id/btn_play"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:onClick="letsplay"
         android:text="LET'S PLAY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -119,16 +118,16 @@
         app:layout_constraintVertical_bias="1.0" />
 
     <RadioGroup
-        android:id="@+id/radioGroup"
-        android:layout_width="274dp"
-        android:layout_height="151dp"
+        android:id="@+id/tossWinnerGroup"
+        android:layout_width="246dp"
+        android:layout_height="63dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.23000002">
+        app:layout_constraintVertical_bias="0.44">
 
         <RadioButton
             android:id="@+id/radioButton2"
@@ -140,6 +139,7 @@
             android:gravity="center"
             android:text="Team 1"
             android:textColor="@android:color/white"
+            android:tag="A"
             android:textSize="20sp" />
 
         <RadioButton
@@ -152,20 +152,21 @@
             android:gravity="center"
             android:text="Team 2"
             android:textColor="@android:color/white"
+            android:tag="B"
             android:textSize="20sp" />
     </RadioGroup>
 
     <RadioGroup
-        android:id="@+id/radioGroup1"
-        android:layout_width="274dp"
-        android:layout_height="151dp"
+        android:id="@+id/tossDecisionGroup"
+        android:layout_width="233dp"
+        android:layout_height="63dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.55">
+        app:layout_constraintVertical_bias="0.62">
 
         <RadioButton
             android:id="@+id/radioButton4"
@@ -177,6 +178,7 @@
             android:gravity="center"
             android:text="bat"
             android:textColor="@android:color/white"
+
             android:textSize="20sp" />
 
         <RadioButton
@@ -189,7 +191,55 @@
             android:gravity="center"
             android:text="bowl"
             android:textColor="@android:color/white"
+
             android:textSize="20sp" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/textView24"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="toss call by"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.062"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.129" />
+
+    <RadioGroup
+        android:id="@+id/teamCallingTossGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.46"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.213">
+
+        <RadioButton
+            android:id="@+id/radioButton11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/radio_button_selector"
+            android:button="@null"
+            android:gravity="center"
+            android:tag="A"
+            android:text="RadioButton" />
+
+        <RadioButton
+            android:id="@+id/radioButton12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/radio_button_selector"
+            android:button="@null"
+            android:gravity="center"
+            android:tag="B"
+            android:text="RadioButton" />
     </RadioGroup>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

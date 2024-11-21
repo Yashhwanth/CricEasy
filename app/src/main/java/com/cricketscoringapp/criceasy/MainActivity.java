@@ -52,11 +52,11 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Check if there's a current activity saved and navigate accordingly
+//        // Check if there's a current activity saved and navigate accordingly
 //        if (navigateToLastActivityIfOngoingMatch()) {
 //            return; // Skip MainActivity logic if navigating to the last activity
 //        }
-
+//
         updateCurrentActivityInPreferences();
 
         // Load saved match ID from SharedPreferences (if any)
