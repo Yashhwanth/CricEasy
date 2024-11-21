@@ -37,6 +37,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
+
+
+
+
         // Retrieve the last saved activity
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
 
@@ -44,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize database helper
         databaseHelper = new DatabaseHelper(this);
+
 
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {

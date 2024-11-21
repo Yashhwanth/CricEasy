@@ -422,13 +422,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void addTeamNames(long match_id, String teamAName, String teamBName) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction(); // Start a transaction for atomicity
-
         try {
             // Check if Team A exists, insert if not, and get its ID
             long teamAId = getOrInsertTeam(db, teamAName);
 
             // Check if Team B exists, insert if not, and get its ID
             long teamBId = getOrInsertTeam(db, teamBName);
+
+            // Ensure Matches_Teams table is clean for the given match_id
+            resetMatchTeams(db, match_id);
 
             // Insert into Matches_Teams table
             insertMatchTeamPair(db, match_id, teamAId);
@@ -442,14 +444,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close(); // Close the database
         }
     }
-
     // Helper method to check if a team exists or insert it and return the team ID
     private long getOrInsertTeam(SQLiteDatabase db, String teamName) {
         // Query to check if the team exists
         String query = "SELECT " + COLUMN_TEAM_ID + " FROM " + TABLE_TEAMS + " WHERE " + COLUMN_TEAM_NAME + " = ?";
         Cursor cursor = db.rawQuery(query, new String[]{teamName});
         long teamId = -1;
-
         try {
             if (cursor.moveToFirst()) {
                 // Check if COLUMN_TEAM_ID index is valid
@@ -468,30 +468,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } finally {
             cursor.close(); // Always close the cursor to avoid memory leaks
         }
-
         if (teamId == -1) {
             throw new IllegalStateException("Failed to retrieve or insert team.");
         }
-
         return teamId;
     }
 
+    // Helper method to reset Matches_Teams table for the given match ID
+    private void resetMatchTeams(SQLiteDatabase db, long matchId) {
+        // Delete all records for the current match ID in Matches_Teams
+        String whereClause = COLUMN_MATCH_ID + " = ?";
+        String[] whereArgs = {String.valueOf(matchId)};
+        db.delete(TABLE_MATCHES_TEAMS, whereClause, whereArgs);
+    }
 
     // Helper method to insert match and team ID pair into Matches_Teams table
     private void insertMatchTeamPair(SQLiteDatabase db, long matchId, long teamId) {
-        // Check if the pair already exists
-        String query = "SELECT 1 FROM " + TABLE_MATCHES_TEAMS + " WHERE " + COLUMN_MATCH_ID + " = ? AND " + COLUMN_TEAM_ID + " = ?";
-        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(matchId), String.valueOf(teamId)});
-
-        if (!cursor.moveToFirst()) {
-            // Pair does not exist, insert it
-            ContentValues values = new ContentValues();
-            values.put(COLUMN_MATCH_ID, matchId);
-            values.put(COLUMN_TEAM_ID, teamId);
-            db.insert(TABLE_MATCHES_TEAMS, null, values);
+        // Insert the pair into Matches_Teams
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_MATCH_ID, matchId);
+        values.put(COLUMN_TEAM_ID, teamId);
+        long result = db.insert(TABLE_MATCHES_TEAMS, null, values);
+        if (result == -1) {
+            throw new IllegalStateException("Failed to insert match-team pair for match_id=" + matchId + " and team_id=" + teamId);
         }
-        cursor.close();
     }
+
 
     //                         *******TOSS PAGE METHODS********
     public void saveOrUpdateTossDetails(Context context, Long tossId, String teamCalling, String tossWinner, String tossDecision) {
@@ -603,6 +605,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return -1; // If no team found or error occurred, return -1
     }
+
+
+
 
 
 
