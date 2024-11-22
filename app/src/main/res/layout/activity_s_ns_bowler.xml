@@ -47,7 +47,7 @@
             android:layout_width="match_parent"
             android:layout_height="121dp"
             android:contentDescription="Description of the image"
-            android:onClick="select_striker"
+            android:onClick="select_strike"
             app:srcCompat="@drawable/striker" />
 
         <TextView
@@ -73,7 +73,7 @@
             android:layout_width="wrap_content"
             android:layout_height="121dp"
             android:contentDescription="Description of the image"
-            android:onClick="select_striker"
+            android:onClick="select_strike"
             app:srcCompat="@drawable/nonstriker" />
 
         <TextView
@@ -111,7 +111,7 @@
             android:id="@+id/imageView3"
             android:layout_width="match_parent"
             android:layout_height="121dp"
-            android:onClick="select_striker"
+            android:onClick="select_strike"
             android:contentDescription="Description of the image"
             app:srcCompat="@drawable/ball" />
 
