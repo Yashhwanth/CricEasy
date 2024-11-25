@@ -65,7 +65,7 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
         //finish(); // Close the current activity
     }
 
-    public void lets_play(View view) {
+    public void lets_play() {
         // Navigate back to MatchInfoActivity
         Intent intent = new Intent(this, MatchActivity.class);
         startActivity(intent);
