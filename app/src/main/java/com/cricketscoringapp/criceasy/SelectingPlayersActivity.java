@@ -55,6 +55,8 @@ public class SelectingPlayersActivity extends AppCompatActivity {
         String bat_style = bat_style_button.getTag().toString();
         String bowl_style = bowl_style_button.getTag().toString();
 
+
+
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         String player_type = sharedPreferences.getString("player_type",null);

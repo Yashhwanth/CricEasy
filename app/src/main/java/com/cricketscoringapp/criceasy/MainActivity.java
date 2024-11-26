@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
 
 
-
         // Initialize database helper
         databaseHelper = new DatabaseHelper(this);
 

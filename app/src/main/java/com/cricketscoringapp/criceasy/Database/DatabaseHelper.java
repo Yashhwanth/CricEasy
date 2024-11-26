@@ -12,6 +12,8 @@ import android.util.Log;
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 5; // Update version
     private static final String DATABASE_NAME = "CricketDB";
+    private Context context;
+    private SharedPreferences sharedPreferences;
 
 
     // Table schema
@@ -280,6 +282,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Constructor
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
     }
 
     @Override
@@ -435,6 +438,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // Insert into Matches_Teams table
             insertMatchTeamPair(db, match_id, teamAId);
             insertMatchTeamPair(db, match_id, teamBId);
+
+            SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs",Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putLong("teamA_id", teamAId);
+            editor.putLong("teamB_id", teamBId);
+            editor.apply(); // Save team IDs for use in TossActivity
+
 
             db.setTransactionSuccessful(); // Mark transaction as successful
         } catch (Exception e) {
@@ -606,6 +616,92 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return -1; // If no team found or error occurred, return -1
     }
 
+    //                                           ****S,Ns,Bow PAGE METHODS *****
+    public void insertPlayer(String playerName, String playerRole, String battingStyle, String bowlingStyle, String playerType) {
+        // Get writable database instance
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Create a ContentValues object to store the player data
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_NAME, playerName);
+        contentValues.put(COLUMN_ROLE, playerRole);
+        contentValues.put(COLUMN_PLAYER_BATTING_STYLE, battingStyle);
+        contentValues.put(COLUMN_PLAYER_BOWLING_STYLE, bowlingStyle);
+
+        // Insert the data into the players table
+        long result = db.insert(TABLE_PLAYERS, null, contentValues);
+
+        // Check if the insertion was successful
+        if (result == -1) {
+            Log.e("DatabaseHelper", "Error inserting player into database");
+        } else {
+            // Player inserted successfully
+            Log.d("DatabaseHelper", "Player inserted successfully");
+
+            SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+
+            // Update the specific role
+            switch (playerType) {
+                case "striker":
+                    editor.putLong("striker_id", result);
+                    break;
+                case "non_striker":
+                    editor.putLong("non_striker_id", result);
+                    break;
+                case "bowler":
+                    editor.putLong("bowler_id", result);
+                    break;
+            }
+            editor.apply();
+        }
+        // Close the database connection
+        db.close();
+    }
+
+    //start first innings
+    public void startFirstInnings(long matchId, long battingTeamId) {
+
+        // Check if the necessary data is available
+        if (matchId == -1 || battingTeamId == -1) {
+            // Handle error: return or show a message that necessary data is missing
+            Log.e("DatabaseHelper", "Missing data for match or team in SharedPreferences");
+            return;
+        }
+
+        // Create a writable database
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        try {
+            // Insert a new row to start the first innings
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_INNINGS_NUMBER, 1); // First innings
+            values.put(COLUMN_MATCH_ID, matchId); // Match ID
+            values.put(COLUMN_TEAM_BATTING, battingTeamId); // Batting team ID
+            values.put(COLUMN_IS_COMPLETED, 0); // Incomplete innings
+
+            // Insert into the INNINGS table
+            long inningsId = db.insert(TABLE_INNINGS, null, values);
+
+            if (inningsId == -1) {
+                // Handle failure to insert
+                Log.e("DatabaseHelper", "Failed to start first innings.");
+            }else {
+                // Successfully inserted, store inningsId in SharedPreferences
+                SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs",Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putLong("Innings_id", inningsId); // Save inningsId in SharedPreferences
+                editor.apply(); // Commit changes
+                Log.d("DatabaseHelper", "First innings started with inningsId: " + inningsId);
+            }
+        } catch (Exception e) {
+            // Handle any exceptions
+            e.printStackTrace();
+        } finally {
+            // Close the database
+            db.close();
+        }
+    }
 
 
 

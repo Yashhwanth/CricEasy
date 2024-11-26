@@ -122,6 +122,24 @@ public class TossActivity extends AppCompatActivity {
         // Call the saveOrUpdateTossDetails method
         databaseHelper.saveOrUpdateTossDetails(this, tossId, teamCalling, tossWinner, tossDecision);
 
+        // Now determine the batting team based on the toss details
+        int battingTeam = determineBattingTeam(tossWinner, tossDecision);
+
+        // Retrieve team IDs from SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
+        long teamAId = sharedPreferences.getLong("teamA_id", -1);
+        long teamBId = sharedPreferences.getLong("teamB_id", -1);
+
+        // Update team1_id and team2_id based on the determined batting team
+        long battingTeamId = (battingTeam == 1) ? teamAId : teamBId;
+        long bowlingTeamId = (battingTeam == 1) ? teamBId : teamAId;
+
+        // Save the batting and bowling team IDs (update team1_id and team2_id accordingly)
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putLong("teamA_id", battingTeamId); // Batting team is always team1
+        editor.putLong("teamB_id", bowlingTeamId); // Bowling team is always team2
+        editor.apply();
+
 
         // Navigate back to MatchInfoActivity
         Intent intent = new Intent(this, SelectingSrNsBowActivity.class);
@@ -167,4 +185,28 @@ public class TossActivity extends AppCompatActivity {
         editor.putString("current_activity", getClass().getSimpleName()); // Store the current activity name
         editor.apply(); // Save changes asynchronously
     }
+
+    private int determineBattingTeam(String tossWinner, String tossDecision) {
+        // Retrieve team names from SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        String teamAName = sharedPreferences.getString("A", null);
+        String teamBName = sharedPreferences.getString("B", null);
+
+        // Determine the batting team based on the toss winner and decision
+        if (tossWinner.equals(teamAName)) {
+            if (tossDecision.equals("Bat")) {
+                return 1; // Team A is the batting team
+            } else {
+                return 2; // Team B is the batting team
+            }
+        } else if (tossWinner.equals(teamBName)) {
+            if (tossDecision.equals("Bat")) {
+                return 2; // Team B is the batting team
+            } else {
+                return 1; // Team A is the batting team
+            }
+        }
+        return -1; // In case of an error or invalid data
+    }
+
 }
