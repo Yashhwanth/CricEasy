@@ -55,6 +55,8 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
             if (validateInputs()) {
                 insertSNsBowl();
                 innings_table();
+                overs_table();
+                partnerships_table();
                 lets_play(); // Navigate to the scoring page
             }
         });
@@ -169,5 +171,21 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
         long matchId = sharedPreferences.getLong("match_id", -1); // Get the match ID from SharedPreferences
         long battingTeamId = sharedPreferences.getLong("teamA_id", -1); // Get the batting team ID (team1_id)
         databaseHelper.startFirstInnings(matchId, battingTeamId);
+    }
+
+    private void overs_table(){
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        long inningsId = sharedPreferences.getLong("Innings_id", -1);  // Get the innings ID from SharedPreferences
+        long bowlerId = sharedPreferences.getLong("bowler_id",-1);
+        databaseHelper.insertOver(inningsId, 1, bowlerId,0  );
+
+    }
+
+    private void partnerships_table(){
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+        long innings_id = sharedPreferences.getLong("Innings_id",-1);
+        long bat1_id = sharedPreferences.getLong("striker_id",-1);
+        long bat2_id = sharedPreferences.getLong("non_striker_id",-1);
+        databaseHelper.insertPartnership(innings_id,bat1_id, bat2_id, 0, 0);
     }
 }

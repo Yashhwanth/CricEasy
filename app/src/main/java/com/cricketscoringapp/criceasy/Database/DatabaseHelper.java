@@ -45,13 +45,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + COLUMN_IS_MATCH_COMPLETED + " INTEGER, "
             + COLUMN_MATCH_WON_BY + " INTEGER, "
             + COLUMN_MATCH_RESULT + " TEXT, "
-            + "FOREIGN KEY(" + COLUMN_LOCATION + ") REFERENCES Places("+ COLUMN_PLACE_ID + "), "
-            + "FOREIGN KEY(" + COLUMN_TOSS + ") REFERENCES Toss(" + COLUMN_TOSS_ID +"), "
+            + "FOREIGN KEY(" + COLUMN_LOCATION + ") REFERENCES Places(" + COLUMN_PLACE_ID + "), "
+            + "FOREIGN KEY(" + COLUMN_TOSS + ") REFERENCES Toss(" + COLUMN_TOSS_ID + "), "
             + "FOREIGN KEY(" + COLUMN_MATCH_WON_BY + ") REFERENCES Teams(" + COLUMN_TEAM_ID + ")"
             + ");";
-
-
-
 
 
     //Team Table
@@ -61,7 +58,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + COLUMN_TEAM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_TEAM_NAME + " TEXT NOT NULL "
             + ");";
-
 
 
     // Matches-Teams Table
@@ -79,7 +75,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     ");";
 
 
-
     // Places Table
     // Places table and column names
     public static final String TABLE_PLACES = "Places";
@@ -89,8 +84,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + COLUMN_PLACE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_PLACE_NAME + " TEXT NOT NULL UNIQUE"
             + ");";
-
-
 
 
     // Toss table and column names
@@ -108,8 +101,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + "FOREIGN KEY(" + COLUMN_TOSS_CALL_BY + ") REFERENCES Teams(" + COLUMN_TEAM_ID + "), "
             + "FOREIGN KEY(" + COLUMN_TOSS_WON_BY + ") REFERENCES Teams(" + COLUMN_TEAM_ID + ")"
             + ");";
-
-
 
 
     // Table Players
@@ -135,9 +126,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COLUMN_TEAM_ID + " INTEGER, " +
             COLUMN_PLAYER_ID + " INTEGER, " +
             "FOREIGN KEY (" + COLUMN_TEAM_ID + ") REFERENCES Teams(" + COLUMN_TEAM_ID + ") ON DELETE CASCADE," +
-            "FOREIGN KEY (" + COLUMN_PLAYER_ID + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE,"+
+            "FOREIGN KEY (" + COLUMN_PLAYER_ID + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE," +
             "PRIMARY KEY (" + COLUMN_TEAM_ID + "," + COLUMN_PLAYER_ID + "))";
-
 
 
     // Partnerships Table
@@ -157,12 +147,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COLUMN_BATSMAN2_ID + " INTEGER, " +
             COLUMN_RUNS + " INTEGER, " +
             COLUMN_BALLS + " INTEGER, " +
-            "FOREIGN KEY(" + COLUMN_INNINGS_ID + ") REFERENCES Innings(" +COLUMN_INNINGS_ID + ") ON DELETE CASCADE, " +
-            "FOREIGN KEY(" + COLUMN_BATSMAN1_ID + ") REFERENCES Players(" + COLUMN_PLAYER_ID+ ") ON DELETE CASCADE, " +
+            "FOREIGN KEY(" + COLUMN_INNINGS_ID + ") REFERENCES Innings(" + COLUMN_INNINGS_ID + ") ON DELETE CASCADE, " +
+            "FOREIGN KEY(" + COLUMN_BATSMAN1_ID + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE, " +
             "FOREIGN KEY(" + COLUMN_BATSMAN2_ID + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE" +
             ");";
-
-
 
 
     // Innings Table
@@ -183,7 +171,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ");";
 
 
-
     // Over Table
     private static final String TABLE_OVERS = "Overs";
     private static final String COLUMN_OVER_ID = "over_id";
@@ -200,7 +187,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "FOREIGN KEY(" + COLUMN_INNINGS_ID + ") REFERENCES Innings(" + COLUMN_INNINGS_ID + ") ON DELETE CASCADE, " +
             "FOREIGN KEY(" + COLUMN_PLAYER_ID + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE" +
             ");";
-
 
 
     // Balls Table
@@ -223,7 +209,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COLUMN_NON_STRIKER + " INTEGER, " +
             COLUMN_IS_SYNCED + "INTEGER DEFAULT 0, " + // New column to track sync status (0 = not synced, 1 = synced)
             "FOREIGN KEY(" + COLUMN_OVER_ID + ") REFERENCES Overs(" + COLUMN_OVER_ID + ") ON DELETE CASCADE, " +
-            "FOREIGN KEY(" + COLUMN_STRIKER + ") REFERENCES Players(" + COLUMN_PLAYER_ID+ ") ON DELETE CASCADE, " +
+            "FOREIGN KEY(" + COLUMN_STRIKER + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE, " +
             "FOREIGN KEY(" + COLUMN_NON_STRIKER + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE " +
             ");";
 
@@ -250,7 +236,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ");";
 
 
-
     // Extras Table
     private static final String TABLE_EXTRAS = "Extras";
     private static final String COLUMN_EXTRA_ID = "extra_id";
@@ -263,20 +248,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COLUMN_BALL_ID + " INTEGER, " +
             COLUMN_EXTRA_TYPE + " TEXT, " +
             COLUMN_EXTRA_RUNS + " INTEGER, " +
-            "FOREIGN KEY(" + COLUMN_BALL_ID + ") REFERENCES Balls(" + COLUMN_BALL_ID +") ON DELETE CASCADE" +
+            "FOREIGN KEY(" + COLUMN_BALL_ID + ") REFERENCES Balls(" + COLUMN_BALL_ID + ") ON DELETE CASCADE" +
             ");";
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     // Constructor
@@ -418,9 +391,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-
-
-
     //                           ***TEAM CREATION PAGE ****
     public void addTeamNames(long match_id, String teamAName, String teamBName) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -439,7 +409,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             insertMatchTeamPair(db, match_id, teamAId);
             insertMatchTeamPair(db, match_id, teamBId);
 
-            SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs",Context.MODE_PRIVATE);
+            SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putLong("teamA_id", teamAId);
             editor.putLong("teamB_id", teamBId);
@@ -454,6 +424,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close(); // Close the database
         }
     }
+
     // Helper method to check if a team exists or insert it and return the team ID
     private long getOrInsertTeam(SQLiteDatabase db, String teamName) {
         // Query to check if the team exists
@@ -582,7 +553,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-
     private int getTeamIdFromName(SQLiteDatabase db, String teamName) {
         Cursor cursor = null;
         try {
@@ -686,9 +656,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (inningsId == -1) {
                 // Handle failure to insert
                 Log.e("DatabaseHelper", "Failed to start first innings.");
-            }else {
+            } else {
                 // Successfully inserted, store inningsId in SharedPreferences
-                SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs",Context.MODE_PRIVATE);
+                SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putLong("Innings_id", inningsId); // Save inningsId in SharedPreferences
                 editor.apply(); // Commit changes
@@ -703,13 +673,63 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    public void insertOver(long inningsId, int over, long playerId, int isMaiden) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_INNINGS_ID, inningsId);
+            values.put(COLUMN_OVER, over);
+            values.put(COLUMN_PLAYER_ID, playerId);
+            values.put(COLUMN_IS_MAIDEN, isMaiden);
 
+            // Insert into the overs table
+            long over_id = db.insert(TABLE_OVERS, null, values);
+            if (over_id == -1) {
+                // Handle failure to insert
+                Log.e("DatabaseHelper", "Failed to start over");
+            } else {
+                SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putLong("over_id", over_id);
+                editor.apply();
+            }
+        } catch (Exception e) {
+            // Handle any exceptions
+            e.printStackTrace();
+        } finally {
+            // Close the database
+            db.close();
+        }
+    }
 
+    public void insertPartnership(long innings_id, long bat1_id, long bat2_id, int runs,int balls){
+        SQLiteDatabase db = this.getWritableDatabase();
+        try{
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_INNINGS_ID,innings_id);
+            values.put(COLUMN_BATSMAN1_ID,bat1_id);
+            values.put(COLUMN_BATSMAN2_ID,bat2_id);
+            values.put(COLUMN_RUNS,runs);
+            values.put(COLUMN_BALLS,balls);
 
-
-
-
+            long partnership_id = db.insert(TABLE_PARTNERSHIPS, null, values);
+            if (partnership_id == -1) {
+                // Handle failure to insert
+                Log.e("DatabaseHelper", "Failed to start over");
+            } else {
+                SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putLong("partnership_id", partnership_id);
+                editor.apply();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            db.close();
+        }
+    }
 }
+
 
 
 
