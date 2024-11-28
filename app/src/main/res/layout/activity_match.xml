@@ -20,7 +20,7 @@
         app:layout_constraintVertical_bias="0.88" />
 
     <TextView
-        android:id="@+id/textView11"
+        android:id="@+id/team1Name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TextView"
@@ -29,7 +29,7 @@
         app:layout_constraintHorizontal_bias="0.045"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.075" />
+        app:layout_constraintVertical_bias="0.082" />
 
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView"
@@ -40,7 +40,7 @@
         app:layout_constraintHorizontal_bias="0.461"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.13">
+        app:layout_constraintVertical_bias="0.26999998">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -87,8 +87,8 @@
 
     <FrameLayout
         android:id="@+id/frameLayout"
-        android:layout_width="361dp"
-        android:layout_height="526dp"
+        android:layout_width="365dp"
+        android:layout_height="439dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -102,31 +102,92 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
 
-        <include
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/lay1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
 
-            layout="@layout/activity_mp_info"
-            android:visibility="gone" />
+            />
 
-        <include
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/lay2"
-            layout="@layout/activity_mp_summary"
-            android:visibility="gone" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
-        <include
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/lay3"
-            layout="@layout/activity_mp_scorecard"
-            android:visibility="gone" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
-        <include
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/lay4"
-            layout="@layout/activity_mp_commentary"
-            android:visibility="gone" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
-        <include
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/lay5"
-            layout="@layout/activity_mp_teams"
-            android:visibility="gone" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
     </FrameLayout>
+
+    <TextView
+        android:id="@+id/team1Score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.045"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.12" />
+
+    <TextView
+        android:id="@+id/team1Overs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.249"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.119" />
+
+    <TextView
+        android:id="@+id/team2Name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.045"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.16" />
+
+    <TextView
+        android:id="@+id/team2Score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.045"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.198" />
+
+    <TextView
+        android:id="@+id/team2Overs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.249"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.198" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

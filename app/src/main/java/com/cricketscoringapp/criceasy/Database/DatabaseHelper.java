@@ -9,6 +9,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 5; // Update version
     private static final String DATABASE_NAME = "CricketDB";
@@ -728,6 +731,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
+
+
+
+    public Map<String, String> getMatchDetails(long matchId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Map<String, String> matchDetails = new HashMap<>();
+
+        // SQL query with JOIN to get the place name from the places table
+        String query = "SELECT m.match_type, m.overs, m.ball_type, p.place AS venue, m.date_time " +
+                "FROM Matches m " +
+                "INNER JOIN Places p ON m.location = p.place_id " +
+                "WHERE m.match_id = ?";
+        Log.d("SQLQuery", "Query: " + query);  // Log the query for debugging
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(matchId)});
+
+        if (cursor.moveToFirst()) {
+            matchDetails.put("match_type", cursor.getString(cursor.getColumnIndexOrThrow("match_type")));
+            matchDetails.put("overs", cursor.getString(cursor.getColumnIndexOrThrow("overs")));
+            matchDetails.put("ball_type", cursor.getString(cursor.getColumnIndexOrThrow("ball_type")));
+            matchDetails.put("venue", cursor.getString(cursor.getColumnIndexOrThrow("venue"))); // place name from places table
+            matchDetails.put("datetime", cursor.getString(cursor.getColumnIndexOrThrow("date_time")));
+        }else {
+            Log.d("SQLQuery", "No data found for matchId: " + matchId);  // Log if no data is found
+        }
+
+
+        cursor.close();
+        db.close();
+        Log.d("MatchDetails", "Fetched Match Details: " + matchDetails);  // Log the match details map
+
+        return matchDetails;
+    }
+
 }
 
 

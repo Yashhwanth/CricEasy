@@ -20,7 +20,12 @@
     <string name="select_team_a">Select Team A</string>
     <string name="select_team_b">Select Team B</string>
     <string name="versus">VS</string>
-
+    <string name="Teams">Teams</string>
+    <string name="matchtypeKey">Match Type : </string>
+    <string name="oversKey">Overs : </string>
+    <string name="balltypeKey">Ball Type : </string>
+    <string name="venueKey">Venue : </string>
+    <string name="dateKey">Time : </string>
 
 
 </resources>
