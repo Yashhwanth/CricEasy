@@ -46,6 +46,12 @@ public class InfoFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        populateData(); // Reload match details when fragment resumes
+    }
+
     private void populateData() {
         // Example: Retrieving data from SharedPreferences
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
@@ -53,35 +59,19 @@ public class InfoFragment extends Fragment {
         String team1 = sharedPreferences.getString("A", "Team 1");
         String team2 = sharedPreferences.getString("B", "Team 2");
         long matchId = sharedPreferences.getLong("match_id", -1);
-        Log.d("hiiiiiiii", "populateData: ");
-        // Update TextViews
-//        team1TextView.setText(team1);
-//        team2TextView.setText(team2);
+
 
         if (matchId != -1) {
             // Get match details using the helper function
             Map<String, String> matchDetails = databaseHelper.getMatchDetails(matchId);
-            Log.d("hiiiiiiiibiiiiii", "populateData: " + matchDetails);
             // Update UI with match details
             team1TextView.setText(team1);
             team2TextView.setText(team2);
-
             matchTypeTextView.setText(matchDetails.get("match_type"));
             oversTextView.setText(matchDetails.get("overs"));
             ballTypeTextView.setText(matchDetails.get("ball_type"));
             venueTextView.setText(matchDetails.get("venue"));
             dateTextView.setText(matchDetails.get("datetime"));
-        }else {
-            Log.d("hiiiiiiiibiiiiiihiiiiii", "populateData: " );
-            // Handle the case where matchId is invalid or not available
-            team1TextView.setText(team1);
-            team2TextView.setText(team2);
-
-            matchTypeTextView.setText("N/A");
-            oversTextView.setText("N/A");
-            ballTypeTextView.setText("N/A");
-            venueTextView.setText("N/A");
-            dateTextView.setText("N/A");
         }
     }
 }

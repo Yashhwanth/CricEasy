@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 5; // Update version
+    private static final int DATABASE_VERSION = 7; // Update version
     private static final String DATABASE_NAME = "CricketDB";
     private Context context;
     private SharedPreferences sharedPreferences;
@@ -255,6 +255,79 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ");";
 
 
+
+    //Batsmans table
+    private static final String TABLE_BATSMAN = "Batsmans";
+    // Batsman Table columns
+    private static final String COLUMN_PLAYER = "player";
+    private static final String COLUMN_SCORE = "score";
+    private static final String COLUMN_BALLS_PLAYED = "balls";
+    private static final String COLUMN_ZEROES = "zeroes";
+    private static final String COLUMN_ONES = "ones";
+    private static final String COLUMN_TWOS = "twos";
+    private static final String COLUMN_THREES = "threes";
+    private static final String COLUMN_FOURS = "bndry";
+    private static final String COLUMN_FIVES = "fives";
+    private static final String COLUMN_SIXES = "sixes";
+
+    String CREATE_BATSMAN_TABLE = "CREATE TABLE " + TABLE_BATSMAN + " (" +
+            COLUMN_PLAYER + " INTEGER, " +
+            COLUMN_INNINGS_ID + " INTEGER, " +
+            COLUMN_SCORE + " INTEGER DEFAULT 0, " +
+            COLUMN_BALLS_PLAYED + " INTEGER DEFAULT 0, " +
+            COLUMN_ZEROES + " INTEGER DEFAULT 0, " +
+            COLUMN_ONES + " INTEGER DEFAULT 0, " +
+            COLUMN_TWOS + " INTEGER DEFAULT 0, " +
+            COLUMN_THREES + " INTEGER DEFAULT 0, " +
+            COLUMN_FOURS + " INTEGER DEFAULT 0, " +
+            COLUMN_FIVES + " INTEGER DEFAULT 0, " +
+            COLUMN_SIXES + " INTEGER DEFAULT 0, " +
+            "PRIMARY KEY(" + COLUMN_PLAYER + ", " + COLUMN_INNINGS_ID + "), " +
+            "FOREIGN KEY (" + COLUMN_PLAYER + ") REFERENCES Players(player_id), " +
+            "FOREIGN KEY (" + COLUMN_INNINGS_ID + ") REFERENCES Innings(innings_id)" +
+            ")";
+
+
+    // Bowler table name
+    private static final String TABLE_BOWLER = "bowler";
+
+    // Bowler table columns
+    private static final String COLUMN_MAIDENS = "maidens";
+    private static final String COLUMN_ECONOMY = "economy";
+    private static final String COLUMN_WK = "wk";
+    private static final String COLUMN_BY = "bye";
+    private static final String COLUMN_LB = "lb";
+    private static final String COLUMN_WB = "wb";
+    private static final String COLUMN_NB = "nb";
+    private static final String COLUMN_DB = "db";
+
+    // SQL query to create the Bowler table
+    private static final String CREATE_TABLE_BOWLER = "CREATE TABLE " + TABLE_BOWLER + " ("
+            + COLUMN_PLAYER_ID + " INTEGER, "
+            + COLUMN_INNINGS_ID + " INTEGER, "
+            + COLUMN_PLAYER + " INTEGER, "
+            + COLUMN_MAIDENS + " INTEGER DEFAULT 0, "
+            + COLUMN_BALLS_PLAYED + " INTEGER DEFAULT 0, "
+            + COLUMN_RUNS + " INTEGER DEFAULT 0, "
+            + COLUMN_ECONOMY + " REAL DEFAULT 0, "
+            + COLUMN_ZEROES + " INTEGER DEFAULT 0, "
+            + COLUMN_ONES + " INTEGER DEFAULT 0, "
+            + COLUMN_TWOS + " INTEGER DEFAULT 0, "
+            + COLUMN_THREES + " INTEGER DEFAULT 0, "
+            + COLUMN_FOURS + " INTEGER DEFAULT 0, "
+            + COLUMN_FIVES + " INTEGER DEFAULT 0, "
+            + COLUMN_SIXES + " INTEGER DEFAULT 0, "
+            + COLUMN_WK + " INTEGER DEFAULT 0, "
+            + COLUMN_BY + " INTEGER DEFAULT 0, "
+            + COLUMN_LB + " INTEGER DEFAULT 0, "
+            + COLUMN_WB + " INTEGER DEFAULT 0, "
+            + COLUMN_NB + " INTEGER DEFAULT 0, "
+            + COLUMN_DB + " INTEGER DEFAULT 0, "
+            + "PRIMARY KEY(" + COLUMN_PLAYER + ", " + COLUMN_INNINGS_ID + "), "
+            + "FOREIGN KEY (" + COLUMN_PLAYER + ") REFERENCES Players(player_id), "
+            + "FOREIGN KEY (" + COLUMN_INNINGS_ID + ") REFERENCES Innings(innings_id));";
+
+
     // Constructor
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -276,6 +349,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_BALLS_TABLE);
         db.execSQL(CREATE_WICKETS_TABLE);
         db.execSQL(CREATE_EXTRAS_TABLE);
+        db.execSQL(CREATE_BATSMAN_TABLE);
+        db.execSQL(CREATE_TABLE_BOWLER);
     }
 
     @Override
@@ -293,7 +368,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS Balls");
         db.execSQL("DROP TABLE IF EXISTS Wickets");
         db.execSQL("DROP TABLE IF EXISTS Extras");
-        // Call onCreate to recreate the tables
         onCreate(db);
     }
 

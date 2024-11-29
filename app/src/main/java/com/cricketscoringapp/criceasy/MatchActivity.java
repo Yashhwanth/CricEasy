@@ -26,14 +26,14 @@ public class MatchActivity extends AppCompatActivity {
 
         // Set onClickListeners to show the corresponding fragments
         btnLayout1.setOnClickListener(view -> showFragment(new InfoFragment()));
-//        btnLayout2.setOnClickListener(view -> showFragment(new Fragment2()));
+        btnLayout2.setOnClickListener(view -> showFragment(new liveFragment()));
 //        btnLayout3.setOnClickListener(view -> showFragment(new Fragment3()));
 //        btnLayout4.setOnClickListener(view -> showFragment(new Fragment4()));
 //        btnLayout5.setOnClickListener(view -> showFragment(new Fragment5()));
 
         // Load the first fragment by default
         if (savedInstanceState == null) {
-            showFragment(new InfoFragment());
+            showFragment(new liveFragment());
         }
 
     }
