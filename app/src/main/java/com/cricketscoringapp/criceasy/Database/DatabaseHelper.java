@@ -665,9 +665,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return -1; // If no team found or error occurred, return -1
     }
 
+
+    //                                           ****S,Ns,Bow PAGE METHODS *****
     public void initializeBatsmanStats(long playerId, long inningsId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
+        Log.d("batter id check", "initializeBatsmanStats: " + playerId);
         values.put(COLUMN_PLAYER, playerId);
         values.put(COLUMN_INNINGS_ID, inningsId);
         values.put(COLUMN_SCORE, 0);
@@ -686,6 +689,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void initializeBowlerStats(long playerId, long inningsId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
+        Log.d("bowler id check", "initializeBowlerStats: " + playerId);
         values.put(COLUMN_PLAYER, playerId);
         values.put(COLUMN_INNINGS_ID, inningsId);
         values.put(COLUMN_MAIDENS, 0);
@@ -710,7 +714,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    //                                           ****S,Ns,Bow PAGE METHODS *****
+
     public void insertPlayer(String playerName, String playerRole, String battingStyle, String bowlingStyle, String playerType) {
         // Get writable database instance
         SQLiteDatabase db = this.getWritableDatabase();

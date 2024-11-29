@@ -19,7 +19,6 @@ public class liveFragment extends Fragment {
     // Declare the UI elements
     private TextView currentBattingTeamName;
     private TextView currentBattingScore;
-    private TextView currentOvers;
 
     // Batting stats for the current batsman
     private TextView batter1Name;
@@ -63,7 +62,6 @@ public class liveFragment extends Fragment {
         Log.d("LiveFragment", "currentBattingTeamName: " + currentBattingTeamName);
         currentBattingScore = view.findViewById(R.id.tv_batting_score);
         Log.d("LiveFragment", "currentBattingScore: " + currentBattingScore);
-        //currentOvers = view.findViewById(R.id.currentOvers);
 
         batter1Name = view.findViewById(R.id.tv_batter_1_name);
         batter1R = view.findViewById(R.id.tv_batter_1_runs);
@@ -89,7 +87,7 @@ public class liveFragment extends Fragment {
         runRate = view.findViewById(R.id.tv_run_rate);
         partnership = view.findViewById(R.id.tv_partnership_runs);
         // Load match details
-        //loadMatchDetails();
+        displayMatchResult();
         return view;
     }
 
@@ -99,7 +97,6 @@ public class liveFragment extends Fragment {
             // Show ongoing match details (current batting team, current batsman stats, etc.)
             currentBattingTeamName.setText("Team 1");
             currentBattingScore.setText("120/3");
-            currentOvers.setText("15.3");
 
             // Batting stats example
             batter1Name.setText("bat1");
@@ -146,7 +143,7 @@ public class liveFragment extends Fragment {
         // Example:
         currentBattingTeamName.setText("Match Completed");
         currentBattingScore.setText("250/8");
-        currentOvers.setText("50.0");
+
 
         // Add top batsmen and bowlers stats here
     }
