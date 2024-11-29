@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 7; // Update version
+    private static final int DATABASE_VERSION = 8; // Update version
     private static final String DATABASE_NAME = "CricketDB";
     private Context context;
     private SharedPreferences sharedPreferences;
@@ -289,7 +289,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     // Bowler table name
-    private static final String TABLE_BOWLER = "bowler";
+    private static final String TABLE_BOWLER = "Bowlers";
 
     // Bowler table columns
     private static final String COLUMN_MAIDENS = "maidens";
@@ -302,8 +302,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_DB = "db";
 
     // SQL query to create the Bowler table
-    private static final String CREATE_TABLE_BOWLER = "CREATE TABLE " + TABLE_BOWLER + " ("
-            + COLUMN_PLAYER_ID + " INTEGER, "
+    private static final String CREATE_BOWLER_TABLE = "CREATE TABLE " + TABLE_BOWLER + " ("
             + COLUMN_INNINGS_ID + " INTEGER, "
             + COLUMN_PLAYER + " INTEGER, "
             + COLUMN_MAIDENS + " INTEGER DEFAULT 0, "
@@ -350,7 +349,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_WICKETS_TABLE);
         db.execSQL(CREATE_EXTRAS_TABLE);
         db.execSQL(CREATE_BATSMAN_TABLE);
-        db.execSQL(CREATE_TABLE_BOWLER);
+        db.execSQL(CREATE_BOWLER_TABLE);
     }
 
     @Override
@@ -368,6 +367,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS Balls");
         db.execSQL("DROP TABLE IF EXISTS Wickets");
         db.execSQL("DROP TABLE IF EXISTS Extras");
+        db.execSQL("DROP TABLE IF EXISTS Batsmans");
+        db.execSQL("DROP TABLE IF EXISTS Bowlers");
         onCreate(db);
     }
 
@@ -561,6 +562,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Retrieve the ongoing match ID from SharedPreferences
         SharedPreferences prefs = context.getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
         long matchId = prefs.getLong("match_id", -1); // Default to -1 if not found
+        Log.d("match_id check", "saveOrUpdateTossDetails: " + matchId);
 
         if (matchId == -1) {
             Log.e("DatabaseHelper", "Match ID not found in SharedPreferences.");
@@ -662,6 +664,51 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return -1; // If no team found or error occurred, return -1
     }
+
+    public void initializeBatsmanStats(long playerId, long inningsId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_PLAYER, playerId);
+        values.put(COLUMN_INNINGS_ID, inningsId);
+        values.put(COLUMN_SCORE, 0);
+        values.put(COLUMN_BALLS_PLAYED, 0);
+        values.put(COLUMN_ZEROES, 0);
+        values.put(COLUMN_ONES, 0);
+        values.put(COLUMN_TWOS, 0);
+        values.put(COLUMN_THREES, 0);
+        values.put(COLUMN_FOURS, 0);
+        values.put(COLUMN_FIVES, 0);
+        values.put(COLUMN_SIXES, 0);
+
+        db.insert(TABLE_BATSMAN, null, values);
+    }
+
+    public void initializeBowlerStats(long playerId, long inningsId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_PLAYER, playerId);
+        values.put(COLUMN_INNINGS_ID, inningsId);
+        values.put(COLUMN_MAIDENS, 0);
+        values.put(COLUMN_BALLS_PLAYED, 0);
+        values.put(COLUMN_RUNS, 0);
+        values.put(COLUMN_ECONOMY, 0.0);
+        values.put(COLUMN_ZEROES, 0);
+        values.put(COLUMN_ONES, 0);
+        values.put(COLUMN_TWOS, 0);
+        values.put(COLUMN_THREES, 0);
+        values.put(COLUMN_FOURS, 0);
+        values.put(COLUMN_FIVES, 0);
+        values.put(COLUMN_SIXES, 0);
+        values.put(COLUMN_WK, 0);
+        values.put(COLUMN_BY, 0);
+        values.put(COLUMN_LB, 0);
+        values.put(COLUMN_WB, 0);
+        values.put(COLUMN_NB, 0);
+        values.put(COLUMN_DB, 0);
+
+        db.insert(TABLE_BOWLER, null, values);
+    }
+
 
     //                                           ****S,Ns,Bow PAGE METHODS *****
     public void insertPlayer(String playerName, String playerRole, String battingStyle, String bowlingStyle, String playerType) {

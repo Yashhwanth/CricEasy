@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -26,6 +27,7 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
+
 
         //UI
         ImageView striker_button = findViewById(R.id.imageView);
@@ -52,11 +54,17 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
         });
 
         start_scoring_button.setOnClickListener(view ->{
+            long str_id = sharedPreferences.getLong("striker_id",-1);
+            long n_str_id = sharedPreferences.getLong("non_striker_id",-1);
+            long bow_id = sharedPreferences.getLong("bowler_id",-1);
             if (validateInputs()) {
                 insertSNsBowl();
                 innings_table();
                 overs_table();
                 partnerships_table();
+                batsman_table(str_id, n_str_id);
+                bowler_table();
+                Log.d("players ids check", "onCreate: " + str_id + n_str_id);
                 lets_play(); // Navigate to the scoring page
             }
         });
@@ -187,5 +195,20 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
         long bat1_id = sharedPreferences.getLong("striker_id",-1);
         long bat2_id = sharedPreferences.getLong("non_striker_id",-1);
         databaseHelper.insertPartnership(innings_id,bat1_id, bat2_id, 0, 0);
+    }
+
+    private void batsman_table(long s_id, long ns_id){
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+        long innings_id = sharedPreferences.getLong("Innings_id",-1);
+        databaseHelper.initializeBatsmanStats(s_id,innings_id );
+        databaseHelper.initializeBatsmanStats(ns_id,innings_id );
+
+    }
+
+    private void bowler_table(){
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+        long bowler_id = sharedPreferences.getLong("bowler_id",-1);
+        long innings_id = sharedPreferences.getLong("Innings_id",-1);
+        databaseHelper.initializeBowlerStats(bowler_id,innings_id );
     }
 }

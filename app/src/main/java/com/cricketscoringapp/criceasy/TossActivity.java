@@ -122,6 +122,8 @@ public class TossActivity extends AppCompatActivity {
         // Call the saveOrUpdateTossDetails method
         databaseHelper.saveOrUpdateTossDetails(this, tossId, teamCalling, tossWinner, tossDecision);
 
+
+
         // Now determine the batting team based on the toss details
         int battingTeam = determineBattingTeam(tossWinner, tossDecision);
 

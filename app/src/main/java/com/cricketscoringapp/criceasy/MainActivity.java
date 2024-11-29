@@ -36,6 +36,11 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
+//        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.clear();
+//        editor.apply();
+
 
         // Initialize database helper
         databaseHelper = new DatabaseHelper(this);
@@ -109,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putLong(KEY_MATCH_ID, currentMatchId);
+        Log.d("match id check", "hi" + currentMatchId);
         editor.apply(); // Save changes asynchronously
     }
     //Load the match ID from SharedPreferences.
