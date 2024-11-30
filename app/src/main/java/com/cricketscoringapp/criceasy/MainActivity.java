@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -19,7 +18,6 @@ import androidx.core.view.WindowInsetsCompat;
 
 
 import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
-import com.cricketscoringapp.criceasy.Database.MatchesTableDBH;
 
 public class MainActivity extends AppCompatActivity {
     private DatabaseHelper databaseHelper;
