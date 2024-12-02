@@ -16,17 +16,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MatchActivity extends AppCompatActivity {
     private Button btnLayout1, btnLayout2, btnLayout3, btnLayout4, btnLayout5;
 
     private FloatingActionButton floatingbutton;
+    private DatabaseHelper databaseHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_match); // Make sure this layout file exists
         updateCurrentActivityInPreferences();
+
+        // Initialize the DatabaseHelper
+        databaseHelper = new DatabaseHelper(this);
 
 
         btnLayout1 = findViewById(R.id.button5);
@@ -165,6 +170,13 @@ public class MatchActivity extends AppCompatActivity {
         // Handle the run scoring logic here
         // For example, update the score or perform necessary action based on the button click
         // You can update the score or trigger any other logic required
-        Toast.makeText(this, "Runs scored: " + runs, Toast.LENGTH_SHORT).show();
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+        long over_id = sharedPreferences.getLong("over_id", -1);
+        String type_of_ball = "Legal";
+        int runs_scored = runs;
+        long striker = sharedPreferences.getLong("striker_id", -1);
+        long non_striker = sharedPreferences.getLong("striker_id", -1);
+        long ball_id = databaseHelper.insertBallData(over_id, type_of_ball, runs_scored, striker, non_striker);
+        Toast.makeText(this, "Runs scored: " + runs + ball_id, Toast.LENGTH_SHORT).show();
     }
 }

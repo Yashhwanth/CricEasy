@@ -889,6 +889,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return matchDetails;
     }
 
+    //ball table
+    public long insertBallData(long overId, String typeOfBall, int runs, long strikerId, long nonStrikerId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Create a ContentValues object to hold the values to be inserted
+        ContentValues contentValues = new ContentValues();
+
+        // Add the values to the ContentValues object
+        contentValues.put(COLUMN_OVER_ID, overId); // Get overId from SharedPreferences
+        contentValues.put(COLUMN_TYPE_OF_BALL, typeOfBall); // Set type of ball (all legal for now)
+        contentValues.put(COLUMN_RUNS, runs); // Runs scored on the ball
+        contentValues.put(COLUMN_IS_WICKET, 0);
+        contentValues.put(COLUMN_IS_WICKET, 0); // Wicket is false (0)
+        contentValues.put(COLUMN_STRIKER, strikerId); // Get striker ID from SharedPreferences
+        contentValues.put(COLUMN_NON_STRIKER, nonStrikerId); // Get non-striker ID from SharedPreferences
+
+        // Insert the data into the balls table
+        long ballId = db.insert(TABLE_BALLS, null, contentValues);
+
+        db.close(); // Close the database connection
+
+        // Return the ID of the inserted ball (auto-generated)
+        return ballId;
+    }
+
+
 }
 
 
