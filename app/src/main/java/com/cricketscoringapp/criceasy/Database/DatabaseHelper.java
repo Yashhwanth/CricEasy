@@ -1033,14 +1033,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             double newEconomy = 0.0;
             if (newBalls > 0) {
                 // Round newBalls / 6.0 to one decimal place
-                double overs = Math.round((newBalls / 6.0) * 10.0) / 10.0;
+                double overs = newBalls / 6.0 + (newBalls % 6) * 1.0 / 6.0;
                 newEconomy = newRuns / overs;
             }
 
-
-
-
 //            // Prepare SQL update query for bowler stats
+
             String updateQuery = "UPDATE " + TABLE_BOWLER +
                     " SET " +
                     COLUMN_RUNS + " = ?, " +

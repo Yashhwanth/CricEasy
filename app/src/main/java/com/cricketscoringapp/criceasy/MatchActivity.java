@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -70,7 +72,7 @@ public class MatchActivity extends AppCompatActivity {
     public void popup() {
         // Inflate the scoring layout
         View dialogView = getLayoutInflater().inflate(R.layout.activity_scoring, null);
-        Button btn_0, btn_1, btn_2, btn_3, btn_4, btn_5, btn_6;
+        Button btn_0, btn_1, btn_2, btn_3, btn_4, btn_5, btn_6, btn_bye, btn_leg_bye;
         btn_0 = dialogView.findViewById(R.id.button21);
         btn_1 = dialogView.findViewById(R.id.button22);
         btn_2 = dialogView.findViewById(R.id.button23);
@@ -78,6 +80,8 @@ public class MatchActivity extends AppCompatActivity {
         btn_4 = dialogView.findViewById(R.id.button19);
         btn_5 = dialogView.findViewById(R.id.button17);
         btn_6 = dialogView.findViewById(R.id.button18);
+        btn_bye = dialogView.findViewById(R.id.button9);
+        btn_leg_bye = dialogView.findViewById(R.id.button10);
 
 
         // Create the dialog
@@ -148,6 +152,16 @@ public class MatchActivity extends AppCompatActivity {
             dialog.dismiss(); // Dismiss the dialog after the action is performed
         });
 
+        // Handle Bye and Leg Bye buttons
+        btn_bye.setOnClickListener(view -> {
+            //dialog.dismiss();
+            showExtrasDialog("Bye", dialog);
+        });
+
+        btn_leg_bye.setOnClickListener(view -> {
+            //dialog.dismiss();
+            showExtrasDialog("Leg Bye", dialog);
+        });
     }
 
 
@@ -215,4 +229,46 @@ public class MatchActivity extends AppCompatActivity {
         editor.apply();
     }
 
+    private void showExtrasDialog(String ballType, AlertDialog parentDialog) {
+        // Inflate the extras dialog layout
+        View extrasDialogView = getLayoutInflater().inflate(R.layout.activity_dialog_for_extras, null);
+        EditText extraRunsInput = extrasDialogView.findViewById(R.id.extra_runs_input);
+        Button btnCancel = extrasDialogView.findViewById(R.id.btn_cancel);
+        Button btnSubmit = extrasDialogView.findViewById(R.id.btn_submit);
+
+        // Set the ball type label
+        TextView ballTypeLabel = extrasDialogView.findViewById(R.id.ball_type_label);
+        ballTypeLabel.setText(ballType);
+
+        // Create the extras dialog
+        AlertDialog.Builder extrasBuilder = new AlertDialog.Builder(this);
+        extrasBuilder.setView(extrasDialogView);
+        AlertDialog extrasDialog = extrasBuilder.create();
+        extrasDialog.show();
+
+        if (extrasDialog.getWindow() != null) {
+            extrasDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+
+        // Handle Cancel button
+        btnCancel.setOnClickListener(view -> {
+            extrasDialog.dismiss();
+            popup(); // Reopen the scoring dialog
+        });
+
+        // Handle Submit button
+        btnSubmit.setOnClickListener(view -> {
+            String extraRunsStr = extraRunsInput.getText().toString();
+            if (!extraRunsStr.isEmpty()) {
+                int extraRuns = Integer.parseInt(extraRunsStr);
+                // TODO: Handle database operation with extraRuns and ballType
+
+                Toast.makeText(this, ballType + " runs: " + extraRuns, Toast.LENGTH_SHORT).show();
+                extrasDialog.dismiss();
+                parentDialog.dismiss(); // Close the scoring popup
+            } else {
+                Toast.makeText(this, "Please enter the extra runs.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 }
