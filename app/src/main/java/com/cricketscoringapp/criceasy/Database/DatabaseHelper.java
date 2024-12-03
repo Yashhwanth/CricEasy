@@ -1038,11 +1038,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
 
 
-            // Prepare SQL update query for bowler stats
-            String updateQuery = "UPDATE " + TABLE_BOWLER +
-                    " SET " +
-                    COLUMN_RUNS + " = ?, " +
-                    COLUMN_BALLS_PLAYED + " = ?, ";
+//            // Prepare SQL update query for bowler stats
+//            String updateQuery = "UPDATE " + TABLE_BOWLER +
+//                    " SET " +
+//                    COLUMN_RUNS + " = ?, " +
+//                    COLUMN_BALLS_PLAYED + " = ?, ";
 
             // Update the run type columns (0s, 1s, 2s, etc.)
             switch (runs) {
