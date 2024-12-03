@@ -1032,17 +1032,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // Calculate the new economy: Runs / (Balls / 6.0)
             double newEconomy = 0.0;
             if (newBalls > 0) {
-                // Round the overs to one decimal place
-                double overs = Math.round(newBalls / 6.0 * 10.0) / 10.0;
+                // Round newBalls / 6.0 to one decimal place
+                double overs = Math.round((newBalls / 6.0) * 10.0) / 10.0;
                 newEconomy = newRuns / overs;
             }
 
 
+
+
 //            // Prepare SQL update query for bowler stats
-//            String updateQuery = "UPDATE " + TABLE_BOWLER +
-//                    " SET " +
-//                    COLUMN_RUNS + " = ?, " +
-//                    COLUMN_BALLS_PLAYED + " = ?, ";
+            String updateQuery = "UPDATE " + TABLE_BOWLER +
+                    " SET " +
+                    COLUMN_RUNS + " = ?, " +
+                    COLUMN_BALLS_PLAYED + " = ?, ";
 
             // Update the run type columns (0s, 1s, 2s, etc.)
             switch (runs) {
