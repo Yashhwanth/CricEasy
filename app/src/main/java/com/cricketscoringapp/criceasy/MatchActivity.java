@@ -171,12 +171,48 @@ public class MatchActivity extends AppCompatActivity {
         // For example, update the score or perform necessary action based on the button click
         // You can update the score or trigger any other logic required
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+        long innings_id = sharedPreferences.getLong("Innings_id",-1);
         long over_id = sharedPreferences.getLong("over_id", -1);
         String type_of_ball = "Legal";
         int runs_scored = runs;
         long striker = sharedPreferences.getLong("striker_id", -1);
-        long non_striker = sharedPreferences.getLong("striker_id", -1);
+        long non_striker = sharedPreferences.getLong("non_striker_id", -1);
+        long bowler = sharedPreferences.getLong("bowler_id",-1);
+        //insert ball data to balls table
         long ball_id = databaseHelper.insertBallData(over_id, type_of_ball, runs_scored, striker, non_striker);
+        //update the partnerships table
+        databaseHelper.updatePartnership(runs_scored, 1);
+        //rotating strike
+        rotateStrike(runs_scored);
+        //updating batters table
+        databaseHelper.updateBatsmanStats(innings_id, striker, runs_scored);
+        //updating bowlers table
+        databaseHelper.updateBowlerStats(innings_id, bowler, runs_scored);
         Toast.makeText(this, "Runs scored: " + runs + ball_id, Toast.LENGTH_SHORT).show();
     }
+
+    //striker rotating
+    private void rotateStrike(int runs) {
+        // Access the SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        // Retrieve current striker and non-striker IDs
+        long strikerId = sharedPreferences.getLong("striker_id", -1);
+        long nonStrikerId = sharedPreferences.getLong("non_striker_id", -1);
+
+        // Check if runs are odd
+        if (runs % 2 != 0) {
+            // Swap striker and non-striker
+            long temp = strikerId;
+            strikerId = nonStrikerId;
+            nonStrikerId = temp;
+        }
+
+        // Update the SharedPreferences with the new IDs
+        editor.putLong("striker_id", strikerId);
+        editor.putLong("non_striker_id", nonStrikerId);
+        editor.apply();
+    }
+
 }

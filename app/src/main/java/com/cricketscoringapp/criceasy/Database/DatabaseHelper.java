@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
 import java.util.HashMap;
@@ -889,7 +890,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return matchDetails;
     }
 
-    //ball table
+    //---------------------------------------------ball table------------------------------
     public long insertBallData(long overId, String typeOfBall, int runs, long strikerId, long nonStrikerId) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -913,6 +914,189 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Return the ID of the inserted ball (auto-generated)
         return ballId;
     }
+
+    //---------------------------------updating partnerships---------------------------------
+    public void updatePartnership(int runsScored, int ballsFaced) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
+
+        // Retrieve the partnership ID from shared preferences
+        long partnershipId = sharedPreferences.getLong("partnership_id", -1);
+
+        if (partnershipId == -1) {
+            Log.e("DatabaseHelper", "Partnership ID not found in SharedPreferences.");
+            return;
+        }
+
+        try {
+            // Prepare SQL update query
+            String query = "UPDATE " + TABLE_PARTNERSHIPS +
+                    " SET " + COLUMN_RUNS + " = " + COLUMN_RUNS + " + ?, " +
+                    COLUMN_BALLS + " = " + COLUMN_BALLS + " + ? " +
+                    "WHERE " + COLUMN_PARTNERSHIP_ID + " = ?";
+
+            // Execute update
+            db.execSQL(query, new Object[]{runsScored, ballsFaced, partnershipId});
+            Log.d("DatabaseHelper", "Partnership updated successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("DatabaseHelper", "Failed to update partnership.");
+        } finally {
+            db.close();
+        }
+    }
+
+    //--------------------------------------updating batsman score---------------------------
+    public void updateBatsmanStats(long innings_id, long player_id, int runs) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        try {
+            // Prepare SQL update query for batsman stats
+            String updateQuery = "UPDATE " + TABLE_BATSMAN +
+                    " SET " +
+                    COLUMN_SCORE + " = " + COLUMN_SCORE + " + ?, " +
+                    COLUMN_BALLS_PLAYED + " = " + COLUMN_BALLS_PLAYED + " + ?, ";
+
+            // Update the run type columns (0s, 1s, 2s, etc.)
+            switch (runs) {
+                case 0:
+                    updateQuery += COLUMN_ZEROES + " = " + COLUMN_ZEROES + " + 1 ";
+                    break;
+                case 1:
+                    updateQuery += COLUMN_ONES + " = " + COLUMN_ONES + " + 1 ";
+                    break;
+                case 2:
+                    updateQuery += COLUMN_TWOS + " = " + COLUMN_TWOS + " + 1 ";
+                    break;
+                case 3:
+                    updateQuery += COLUMN_THREES + " = " + COLUMN_THREES + " + 1 ";
+                    break;
+                case 4:
+                    updateQuery += COLUMN_FOURS + " = " + COLUMN_FOURS + " + 1 ";
+                    break;
+                case 5:
+                    updateQuery += COLUMN_FIVES + " = " + COLUMN_FIVES + " + 1 ";
+                    break;
+                case 6:
+                    updateQuery += COLUMN_SIXES + " = " + COLUMN_SIXES + " + 1 ";
+                    break;
+                default:
+                    return;  // Invalid run, do nothing
+            }
+
+
+
+            // Add WHERE condition to the query
+            updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+
+            // Execute the query
+            SQLiteStatement statement = db.compileStatement(updateQuery);
+            statement.bindLong(1, runs);  // Bind the runs value
+            statement.bindLong(2, 1);     // Bind the balls increment (1 for each ball played)
+            statement.bindLong(3, player_id);  // Bind player_id
+            statement.bindLong(4, innings_id);  // Bind innings_id
+
+            statement.executeUpdateDelete();  // Execute the update query
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.close();
+        }
+    }
+
+    //---------------------------------------- update bowlers stats-------------------------------
+    public void updateBowlerStats(long innings_id, long player_id, int runs) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        try {
+            // First, get the current stats for the bowler (runs, balls)
+            String getCurrentStatsQuery = "SELECT " + COLUMN_RUNS + ", " + COLUMN_BALLS_PLAYED + " FROM " + TABLE_BOWLER +
+                    " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+            Cursor cursor = db.rawQuery(getCurrentStatsQuery, new String[]{String.valueOf(player_id), String.valueOf(innings_id)});
+
+            int currentRuns = 0;
+            int currentBalls = 0;
+
+            if (cursor.moveToFirst()) {
+                currentRuns = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_RUNS));
+                currentBalls = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_BALLS_PLAYED));
+
+            }
+            cursor.close();
+
+            // Now, calculate the new runs and balls values
+            int newRuns = currentRuns + runs;
+            int newBalls = currentBalls + 1; // 1 ball is being played on each update
+
+            // Calculate the new economy: Runs / (Balls / 6.0)
+            double newEconomy = 0.0;
+            if (newBalls > 0) {
+                // Round the overs to one decimal place
+                double overs = Math.round(newBalls / 6.0 * 10.0) / 10.0;
+                newEconomy = newRuns / overs;
+            }
+
+
+            // Prepare SQL update query for bowler stats
+            String updateQuery = "UPDATE " + TABLE_BOWLER +
+                    " SET " +
+                    COLUMN_RUNS + " = ?, " +
+                    COLUMN_BALLS_PLAYED + " = ?, ";
+
+            // Update the run type columns (0s, 1s, 2s, etc.)
+            switch (runs) {
+                case 0:
+                    updateQuery += COLUMN_ZEROES + " = " + COLUMN_ZEROES + " + 1 ";
+                    break;
+                case 1:
+                    updateQuery += COLUMN_ONES + " = " + COLUMN_ONES + " + 1 ";
+                    break;
+                case 2:
+                    updateQuery += COLUMN_TWOS + " = " + COLUMN_TWOS + " + 1 ";
+                    break;
+                case 3:
+                    updateQuery += COLUMN_THREES + " = " + COLUMN_THREES + " + 1 ";
+                    break;
+                case 4:
+                    updateQuery += COLUMN_FOURS + " = " + COLUMN_FOURS + " + 1 ";
+                    break;
+                case 5:
+                    updateQuery += COLUMN_FIVES + " = " + COLUMN_FIVES + " + 1 ";
+                    break;
+                case 6:
+                    updateQuery += COLUMN_SIXES + " = " + COLUMN_SIXES + " + 1 ";
+                    break;
+                default:
+                    return;  // Invalid run, do nothing
+            }
+
+            // Add the economy update
+            updateQuery += ", " + COLUMN_ECONOMY + " = ? ";
+
+            // Add WHERE condition to the query
+            updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+
+            // Prepare the statement and bind values
+            SQLiteStatement statement = db.compileStatement(updateQuery);
+            statement.bindLong(1, newRuns); // Bind updated runs value
+            statement.bindLong(2, newBalls); // Bind updated balls value
+            statement.bindDouble(3, newEconomy); // Bind the newly calculated economy value
+            statement.bindLong(4, player_id);  // Bind player_id
+            statement.bindLong(5, innings_id);  // Bind innings_id
+
+            // Execute the update query
+            statement.executeUpdateDelete();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.close();
+        }
+    }
+
+
+
 
 
 }
