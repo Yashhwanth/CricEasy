@@ -901,7 +901,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_TYPE_OF_BALL, typeOfBall); // Set type of ball (all legal for now)
         contentValues.put(COLUMN_RUNS, runs); // Runs scored on the ball
         contentValues.put(COLUMN_IS_WICKET, 0);
-        contentValues.put(COLUMN_IS_WICKET, 0); // Wicket is false (0)
         contentValues.put(COLUMN_STRIKER, strikerId); // Get striker ID from SharedPreferences
         contentValues.put(COLUMN_NON_STRIKER, nonStrikerId); // Get non-striker ID from SharedPreferences
 
@@ -924,7 +923,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_TYPE_OF_BALL, typeOfBall); // Set type of ball (all legal for now)
         contentValues.put(COLUMN_RUNS, runs); // Runs scored on the ball
         contentValues.put(COLUMN_IS_WICKET, 0);
-        contentValues.put(COLUMN_IS_WICKET, 0); // Wicket is false (0)
         contentValues.put(COLUMN_STRIKER, strikerId); // Get striker ID from SharedPreferences
         contentValues.put(COLUMN_NON_STRIKER, nonStrikerId); // Get non-striker ID from SharedPreferences
 
@@ -936,6 +934,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Return the ID of the inserted ball (auto-generated)
         return ballId;
     }
+    public long insertBallDataForWide(long overId, int runs, long strikerId, long nonStrikerId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Create a ContentValues object to hold the values to be inserted
+        ContentValues contentValues = new ContentValues();
+
+        // Add the values to the ContentValues object
+        contentValues.put(COLUMN_OVER_ID, overId); // Get overId from SharedPreferences
+        contentValues.put(COLUMN_TYPE_OF_BALL, "Wide"); // Set type of ball (all legal for now)
+        contentValues.put(COLUMN_RUNS, runs + 1); // Runs scored on the ball
+        contentValues.put(COLUMN_IS_WICKET, 0);
+        contentValues.put(COLUMN_STRIKER, strikerId); // Get striker ID from SharedPreferences
+        contentValues.put(COLUMN_NON_STRIKER, nonStrikerId); // Get non-striker ID from SharedPreferences
+
+        // Insert the data into the balls table
+        long ballId = db.insert(TABLE_BALLS, null, contentValues);
+
+        db.close(); // Close the database connection
+
+        // Return the ID of the inserted ball (auto-generated)
+        return ballId;
+    }
+
 
     //---------------------------------updating partnerships---------------------------------
     public void updatePartnershipFor0to6(int runsScored, int ballsFaced) {
@@ -1171,7 +1192,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
-
     public void updateBowlerForByLBes(long innings_id, long player_id, String ballType) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -1208,6 +1228,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
+    public void updateBowlerForWide(long innings_id, long player_id, int wideRuns) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            // Prepare SQL update query for updating wide balls
+            String updateQuery = "UPDATE " + TABLE_BOWLER +
+                    " SET " + COLUMN_WB + " = " + COLUMN_WB + " + 1, " +
+                    COLUMN_RUNS + " = " + COLUMN_RUNS + " + ? " +
+                    " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+
+            // Compile the statement
+            SQLiteStatement statement = db.compileStatement(updateQuery);
+            statement.bindLong(1, wideRuns + 1);    // Bind the wide runs
+            statement.bindLong(2, player_id);  // Bind the bowler ID
+            statement.bindLong(3, innings_id); // Bind the innings ID
+
+            // Execute the update
+            statement.executeUpdateDelete();
+            Log.d("DatabaseHelper", "Bowler updated successfully for Wide.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("DatabaseHelper", "Failed to update bowler for Wide.");
+        } finally {
+            db.close();
+        }
+    }
+
 
     //------------------------------------update extra table------------------------------
     public void updateExtrasTable(long ball_id, String ball_type, int runs) {
@@ -1233,7 +1279,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 // Handle success, log or perform further actions
                 Log.d("updateExtrasTable", "Extra runs updated successfully for ball_id: " + ball_id);
             }
-        } else {
+        }else if(ball_type.equals("Wide")){
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_BALL_ID, ball_id);
+            values.put(COLUMN_EXTRA_TYPE, ball_type);
+            values.put(COLUMN_EXTRA_RUNS, runs + 1);
+            long result = db.insertWithOnConflict(TABLE_EXTRAS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+            if (result == -1) {
+                // Handle failure, maybe log an error
+                Log.e("updateExtrasTable", "Failed to insert or update extra runs");
+            } else {
+                // Handle success, log or perform further actions
+                Log.d("updateExtrasTable", "Extra runs updated successfully for ball_id: " + ball_id);
+            }
+        }else {
             // Handle invalid extra type (optional)
             Log.e("updateExtrasTable", "Invalid extra type: " + ball_type);
         }

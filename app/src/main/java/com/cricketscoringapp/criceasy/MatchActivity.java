@@ -249,7 +249,7 @@ public class MatchActivity extends AppCompatActivity {
                         handleScoringForByesAndLegByes(extraRuns, ballType);
                         break;
                     case "Wide":
-                        //handleScoringForWide(extraRuns, ballType);
+                        handleScoringForWide(extraRuns, ballType);
                         break;
                     case "No Ball":
                         //handleScoringForNoBall(extraRuns, ballType);
@@ -288,11 +288,22 @@ public class MatchActivity extends AppCompatActivity {
          long bowler_id = sharedPreferences.getLong("bowler_id", -1);
          long ball_id = databaseHelper.insertBallDataForByLByes(over_id, ballType, extraRuns, batsman_id, non_striker_id);
          databaseHelper.updateBatsmanForByLByes(innings_id, batsman_id);
-         rotateStrike(extraRuns);
          databaseHelper.updateBowlerForByLBes(innings_id, bowler_id, ballType);
          databaseHelper.updatePartnershipForByLByes(1);
          databaseHelper.updateExtrasTable(ball_id, ballType, extraRuns);
+         rotateStrike(extraRuns);
      }
+     private void handleScoringForWide(int extraRuns, String ballType){
+         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+         long innings_id = sharedPreferences.getLong("Innings_id", -1);
+         long over_id = sharedPreferences.getLong("over_id", -1);
+         long bowler_id = sharedPreferences.getLong("bowler_id", -1);
+         long batsman_id = sharedPreferences.getLong("striker_id", -1);
+         long non_striker_id = sharedPreferences.getLong("non_striker_id", -1);
+         long ball_id = databaseHelper.insertBallDataForWide(over_id, extraRuns, batsman_id, non_striker_id);
+         databaseHelper.updateBowlerForWide(innings_id, bowler_id, extraRuns);
+         databaseHelper.updateExtrasTable(ball_id, ballType, extraRuns);
 
+     }
 
 }
