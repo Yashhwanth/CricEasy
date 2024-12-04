@@ -27,6 +27,39 @@
 
     <!-- Buttons for Cancel and Submit -->
     <LinearLayout
+        android:id="@+id/source_of_runs_LL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioGroup
+            android:id="@+id/noballrg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radioButton25"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="from bat" />
+
+            <RadioButton
+                android:id="@+id/radioButton23"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="from leg bye" />
+
+            <RadioButton
+                android:id="@+id/radioButton24"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="from bye" />
+
+        </RadioGroup>
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="end"

@@ -9,6 +9,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,7 +72,7 @@ public class MatchActivity extends AppCompatActivity {
     public void popup() {
         // Inflate the scoring layout
         View dialogView = getLayoutInflater().inflate(R.layout.activity_scoring, null);
-        Button btn_0, btn_1, btn_2, btn_3, btn_4, btn_5, btn_6, btn_7, btn_8, btn_bye, btn_leg_bye;
+        Button btn_0, btn_1, btn_2, btn_3, btn_4, btn_5, btn_6, btn_7, btn_8, btn_bye, btn_leg_bye, btn_wide, btn_noball;
         btn_0 = dialogView.findViewById(R.id.button21);
         btn_1 = dialogView.findViewById(R.id.button22);
         btn_2 = dialogView.findViewById(R.id.button23);
@@ -83,6 +84,8 @@ public class MatchActivity extends AppCompatActivity {
         btn_8 = dialogView.findViewById(R.id.button16);
         btn_bye = dialogView.findViewById(R.id.button9);
         btn_leg_bye = dialogView.findViewById(R.id.button10);
+        btn_wide = dialogView.findViewById(R.id.button14);
+        btn_noball = dialogView.findViewById(R.id.button12);
 
 
         // Create the dialog
@@ -112,65 +115,54 @@ public class MatchActivity extends AppCompatActivity {
 
         // Set up OnClickListeners for the dialog buttons
         btn_0.setOnClickListener(view -> {
-            // Handle click for "0" button
             handleScoringFor0To6(0);
-            dialog.dismiss(); // Dismiss the dialog after the action is performed
+            dialog.dismiss();
         });
-        // Set up OnClickListeners for the dialog buttons
         btn_1.setOnClickListener(view -> {
-            // Handle click for "0" button
             handleScoringFor0To6(1);
-            dialog.dismiss(); // Dismiss the dialog after the action is performed
+            dialog.dismiss();
         });
-        // Set up OnClickListeners for the dialog buttons
         btn_2.setOnClickListener(view -> {
-            // Handle click for "0" button
             handleScoringFor0To6(2);
-            dialog.dismiss(); // Dismiss the dialog after the action is performed
+            dialog.dismiss();
         });
-        // Set up OnClickListeners for the dialog buttons
         btn_3.setOnClickListener(view -> {
-            // Handle click for "0" button
             handleScoringFor0To6(3);
-            dialog.dismiss(); // Dismiss the dialog after the action is performed
+            dialog.dismiss();
         });
-        // Set up OnClickListeners for the dialog buttons
         btn_4.setOnClickListener(view -> {
-            // Handle click for "0" button
             handleScoringFor0To6(4);
-            dialog.dismiss(); // Dismiss the dialog after the action is performed
+            dialog.dismiss();
         });
-        // Set up OnClickListeners for the dialog buttons
         btn_5.setOnClickListener(view -> {
-            // Handle click for "0" button
             handleScoringFor0To6(5);
-            dialog.dismiss(); // Dismiss the dialog after the action is performed
+            dialog.dismiss();
         });
-        // Set up OnClickListeners for the dialog buttons
         btn_6.setOnClickListener(view -> {
-            // Handle click for "0" button
             handleScoringFor0To6(6);
-            dialog.dismiss(); // Dismiss the dialog after the action is performed
+            dialog.dismiss();
         });
         btn_7.setOnClickListener(view -> {
-            // Handle click for "0" button
             handleScoringFor0To6(7);
-            dialog.dismiss(); // Dismiss the dialog after the action is performed
+            dialog.dismiss();
         });
         btn_8.setOnClickListener(view -> {
-            // Handle click for "0" button
             handleScoringFor0To6(8);
-            dialog.dismiss(); // Dismiss the dialog after the action is performed
+            dialog.dismiss();
         });
-
-        //Handle Bye and Leg Bye buttons
         btn_bye.setOnClickListener(view -> {
             showExtrasDialog("Bye", dialog);
         });
-
         btn_leg_bye.setOnClickListener(view -> {
             showExtrasDialog("Leg Bye", dialog);
         });
+        btn_wide.setOnClickListener(view -> {
+            showExtrasDialog("Wide", dialog);
+        });
+        btn_noball.setOnClickListener(view -> {
+            showExtrasDialog("No Ball", dialog);
+        });
+
     }
 
 
@@ -181,39 +173,12 @@ public class MatchActivity extends AppCompatActivity {
         transaction.addToBackStack(null); // Optionally, add the transaction to the back stack if you want to handle back navigation
         transaction.commit();
     }
-
     private void updateCurrentActivityInPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("current_activity", getClass().getSimpleName()); // Store the current activity name
         editor.apply(); // Save changes asynchronously
     }
-
-    private void handleScoringFor0To6(int runs) {
-        // Handle the run scoring logic here
-        // For example, update the score or perform necessary action based on the button click
-        // You can update the score or trigger any other logic required
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
-        long innings_id = sharedPreferences.getLong("Innings_id",-1);
-        long over_id = sharedPreferences.getLong("over_id", -1);
-        String type_of_ball = "Legal";
-        int runs_scored = runs;
-        long striker = sharedPreferences.getLong("striker_id", -1);
-        long non_striker = sharedPreferences.getLong("non_striker_id", -1);
-        long bowler = sharedPreferences.getLong("bowler_id",-1);
-        //insert ball data to balls table
-        long ball_id = databaseHelper.insertBallDataFor0To6(over_id, type_of_ball, runs_scored, striker, non_striker);
-        //update the partnerships table
-        databaseHelper.updatePartnershipFor0to6(runs_scored, 1);
-        //rotating strike
-        rotateStrike(runs_scored);
-        //updating batters table
-        databaseHelper.updateBatsmanStatsFor0To6(innings_id, striker, runs_scored);
-        //updating bowlers table
-        databaseHelper.updateBowlerStatsFor0to6(innings_id, bowler, runs_scored);
-        Toast.makeText(this, "Runs scored: " + runs + ball_id, Toast.LENGTH_SHORT).show();
-    }
-
     //striker rotating
     private void rotateStrike(int runs) {
         // Access the SharedPreferences
@@ -237,21 +202,20 @@ public class MatchActivity extends AppCompatActivity {
         editor.putLong("non_striker_id", nonStrikerId);
         editor.apply();
     }
-
     private void showExtrasDialog(String ballType, AlertDialog parentDialog) {
         // Inflate the extras dialog layout
         View extrasDialogView = getLayoutInflater().inflate(R.layout.activity_dialog_for_extras, null);
+        // Check if the ball type is "No Ball" and set radio group visibility accordingly
+
         EditText extraRunsInput = extrasDialogView.findViewById(R.id.extra_runs_input);
         Button btnCancel = extrasDialogView.findViewById(R.id.btn_cancel);
         Button btnSubmit = extrasDialogView.findViewById(R.id.btn_submit);
-
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
-        long innings_id = sharedPreferences.getLong("Innings_id", -1);
-        long over_id = sharedPreferences.getLong("over_id", -1);
-        long batsman_id = sharedPreferences.getLong("striker_id", -1);
-        long non_striker_id = sharedPreferences.getLong("non_striker_id", -1);
-        long bowler_id = sharedPreferences.getLong("bowler_id", -1);
-
+        RadioGroup radioGroup = extrasDialogView.findViewById(R.id.noballrg);
+        if ("No Ball".equals(ballType)) {
+            radioGroup.setVisibility(View.VISIBLE);  // Show radio group for No Ball
+        } else {
+            radioGroup.setVisibility(View.GONE);  // Hide radio group for other ball types
+        }
 
 
         // Set the ball type label
@@ -278,13 +242,19 @@ public class MatchActivity extends AppCompatActivity {
             String extraRunsStr = extraRunsInput.getText().toString();
             if (!extraRunsStr.isEmpty()) {
                 int extraRuns = Integer.parseInt(extraRunsStr);
-                // TODO: Handle database operation with extraRuns and ballType
-                long ball_id = databaseHelper.insertBallDataForByLByes(over_id, ballType, extraRuns, batsman_id, non_striker_id);
-                databaseHelper.updateBatsmanForByLByes(innings_id, batsman_id);
-                rotateStrike(extraRuns);
-                databaseHelper.updateBowlerForByLBes(innings_id, bowler_id, ballType);
-                databaseHelper.updatePartnershipForByLByes(1);
-                databaseHelper.updateExtrasTable(ball_id, ballType, extraRuns);
+                // Check the ball type and call the corresponding method
+                switch (ballType) {
+                    case "Bye":
+                    case "Leg Bye":
+                        handleScoringForByesAndLegByes(extraRuns, ballType);
+                        break;
+                    case "Wide":
+                        //handleScoringForWide(extraRuns, ballType);
+                        break;
+                    case "No Ball":
+                        //handleScoringForNoBall(extraRuns, ballType);
+                        break;
+                }
 
                 Toast.makeText(this, ballType + " runs: " + extraRuns, Toast.LENGTH_SHORT).show();
                 extrasDialog.dismiss();
@@ -294,4 +264,35 @@ public class MatchActivity extends AppCompatActivity {
             }
         });
     }
+    private void handleScoringFor0To6(int runs) {
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+        long innings_id = sharedPreferences.getLong("Innings_id",-1);
+        long over_id = sharedPreferences.getLong("over_id", -1);
+        String type_of_ball = "Legal";
+        long striker = sharedPreferences.getLong("striker_id", -1);
+        long non_striker = sharedPreferences.getLong("non_striker_id", -1);
+        long bowler = sharedPreferences.getLong("bowler_id",-1);
+        long ball_id = databaseHelper.insertBallDataFor0To6(over_id, type_of_ball, runs, striker, non_striker);
+        databaseHelper.updatePartnershipFor0to6(runs, 1);
+        rotateStrike(runs);
+        databaseHelper.updateBatsmanStatsFor0To6(innings_id, striker, runs);
+        databaseHelper.updateBowlerStatsFor0to6(innings_id, bowler, runs);
+        Toast.makeText(this, "Runs scored: " + runs + ball_id, Toast.LENGTH_SHORT).show();
+    }
+     private void handleScoringForByesAndLegByes(int extraRuns, String ballType) {
+         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+         long innings_id = sharedPreferences.getLong("Innings_id", -1);
+         long over_id = sharedPreferences.getLong("over_id", -1);
+         long batsman_id = sharedPreferences.getLong("striker_id", -1);
+         long non_striker_id = sharedPreferences.getLong("non_striker_id", -1);
+         long bowler_id = sharedPreferences.getLong("bowler_id", -1);
+         long ball_id = databaseHelper.insertBallDataForByLByes(over_id, ballType, extraRuns, batsman_id, non_striker_id);
+         databaseHelper.updateBatsmanForByLByes(innings_id, batsman_id);
+         rotateStrike(extraRuns);
+         databaseHelper.updateBowlerForByLBes(innings_id, bowler_id, ballType);
+         databaseHelper.updatePartnershipForByLByes(1);
+         databaseHelper.updateExtrasTable(ball_id, ballType, extraRuns);
+     }
+
+
 }
