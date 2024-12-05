@@ -328,6 +328,7 @@ public class MatchActivity extends AppCompatActivity {
                  databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "Bat");
                  long ball_id = databaseHelper.insertBallDataForNb(over_id, extraRuns, striker, non_striker_id);
                  databaseHelper.updateExtrasTable(ball_id, ballType, extraRuns);
+                 rotateStrike(extraRuns);
                  //call();
                  break;
              case "Lb":
@@ -336,6 +337,7 @@ public class MatchActivity extends AppCompatActivity {
                  databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "Bye");
                  long balll_id = databaseHelper.insertBallDataForNb(over_id, extraRuns, striker, non_striker_id);
                  databaseHelper.updateExtrasTable(balll_id, ballType, extraRuns);
+                 rotateStrike(extraRuns);
                  //call();
                  break;
              case "By":
@@ -344,6 +346,7 @@ public class MatchActivity extends AppCompatActivity {
                  databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "Leg Bye");
                  long ballll_id = databaseHelper.insertBallDataForNb(over_id, extraRuns, striker, non_striker_id);
                  databaseHelper.updateExtrasTable(ballll_id, ballType, extraRuns);
+                 rotateStrike(extraRuns);
                  //call();
                  break;
          }

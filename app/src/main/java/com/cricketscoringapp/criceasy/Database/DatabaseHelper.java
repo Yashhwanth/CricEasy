@@ -1154,7 +1154,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             // Prepare SQL update query for batsman balls played
             String updateQuery = "UPDATE " + TABLE_BATSMAN +
-                    " SET " + COLUMN_BALLS_PLAYED + " = " + COLUMN_BALLS_PLAYED + " + ? " +
+                    " SET " + COLUMN_BALLS_PLAYED + " = " + COLUMN_BALLS_PLAYED + " + ? ," +
+                    COLUMN_ZEROES + " = " + COLUMN_ZEROES + " + 1" +
                     " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
 
             // Execute the query
@@ -1177,8 +1178,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     " SET " + COLUMN_BALLS_PLAYED + " = " + COLUMN_BALLS_PLAYED + " + 0"; // No-ball does not increment balls played
 
             // Check run type
-            switch (runType.toLowerCase()) {
-                case "bat":
+            switch (runType) {
+                case "Bat":
                     // Add runs to score column
                     updateQuery += ", " + COLUMN_SCORE + " = " + COLUMN_SCORE + " + ?";
                     // Update the specific run type columns (0s, 1s, etc.)
@@ -1212,7 +1213,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 case "bye":
                 case "legbye":
                     // Add 1 run for the no-ball (extras) but do not update specific run type columns
-                    updateQuery += ", " + COLUMN_SCORE + " = " + COLUMN_SCORE + " + 1";
+                    updateQuery += ", " + COLUMN_SCORE + " = " + COLUMN_SCORE + " + 0";
                     break;
 
                 default:
@@ -1224,7 +1225,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             // Prepare the statement and bind values
             SQLiteStatement statement = db.compileStatement(updateQuery);
-            statement.bindLong(1, (runType.equals("bat") ? runs : 1)); // Bind runs (actual or extras)
+            statement.bindLong(1, (runType.equals("Bat") ? runs : 0)); // Bind runs (actual or extras)
             statement.bindLong(2, player_id);  // Bind player_id
             statement.bindLong(3, innings_id);  // Bind innings_id
             statement.executeUpdateDelete();  // Execute the update query
