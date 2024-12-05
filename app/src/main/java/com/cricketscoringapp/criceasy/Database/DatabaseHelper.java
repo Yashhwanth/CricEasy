@@ -956,6 +956,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Return the ID of the inserted ball (auto-generated)
         return ballId;
     }
+    public long insertBallDataForNb(long overId, int extraRuns, long strikerId, long nonStrikerId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        try {
+            // Calculate the total runs for the no-ball
+            int totalRuns = extraRuns + 1; // 1 run for the no-ball itself + additional runs
+
+            // Create a ContentValues object to hold the values to be inserted
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(COLUMN_OVER_ID, overId); // Over ID
+            contentValues.put(COLUMN_TYPE_OF_BALL, "No Ball"); // Type of ball set to "No Ball"
+            contentValues.put(COLUMN_RUNS, totalRuns); // Total runs for the no-ball
+            contentValues.put(COLUMN_IS_WICKET, 0); // No wicket for no-ball
+            contentValues.put(COLUMN_STRIKER, strikerId); // Striker ID
+            contentValues.put(COLUMN_NON_STRIKER, nonStrikerId); // Non-striker ID
+
+            // Insert the data into the balls table
+            long ballId = db.insert(TABLE_BALLS, null, contentValues);
+
+            Log.d("DatabaseHelper", "No Ball inserted successfully with ID: " + ballId);
+            return ballId; // Return the ID of the inserted ball (auto-generated)
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("DatabaseHelper", "Failed to insert No Ball data.");
+            return -1; // Indicate failure
+        } finally {
+            db.close(); // Close the database connection
+        }
+    }
+
 
 
     //---------------------------------updating partnerships---------------------------------
@@ -988,7 +1018,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
-
     public void updatePartnershipForByLByes(int ballsFaced) {
         SQLiteDatabase db = this.getWritableDatabase();
         SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
@@ -1022,6 +1051,45 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
+    public void updatePartnershipForNb(long partnershipId, int runsScored, String runType) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        if (partnershipId == -1) {
+            Log.e("DatabaseHelper", "Invalid Partnership ID.");
+            return;
+        }
+
+        try {
+            // Base SQL update query
+            String query = "UPDATE " + TABLE_PARTNERSHIPS + " SET ";
+
+            // Determine how to update based on the run type
+            if (runType.equals("Bat")) {
+                // Runs from the bat during a no-ball
+                query += COLUMN_RUNS + " = " + COLUMN_RUNS + " + ? ";
+            } else if (runType.equals("Bye") || runType.equalsIgnoreCase("legbye")) {
+                // No runs added for byes or leg-byes in partnerships table
+                Log.d("DatabaseHelper", "No runs added for run type: " + runType);
+                return;
+            } else if(runType.equals("Leg Bye")){
+                //Log.e("DatabaseHelper", "Invalid run type: " + runType);
+                return;
+            }
+
+            // Add WHERE condition to the query
+            query += " WHERE " + COLUMN_PARTNERSHIP_ID + " = ?";
+
+            // Execute the update query
+            db.execSQL(query, new Object[]{runsScored, partnershipId});
+            Log.d("DatabaseHelper", "Partnership updated successfully for no-ball run type: " + runType);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("DatabaseHelper", "Failed to update partnership for no-ball.");
+        } finally {
+            db.close();
+        }
+    }
+
 
 
     //--------------------------------------updating batsman score---------------------------
@@ -1033,7 +1101,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String updateQuery = "UPDATE " + TABLE_BATSMAN +
                     " SET " +
                     COLUMN_SCORE + " = " + COLUMN_SCORE + " + ?, " +
-                    COLUMN_BALLS_PLAYED + " = " + COLUMN_BALLS_PLAYED + " + ?, ";
+                    COLUMN_BALLS_PLAYED + " = " + COLUMN_BALLS_PLAYED + " + 1, ";
 
             // Update the run type columns (0s, 1s, 2s, etc.)
             switch (runs) {
@@ -1070,9 +1138,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // Execute the query
             SQLiteStatement statement = db.compileStatement(updateQuery);
             statement.bindLong(1, runs);  // Bind the runs value
-            statement.bindLong(2, 1);     // Bind the balls increment (1 for each ball played)
-            statement.bindLong(3, player_id);  // Bind player_id
-            statement.bindLong(4, innings_id);  // Bind innings_id
+            statement.bindLong(2, player_id);  // Bind player_id
+            statement.bindLong(3, innings_id);  // Bind innings_id
 
             statement.executeUpdateDelete();  // Execute the update query
 
@@ -1082,19 +1149,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
-
-    public void updateBatsmanForByLByes(long innings_id, long player_id) {
+    public void updateBatsmanForByLByes(long innings_id, long player_id, int balls) {
         SQLiteDatabase db = this.getWritableDatabase();
         try {
             // Prepare SQL update query for batsman balls played
             String updateQuery = "UPDATE " + TABLE_BATSMAN +
-                    " SET " + COLUMN_BALLS_PLAYED + " = " + COLUMN_BALLS_PLAYED + " + 1 " +
+                    " SET " + COLUMN_BALLS_PLAYED + " = " + COLUMN_BALLS_PLAYED + " + ? " +
                     " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
 
             // Execute the query
             SQLiteStatement statement = db.compileStatement(updateQuery);
-            statement.bindLong(1, player_id);  // Bind player_id
-            statement.bindLong(2, innings_id); // Bind innings_id
+            statement.bindLong(1, balls);  // Bind player_id
+            statement.bindLong(2, player_id); // Bind innings_id
+            statement.bindLong(3, innings_id); // Bind innings_id
             statement.executeUpdateDelete();   // Execute the update query
         } catch (Exception e) {
             e.printStackTrace();
@@ -1102,45 +1169,83 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
+    public void updateBatsmanStatsForNb(long innings_id, long player_id, int runs, String runType) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            // Base SQL update query for batsman stats
+            String updateQuery = "UPDATE " + TABLE_BATSMAN +
+                    " SET " + COLUMN_BALLS_PLAYED + " = " + COLUMN_BALLS_PLAYED + " + 0"; // No-ball does not increment balls played
+
+            // Check run type
+            switch (runType.toLowerCase()) {
+                case "bat":
+                    // Add runs to score column
+                    updateQuery += ", " + COLUMN_SCORE + " = " + COLUMN_SCORE + " + ?";
+                    // Update the specific run type columns (0s, 1s, etc.)
+                    switch (runs) {
+                        case 0:
+                            updateQuery += ", " + COLUMN_ZEROES + " = " + COLUMN_ZEROES + " + 1";
+                            break;
+                        case 1:
+                            updateQuery += ", " + COLUMN_ONES + " = " + COLUMN_ONES + " + 1";
+                            break;
+                        case 2:
+                            updateQuery += ", " + COLUMN_TWOS + " = " + COLUMN_TWOS + " + 1";
+                            break;
+                        case 3:
+                            updateQuery += ", " + COLUMN_THREES + " = " + COLUMN_THREES + " + 1";
+                            break;
+                        case 4:
+                            updateQuery += ", " + COLUMN_FOURS + " = " + COLUMN_FOURS + " + 1";
+                            break;
+                        case 5:
+                            updateQuery += ", " + COLUMN_FIVES + " = " + COLUMN_FIVES + " + 1";
+                            break;
+                        case 6:
+                            updateQuery += ", " + COLUMN_SIXES + " = " + COLUMN_SIXES + " + 1";
+                            break;
+                        default:
+                            return; // Invalid runs, do nothing
+                    }
+                    break;
+
+                case "bye":
+                case "legbye":
+                    // Add 1 run for the no-ball (extras) but do not update specific run type columns
+                    updateQuery += ", " + COLUMN_SCORE + " = " + COLUMN_SCORE + " + 1";
+                    break;
+
+                default:
+                    return; // Invalid run type, do nothing
+            }
+
+            // Add WHERE condition to the query
+            updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+
+            // Prepare the statement and bind values
+            SQLiteStatement statement = db.compileStatement(updateQuery);
+            statement.bindLong(1, (runType.equals("bat") ? runs : 1)); // Bind runs (actual or extras)
+            statement.bindLong(2, player_id);  // Bind player_id
+            statement.bindLong(3, innings_id);  // Bind innings_id
+            statement.executeUpdateDelete();  // Execute the update query
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.close();
+        }
+    }
+
+
 
     //---------------------------------------- update bowlers stats-------------------------------
     public void updateBowlerStatsFor0to6(long innings_id, long player_id, int runs) {
         SQLiteDatabase db = this.getWritableDatabase();
-
         try {
-            // First, get the current stats for the bowler (runs, balls)
-            String getCurrentStatsQuery = "SELECT " + COLUMN_RUNS + ", " + COLUMN_BALLS_PLAYED + " FROM " + TABLE_BOWLER +
-                    " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
-            Cursor cursor = db.rawQuery(getCurrentStatsQuery, new String[]{String.valueOf(player_id), String.valueOf(innings_id)});
-
-            int currentRuns = 0;
-            int currentBalls = 0;
-
-            if (cursor.moveToFirst()) {
-                currentRuns = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_RUNS));
-                currentBalls = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_BALLS_PLAYED));
-
-            }
-            cursor.close();
-
-            // Now, calculate the new runs and balls values
-            int newRuns = currentRuns + runs;
-            int newBalls = currentBalls + 1; // 1 ball is being played on each update
-
-            // Calculate the new economy: Runs / (Balls / 6.0)
-            double newEconomy = 0.0;
-            if (newBalls > 0) {
-                // Round newBalls / 6.0 to one decimal place
-                double overs = newBalls / 6.0 + (newBalls % 6) * 1.0 / 6.0;
-                newEconomy = newRuns / overs;
-            }
-
-//            // Prepare SQL update query for bowler stats
-
+            // Prepare SQL update query for bowler stats
             String updateQuery = "UPDATE " + TABLE_BOWLER +
                     " SET " +
-                    COLUMN_RUNS + " = ?, " +
-                    COLUMN_BALLS_PLAYED + " = ?, ";
+                    COLUMN_RUNS + " = " + COLUMN_RUNS + " + ?, " +
+                    COLUMN_BALLS_PLAYED + " = " + COLUMN_BALLS_PLAYED + " + 1, ";
 
             // Update the run type columns (0s, 1s, 2s, etc.)
             switch (runs) {
@@ -1166,26 +1271,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     updateQuery += COLUMN_SIXES + " = " + COLUMN_SIXES + " + 1 ";
                     break;
                 default:
-                    return;  // Invalid run, do nothing
+                    return; // Invalid run, do nothing
             }
-
-            // Add the economy update
-            updateQuery += ", " + COLUMN_ECONOMY + " = ? ";
 
             // Add WHERE condition to the query
             updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
 
-            // Prepare the statement and bind values
+            // Execute the query
             SQLiteStatement statement = db.compileStatement(updateQuery);
-            statement.bindLong(1, newRuns); // Bind updated runs value
-            statement.bindLong(2, newBalls); // Bind updated balls value
-            statement.bindDouble(3, newEconomy); // Bind the newly calculated economy value
-            statement.bindLong(4, player_id);  // Bind player_id
-            statement.bindLong(5, innings_id);  // Bind innings_id
-
-            // Execute the update query
-            statement.executeUpdateDelete();
-
+            statement.bindLong(1, runs);  // Bind the runs value
+            statement.bindLong(2, player_id);  // Bind player_id
+            statement.bindLong(3, innings_id);  // Bind innings_id
+            statement.executeUpdateDelete();  // Execute the update query
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -1239,7 +1336,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             // Compile the statement
             SQLiteStatement statement = db.compileStatement(updateQuery);
-            statement.bindLong(1, wideRuns + 1);    // Bind the wide runs
+            statement.bindLong(1, 1);    // Bind the wide runs
             statement.bindLong(2, player_id);  // Bind the bowler ID
             statement.bindLong(3, innings_id); // Bind the innings ID
 
@@ -1253,6 +1350,73 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
+    public void updateBowlerStatsForNb(long innings_id, long player_id, int runs, String runType) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            // Base SQL update query for bowler stats
+            String updateQuery = "UPDATE " + TABLE_BOWLER +
+                    " SET " +
+                    COLUMN_RUNS + " = " + COLUMN_RUNS + " + ?, " +  // Increment runs based on the type
+                    COLUMN_BALLS_PLAYED + " = " + COLUMN_BALLS_PLAYED + " + 0 ";  // No-ball does not increment balls played
+
+            // Check run type
+            switch (runType) {
+                case "Bat":
+                    // Add additional logic for runs from the bat
+                    switch (runs) {
+                        case 0:
+                            updateQuery += ", " + COLUMN_ZEROES + " = " + COLUMN_ZEROES + " + 1 ";
+                            break;
+                        case 1:
+                            updateQuery += ", " + COLUMN_ONES + " = " + COLUMN_ONES + " + 1 ";
+                            break;
+                        case 2:
+                            updateQuery += ", " + COLUMN_TWOS + " = " + COLUMN_TWOS + " + 1 ";
+                            break;
+                        case 3:
+                            updateQuery += ", " + COLUMN_THREES + " = " + COLUMN_THREES + " + 1 ";
+                            break;
+                        case 4:
+                            updateQuery += ", " + COLUMN_FOURS + " = " + COLUMN_FOURS + " + 1 ";
+                            break;
+                        case 5:
+                            updateQuery += ", " + COLUMN_FIVES + " = " + COLUMN_FIVES + " + 1 ";
+                            break;
+                        case 6:
+                            updateQuery += ", " + COLUMN_SIXES + " = " + COLUMN_SIXES + " + 1 ";
+                            break;
+                        default:
+                            return; // Invalid run, do nothing
+                    }
+                    break;
+
+                case "Bye":
+                case "Leg Bye":
+                    // No need to update specific run type columns for byes or leg byes
+                    // Increment runs by 1 for the no-ball
+                    break;
+
+                default:
+                    return; // Invalid run type, do nothing
+            }
+
+            // Add WHERE condition to the query
+            updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+
+            // Prepare the statement and bind values
+            SQLiteStatement statement = db.compileStatement(updateQuery);
+            statement.bindLong(1, (runType.equals("Bat") ? runs + 1 : 1));  // Bind runs or 1 based on run type
+            statement.bindLong(2, player_id);  // Bind player_id
+            statement.bindLong(3, innings_id);  // Bind innings_id
+            statement.executeUpdateDelete();  // Execute the update query
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.close();
+        }
+    }
+
+
 
 
     //------------------------------------update extra table------------------------------
@@ -1260,46 +1424,66 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Get writable database instance
         SQLiteDatabase db = this.getWritableDatabase();
 
-        // Check if the ball_type is valid for extras (e.g., 'wide', 'no-ball', 'by', 'lb')
-        if (ball_type.equals("Bye") || ball_type.equals("Leg Bye")) {
+        try {
             // Prepare the content values to insert or update
             ContentValues values = new ContentValues();
             values.put(COLUMN_BALL_ID, ball_id);
             values.put(COLUMN_EXTRA_TYPE, ball_type);
-            values.put(COLUMN_EXTRA_RUNS, runs);
 
-            // Insert the extra data into the EXTRAS table
-            long result = db.insertWithOnConflict(TABLE_EXTRAS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+            // Handle Bye and Leg Bye
+            if (ball_type.equals("Bye") || ball_type.equals("Leg Bye")) {
+                values.put(COLUMN_EXTRA_RUNS, runs);
 
-            // Check if the insert was successful
-            if (result == -1) {
-                // Handle failure, maybe log an error
-                Log.e("updateExtrasTable", "Failed to insert or update extra runs");
-            } else {
-                // Handle success, log or perform further actions
-                Log.d("updateExtrasTable", "Extra runs updated successfully for ball_id: " + ball_id);
+                // Insert the extra data into the EXTRAS table
+                long result = db.insertWithOnConflict(TABLE_EXTRAS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+                if (result == -1) {
+                    Log.e("updateExtrasTable", "Failed to insert or update extra runs for Bye/Leg Bye.");
+                } else {
+                    Log.d("updateExtrasTable", "Extra runs updated successfully for Bye/Leg Bye, ball_id: " + ball_id);
+                }
+
             }
-        }else if(ball_type.equals("Wide")){
-            ContentValues values = new ContentValues();
-            values.put(COLUMN_BALL_ID, ball_id);
-            values.put(COLUMN_EXTRA_TYPE, ball_type);
-            values.put(COLUMN_EXTRA_RUNS, runs + 1);
-            long result = db.insertWithOnConflict(TABLE_EXTRAS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
-            if (result == -1) {
-                // Handle failure, maybe log an error
-                Log.e("updateExtrasTable", "Failed to insert or update extra runs");
-            } else {
-                // Handle success, log or perform further actions
-                Log.d("updateExtrasTable", "Extra runs updated successfully for ball_id: " + ball_id);
+            // Handle Wide
+            else if (ball_type.equals("Wide")) {
+                values.put(COLUMN_EXTRA_RUNS, runs + 1); // Add 1 run for the wide ball itself
+
+                long result = db.insertWithOnConflict(TABLE_EXTRAS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+                if (result == -1) {
+                    Log.e("updateExtrasTable", "Failed to insert or update extra runs for Wide.");
+                } else {
+                    Log.d("updateExtrasTable", "Extra runs updated successfully for Wide, ball_id: " + ball_id);
+                }
+
             }
-        }else {
-            // Handle invalid extra type (optional)
-            Log.e("updateExtrasTable", "Invalid extra type: " + ball_type);
+            // Handle No Ball
+            else if (ball_type.equals("No Ball")) {
+                values.put(COLUMN_EXTRA_RUNS, runs + 1); // Add 1 run for the no-ball itself
+
+                long result = db.insertWithOnConflict(TABLE_EXTRAS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+                if (result == -1) {
+                    Log.e("updateExtrasTable", "Failed to insert or update extra runs for No Ball.");
+                } else {
+                    Log.d("updateExtrasTable", "Extra runs updated successfully for No Ball, ball_id: " + ball_id);
+                }
+
+            }
+            // Handle invalid extra type
+            else {
+                Log.e("updateExtrasTable", "Invalid extra type: " + ball_type);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("updateExtrasTable", "Error while updating extras table: " + e.getMessage());
+        } finally {
+            // Close the database connection
+            db.close();
         }
-
-        // Close the database connection
-        db.close();
     }
+
 
 
 

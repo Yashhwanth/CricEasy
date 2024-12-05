@@ -42,18 +42,21 @@
                 android:id="@+id/radioButton25"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:tag="Bat"
                 android:text="from bat" />
 
             <RadioButton
                 android:id="@+id/radioButton23"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:tag="Lb"
                 android:text="from leg bye" />
 
             <RadioButton
                 android:id="@+id/radioButton24"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:tag="By"
                 android:text="from bye" />
 
         </RadioGroup>

@@ -9,6 +9,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -240,6 +241,12 @@ public class MatchActivity extends AppCompatActivity {
         // Handle Submit button
         btnSubmit.setOnClickListener(view -> {
             String extraRunsStr = extraRunsInput.getText().toString();
+            int radioBtnId = radioGroup.getCheckedRadioButtonId(); // Get the selected RadioButton ID
+            String runFromWhat = null; // Variable to store the tag value
+            if (radioBtnId != -1) { // Check if a RadioButton is selected
+                RadioButton radioBtn = extrasDialogView.findViewById(radioBtnId);
+                runFromWhat = (String) radioBtn.getTag(); // Get the tag of the selected RadioButton
+            }
             if (!extraRunsStr.isEmpty()) {
                 int extraRuns = Integer.parseInt(extraRunsStr);
                 // Check the ball type and call the corresponding method
@@ -252,7 +259,7 @@ public class MatchActivity extends AppCompatActivity {
                         handleScoringForWide(extraRuns, ballType);
                         break;
                     case "No Ball":
-                        //handleScoringForNoBall(extraRuns, ballType);
+                        handleScoringForNoBall(extraRuns, ballType, runFromWhat);
                         break;
                 }
 
@@ -287,7 +294,7 @@ public class MatchActivity extends AppCompatActivity {
          long non_striker_id = sharedPreferences.getLong("non_striker_id", -1);
          long bowler_id = sharedPreferences.getLong("bowler_id", -1);
          long ball_id = databaseHelper.insertBallDataForByLByes(over_id, ballType, extraRuns, batsman_id, non_striker_id);
-         databaseHelper.updateBatsmanForByLByes(innings_id, batsman_id);
+         databaseHelper.updateBatsmanForByLByes(innings_id, batsman_id, 1);
          databaseHelper.updateBowlerForByLBes(innings_id, bowler_id, ballType);
          databaseHelper.updatePartnershipForByLByes(1);
          databaseHelper.updateExtrasTable(ball_id, ballType, extraRuns);
@@ -303,6 +310,43 @@ public class MatchActivity extends AppCompatActivity {
          long ball_id = databaseHelper.insertBallDataForWide(over_id, extraRuns, batsman_id, non_striker_id);
          databaseHelper.updateBowlerForWide(innings_id, bowler_id, extraRuns);
          databaseHelper.updateExtrasTable(ball_id, ballType, extraRuns);
+
+     }
+     private void handleScoringForNoBall(int extraRuns, String ballType, String runFromWhat){
+         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+         long innings_id = sharedPreferences.getLong("Innings_id", -1);
+         long over_id = sharedPreferences.getLong("over_id", -1);
+         long bowler_id = sharedPreferences.getLong("bowler_id", -1);
+         long striker = sharedPreferences.getLong("striker_id", -1);
+         long non_striker_id = sharedPreferences.getLong("non_striker_id", -1);
+         long partnership_id = sharedPreferences.getLong("partnership_id", -1);
+         switch (runFromWhat){
+
+             case "Bat":
+                 databaseHelper.updateBatsmanStatsForNb(innings_id, striker, extraRuns, "Bat");
+                 databaseHelper.updateBowlerStatsForNb(innings_id, bowler_id, extraRuns, "Bat");
+                 databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "Bat");
+                 long ball_id = databaseHelper.insertBallDataForNb(over_id, extraRuns, striker, non_striker_id);
+                 databaseHelper.updateExtrasTable(ball_id, ballType, extraRuns);
+                 //call();
+                 break;
+             case "Lb":
+                 databaseHelper.updateBatsmanStatsForNb(innings_id, striker, extraRuns, "Bye");
+                 databaseHelper.updateBowlerStatsForNb(innings_id, bowler_id, extraRuns, "Bye");
+                 databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "Bye");
+                 long balll_id = databaseHelper.insertBallDataForNb(over_id, extraRuns, striker, non_striker_id);
+                 databaseHelper.updateExtrasTable(balll_id, ballType, extraRuns);
+                 //call();
+                 break;
+             case "By":
+                 databaseHelper.updateBatsmanStatsForNb(innings_id, striker, extraRuns, "Leg Bye");
+                 databaseHelper.updateBowlerStatsForNb(innings_id, bowler_id, extraRuns, "Leg Bye");
+                 databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "Leg Bye");
+                 long ballll_id = databaseHelper.insertBallDataForNb(over_id, extraRuns, striker, non_striker_id);
+                 databaseHelper.updateExtrasTable(ballll_id, ballType, extraRuns);
+                 //call();
+                 break;
+         }
 
      }
 
