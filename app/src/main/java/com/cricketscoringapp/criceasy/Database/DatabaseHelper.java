@@ -1419,7 +1419,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
 
-
     //------------------------------------update extra table------------------------------
     public void updateExtrasTable(long ball_id, String ball_type, int runs) {
         // Get writable database instance

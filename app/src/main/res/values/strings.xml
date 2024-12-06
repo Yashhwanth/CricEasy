@@ -26,6 +26,33 @@
     <string name="balltypeKey">Ball Type : </string>
     <string name="venueKey">Venue : </string>
     <string name="dateKey">Time : </string>
+    <string name="wicket_type">Type of Dismissal</string>
+    <string name="bowled_rb">Bowled </string>
+    <string name="caught_rb">Caught</string>
+    <string name="run_out_rb">Run-Out</string>
+    <string name="stumped_rb">Stumped</string>
+    <string name="lbw_rb">LBW</string>
+    <string name="runs_in_wicket">Runs Scored in Wicket</string>
+    <string name="runs_input">Enter Runs</string>
+    <string name="type_of_ball">Type of delivery</string>
+    <string name="normal_ball">Normal</string>
+    <string name="bye_leg_ball">By / Lb</string>
+    <string name="wide_ball">Wide</string>
+    <string name="no_ball">No_ball</string>
+    <string name="no_ball_bat">From Bat</string>
+    <string name="no_ball_by_lby">From by/lb</string>
+    <string name="out_batsman">Out Batsman</string>
+    <string name="striker_out">Striker</string>
+    <string name="non_striker_out">Non-Striker</string>
+    <string name="out_end">Out-End</string>
+    <string name="striker_end">Striker end</string>
+    <string name="non_striker_end">Non-striker end</string>
+    <string name="submit">Submit</string>
+    <string name="cancel">Cancel</string>
+
+
+
+
 
 
 </resources>

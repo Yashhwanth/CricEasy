@@ -73,7 +73,7 @@ public class MatchActivity extends AppCompatActivity {
     public void popup() {
         // Inflate the scoring layout
         View dialogView = getLayoutInflater().inflate(R.layout.activity_scoring, null);
-        Button btn_0, btn_1, btn_2, btn_3, btn_4, btn_5, btn_6, btn_7, btn_8, btn_bye, btn_leg_bye, btn_wide, btn_noball;
+        Button btn_0, btn_1, btn_2, btn_3, btn_4, btn_5, btn_6, btn_7, btn_8, btn_bye, btn_leg_bye, btn_wide, btn_noball, btn_wicket;
         btn_0 = dialogView.findViewById(R.id.button21);
         btn_1 = dialogView.findViewById(R.id.button22);
         btn_2 = dialogView.findViewById(R.id.button23);
@@ -87,6 +87,7 @@ public class MatchActivity extends AppCompatActivity {
         btn_leg_bye = dialogView.findViewById(R.id.button10);
         btn_wide = dialogView.findViewById(R.id.button14);
         btn_noball = dialogView.findViewById(R.id.button12);
+        btn_wicket = dialogView.findViewById(R.id.button24);
 
 
         // Create the dialog
@@ -162,6 +163,9 @@ public class MatchActivity extends AppCompatActivity {
         });
         btn_noball.setOnClickListener(view -> {
             showExtrasDialog("No Ball", dialog);
+        });
+        btn_wicket.setOnClickListener(view ->{
+            showWicketDialog(dialog);
         });
 
     }
@@ -350,6 +354,28 @@ public class MatchActivity extends AppCompatActivity {
                  //call();
                  break;
          }
+
+     }
+     private void showWicketDialog(AlertDialog parentDialog){
+         View wicketDialogView = getLayoutInflater().inflate(R.layout.activity_typeofwicket, null);
+         // Create the wickets dialog
+         AlertDialog.Builder wicketsBuilder = new AlertDialog.Builder(this);
+         wicketsBuilder.setView(wicketDialogView);
+         AlertDialog wicketDialog = wicketsBuilder.create();
+         wicketDialog.show();
+
+         if (wicketDialog.getWindow() != null) {
+             wicketDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+         }
+         Button cancelButton = wicketDialogView.findViewById(R.id.cancel_btn);
+         Button submitButton = wicketDialogView.findViewById(R.id.submit_btn);
+         cancelButton.setOnClickListener(view -> {
+             wicketDialog.dismiss();
+         });
+         submitButton.setOnClickListener(view -> {
+             wicketDialog.dismiss();
+             parentDialog.dismiss();
+         });
 
      }
 
