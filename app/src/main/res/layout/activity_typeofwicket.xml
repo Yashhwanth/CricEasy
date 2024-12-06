@@ -98,6 +98,7 @@
         android:layout_width="350dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.524"
@@ -162,6 +163,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -183,7 +185,7 @@
             <RadioButton
                 android:id="@+id/normal_rb"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:text="@string/normal_ball" />
 
             <RadioButton
@@ -204,6 +206,12 @@
                 android:layout_height="wrap_content"
                 android:text="@string/wide_ball" />
         </RadioGroup>
+
+        <TextView
+            android:id="@+id/runs_from_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/runs_from" />
 
         <RadioGroup
             android:id="@+id/runs_source_rg"
