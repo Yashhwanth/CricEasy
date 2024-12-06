@@ -373,15 +373,22 @@ public class MatchActivity extends AppCompatActivity {
          RadioGroup dismissalTypeRadioGroup = wicketDialogView.findViewById(R.id.dismissal_type_rg);
          LinearLayout runs_source_ll = wicketDialogView.findViewById(R.id.runs_source_ll);
          LinearLayout out_ends_ll = wicketDialogView.findViewById(R.id.out_ends_ll);
+         LinearLayout stumped_ll = wicketDialogView.findViewById(R.id.stumped_ball_type_ll);
          // Add listener to RadioGroup to detect selection
          dismissalTypeRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
              if (checkedId == R.id.run_out_rb) {
                  runs_source_ll.setVisibility(View.VISIBLE);
                  out_ends_ll.setVisibility(View.VISIBLE);
-             }else {
+             }else if(checkedId == R.id.stumped_rb) {
+                 runs_source_ll.setVisibility(View.GONE);
+                 out_ends_ll.setVisibility(View.GONE);
+                 stumped_ll.setVisibility(View.GONE);
+                 stumped_ll.setVisibility(View.VISIBLE);
+             }else{
                  // Handle other cases, e.g., hide layouts
                  runs_source_ll.setVisibility(View.GONE);
                  out_ends_ll.setVisibility(View.GONE);
+                 stumped_ll.setVisibility(View.GONE);
              }
          });
          cancelButton.setOnClickListener(view -> {
