@@ -1247,7 +1247,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 updateQuery += COLUMN_SCORE + " = " + COLUMN_SCORE + " + ? ," +
                         COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 " ;
             } else if (wicketType.equals("STUMPED")) {
-                Log.d(TAG, "updateBatsmanStatsForWicket: stumped");
                 if(ballType.equals("Wide")){
                     updateQuery += COLUMN_SCORE + " = " + COLUMN_SCORE + " + ? ," +
                             COLUMN_BALLS + " = " + COLUMN_BALLS + " + 0 " ;
@@ -1255,7 +1254,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     updateQuery += COLUMN_SCORE + " = " + COLUMN_SCORE + " + ? ," +
                             COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 " ;
                 }
-            } else if (wicketType.equals("RUN_OUT")) {
+            } else if (wicketType.equals("RUN-OUT")) {
                 // Case 3: Handle run out
                 // Add logic for run out here
             }

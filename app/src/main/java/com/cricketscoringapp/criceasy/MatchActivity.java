@@ -381,7 +381,7 @@ public class MatchActivity extends AppCompatActivity {
          LinearLayout runs_source_ll = wicketDialogView.findViewById(R.id.runs_source_ll);
          LinearLayout out_ends_ll = wicketDialogView.findViewById(R.id.out_ends_ll);
          LinearLayout stumped_ll = wicketDialogView.findViewById(R.id.stumped_ball_type_ll);
-         RadioGroup ball_type_rg = wicketDialogView.findViewById(R.id.stumped_ball_type_rg);
+         RadioGroup ball_type_rg = wicketDialogView.findViewById(R.id.ball_type_rg);
          RadioGroup from_bat_rb = wicketDialogView.findViewById(R.id.runs_source_rg);
          // Add listener to RadioGroup to detect selection
          dismissalTypeRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
@@ -398,7 +398,7 @@ public class MatchActivity extends AppCompatActivity {
                      }
                  });
              }else if(checkedId == R.id.stumped_rb) {
-                 runs_input_ll.setVisibility(View.VISIBLE);
+                 runs_input_ll.setVisibility(View.GONE);
                  runs_source_ll.setVisibility(View.GONE);
                  out_ends_ll.setVisibility(View.GONE);
                  stumped_ll.setVisibility(View.VISIBLE);
@@ -417,6 +417,7 @@ public class MatchActivity extends AppCompatActivity {
              int dismissalTypeID = dismissalTypeRadioGroup.getCheckedRadioButtonId();
              RadioButton dismissalButton = wicketDialogView.findViewById(dismissalTypeID);
              String dismissalType = dismissalButton.getText().toString();
+             Log.d(TAG, "showWicketDialog: " + dismissalType);
              int runs = 0;
              String runsInput = runs_input.getText().toString();
              if (!runsInput.isEmpty()) {
@@ -431,7 +432,7 @@ public class MatchActivity extends AppCompatActivity {
              long innings_id = sharedPreferences.getLong("Innings_id",-1);
              long striker = sharedPreferences.getLong("striker_id", -1);
              if(dismissalType.equals("Bowled") || dismissalType.equals("Caught") || dismissalType.equals("LBW")){
-                 databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, "LEGAL", "NO-RUN", "BOWLED");
+                 databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, "LEGAL", null, "BOWLED");
              }else if(dismissalType.equals("Run-Out")){
                  int runsFromId = from_bat_rb.getCheckedRadioButtonId();
                  RadioButton runsFromRadioButton = findViewById(runsFromId);
@@ -441,8 +442,7 @@ public class MatchActivity extends AppCompatActivity {
                  int ballTypeId = ball_type_rg.getCheckedRadioButtonId();
                  RadioButton ballTypeRadioButton = wicketDialogView.findViewById(ballTypeId);
                  String ballType = ballTypeRadioButton.getText().toString();
-                 Log.d(TAG, "showWicketDialog:mmmmmmmmmmmmmmmmmmmmmmm " + ballType);
-                 databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballType, "bat", "STUMPED");
+                 databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballType, null, "STUMPED");
              }
              wicketDialog.dismiss();
              parentDialog.dismiss();
