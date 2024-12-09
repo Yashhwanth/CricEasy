@@ -1241,32 +1241,72 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         try {
             String updateQuery = "UPDATE " + TABLE_BATSMAN + " SET ";
+            SQLiteStatement statement = null;
 
-            // Handle different wicket types
             if (wicketType.equals("BOWLED") || wicketType.equals("CAUGHT") || wicketType.equals("LBW")) {
                 updateQuery += COLUMN_SCORE + " = " + COLUMN_SCORE + " + ? ," +
-                        COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 " ;
+                        COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 ";
+                updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+                statement = db.compileStatement(updateQuery);
+                statement.bindLong(1, runs); // Bind runs
+                statement.bindLong(2, player_id); // Bind player_id
+                statement.bindLong(3, innings_id); // Bind innings_id
+
             } else if (wicketType.equals("STUMPED")) {
-                if(ballType.equals("Wide")){
+                if (ballType.equals("Wide")) {
+                    updateQuery += COLUMN_SCORE + " = " + COLUMN_SCORE + " + ? ";
+                    updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+                    statement = db.compileStatement(updateQuery);
+                    statement.bindLong(1, runs); // Bind runs
+                    statement.bindLong(2, player_id); // Bind player_id
+                    statement.bindLong(3, innings_id); // Bind innings_id
+                } else if (ballType.equals("Normal")) {
                     updateQuery += COLUMN_SCORE + " = " + COLUMN_SCORE + " + ? ," +
-                            COLUMN_BALLS + " = " + COLUMN_BALLS + " + 0 " ;
-                }else if(ballType.equals("Normal")){
-                    updateQuery += COLUMN_SCORE + " = " + COLUMN_SCORE + " + ? ," +
-                            COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 " ;
+                            COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 ";
+                    updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+                    statement = db.compileStatement(updateQuery);
+                    statement.bindLong(1, runs); // Bind runs
+                    statement.bindLong(2, player_id); // Bind player_id
+                    statement.bindLong(3, innings_id); // Bind innings_id
                 }
             } else if (wicketType.equals("RUN-OUT")) {
-                // Case 3: Handle run out
-                // Add logic for run out here
+                if (ballType.equals("Normal")) {
+                    if (runsFrom.equals("From Bat")) {
+                        updateQuery += COLUMN_SCORE + " = " + COLUMN_SCORE + " + ? ," +
+                                COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 ";
+                        updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+                        statement = db.compileStatement(updateQuery);
+                        statement.bindLong(1, runs); // Bind runs
+                        statement.bindLong(2, player_id); // Bind player_id
+                        statement.bindLong(3, innings_id); // Bind innings_id
+                    } else if (runsFrom.equals("From by/lb")) {
+                        updateQuery += COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 ";
+                        updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+                        statement = db.compileStatement(updateQuery);
+                        statement.bindLong(1, player_id); // Bind player_id
+                        statement.bindLong(2, innings_id); // Bind innings_id
+                    }
+                } else if (ballType.equals("No-ball")) {
+                    Log.d(TAG, "updateBatsmanStatsForWicket:hiiiiiiiiiiiiiiiii " + ballType);
+                    if (runsFrom.equals("From Bat")) {
+                        updateQuery += COLUMN_SCORE + " = " + COLUMN_SCORE + " + ? ";
+                        updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+                        statement = db.compileStatement(updateQuery);
+                        statement.bindLong(1, runs); // Bind runs
+                        statement.bindLong(2, player_id); // Bind player_id
+                        statement.bindLong(3, innings_id); // Bind innings_id
+                    }
+                } else if (ballType.equals("Wide")) {
+                    // Wide deliveries do not affect batter stats
+                    updateQuery = null;
+                }
             }
 
-            // Add WHERE condition to the query to update the specific player in the given innings
-            updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
-            // Execute the query
-            SQLiteStatement statement = db.compileStatement(updateQuery);
-            statement.bindLong(1, runs);  // Bind the runs value
-            statement.bindLong(2, player_id);  // Bind player_id
-            statement.bindLong(3, innings_id);  // Bind innings_id
-            statement.executeUpdateDelete();  // Execute the update query
+            // If the query is valid (not null), execute it
+            if (updateQuery != null && statement != null) {
+                statement.executeUpdateDelete();
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
