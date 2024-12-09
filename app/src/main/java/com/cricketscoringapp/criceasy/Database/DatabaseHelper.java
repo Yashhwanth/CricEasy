@@ -11,6 +11,7 @@ import android.util.Log;
 
 import java.util.HashMap;
 import java.util.Map;
+import static android.content.ContentValues.TAG;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 8; // Update version
@@ -988,6 +989,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
 
+
     //---------------------------------updating partnerships---------------------------------
     public void updatePartnershipFor0to6(int runsScored, int ballsFaced) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -1235,6 +1237,40 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
+    public void updateBatsmanStatsForWicket(long innings_id, long player_id, int runs, String ballType, String runsFrom, String wicketType) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            String updateQuery = "UPDATE " + TABLE_BATSMAN + " SET ";
+
+            // Handle different wicket types
+            if (wicketType.equals("BOWLED") || wicketType.equals("CAUGHT") || wicketType.equals("LBW")) {
+                updateQuery += COLUMN_SCORE + " = " + COLUMN_SCORE + " + ? ," +
+                        COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 " ;
+                // Case 1: Handle bowled, caught, or lbw
+                // Add logic for these cases here
+            } else if (wicketType.equals("STUMPED")) {
+                // Case 2: Handle stumped
+                // Add logic for stumped here
+            } else if (wicketType.equals("RUN_OUT")) {
+                // Case 3: Handle run out
+                // Add logic for run out here
+            }
+
+            // Add WHERE condition to the query to update the specific player in the given innings
+            updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+            // Execute the query
+            SQLiteStatement statement = db.compileStatement(updateQuery);
+            statement.bindLong(1, runs);  // Bind the runs value
+            statement.bindLong(2, player_id);  // Bind player_id
+            statement.bindLong(3, innings_id);  // Bind innings_id
+            statement.executeUpdateDelete();  // Execute the update query
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.close();
+        }
+    }
+
 
 
 

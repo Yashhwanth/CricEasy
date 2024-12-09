@@ -1,7 +1,10 @@
 package com.cricketscoringapp.criceasy;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +25,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 
 public class MatchActivity extends AppCompatActivity {
     private Button btnLayout1, btnLayout2, btnLayout3, btnLayout4, btnLayout5;
@@ -368,24 +372,39 @@ public class MatchActivity extends AppCompatActivity {
          if (wicketDialog.getWindow() != null) {
              wicketDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
          }
+         EditText runs_input = wicketDialogView.findViewById(R.id.runs_input_et);
+
          Button cancelButton = wicketDialogView.findViewById(R.id.cancel_btn);
          Button submitButton = wicketDialogView.findViewById(R.id.submit_btn);
          RadioGroup dismissalTypeRadioGroup = wicketDialogView.findViewById(R.id.dismissal_type_rg);
+         LinearLayout runs_input_ll = wicketDialogView.findViewById(R.id.runs_in_wicket_ll);
          LinearLayout runs_source_ll = wicketDialogView.findViewById(R.id.runs_source_ll);
          LinearLayout out_ends_ll = wicketDialogView.findViewById(R.id.out_ends_ll);
          LinearLayout stumped_ll = wicketDialogView.findViewById(R.id.stumped_ball_type_ll);
+         RadioGroup ball_type_rg = wicketDialogView.findViewById(R.id.stumped_ball_type_rg);
+         RadioGroup from_bat_rb = wicketDialogView.findViewById(R.id.runs_source_rg);
          // Add listener to RadioGroup to detect selection
          dismissalTypeRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
              if (checkedId == R.id.run_out_rb) {
+                 runs_input_ll.setVisibility(View.VISIBLE);
                  runs_source_ll.setVisibility(View.VISIBLE);
                  out_ends_ll.setVisibility(View.VISIBLE);
+                 stumped_ll.setVisibility(View.GONE);
+                 ball_type_rg.setOnCheckedChangeListener((group1, checkedId1) -> {
+                     if(checkedId1 == R.id.wide_rb){
+                         from_bat_rb.setVisibility(View.GONE);
+                     }else{
+                         from_bat_rb.setVisibility(View.VISIBLE);
+                     }
+                 });
              }else if(checkedId == R.id.stumped_rb) {
+                 runs_input_ll.setVisibility(View.VISIBLE);
                  runs_source_ll.setVisibility(View.GONE);
                  out_ends_ll.setVisibility(View.GONE);
-                 stumped_ll.setVisibility(View.GONE);
                  stumped_ll.setVisibility(View.VISIBLE);
              }else{
                  // Handle other cases, e.g., hide layouts
+                 runs_input_ll.setVisibility(View.GONE);
                  runs_source_ll.setVisibility(View.GONE);
                  out_ends_ll.setVisibility(View.GONE);
                  stumped_ll.setVisibility(View.GONE);
@@ -395,6 +414,35 @@ public class MatchActivity extends AppCompatActivity {
              wicketDialog.dismiss();
          });
          submitButton.setOnClickListener(view -> {
+             int dismissalTypeID = dismissalTypeRadioGroup.getCheckedRadioButtonId();
+             RadioButton dismissalButton = wicketDialogView.findViewById(dismissalTypeID);
+             String dismissalType = dismissalButton.getText().toString();
+             int runs = 0;
+             String runsInput = runs_input.getText().toString();
+             if (!runsInput.isEmpty()) {
+                 try {
+                     runs = Integer.parseInt(runsInput);
+                 } catch (NumberFormatException e) {
+                     // Handle the case where the number format is invalid (e.g., non-numeric input)
+                     runs = 0; // Set to default if there's a parsing error
+                 }
+             }
+             SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+             long innings_id = sharedPreferences.getLong("Innings_id",-1);
+             long striker = sharedPreferences.getLong("striker_id", -1);
+             if(dismissalType.equals("Bowled") || dismissalType.equals("Caught") || dismissalType.equals("LBW")){
+                 databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, "LEGAL", "NO-RUN", "BOWLED");
+             }else if(dismissalType.equals("Run-Out")){
+                 int runsFromId = from_bat_rb.getCheckedRadioButtonId();
+                 RadioButton runsFromRadioButton = findViewById(runsFromId);
+                 String runsFrom = runsFromRadioButton.getText().toString();
+                 //databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, "hi", runsFrom);
+             }else if(dismissalType.equals("Stumped")){
+                 int ballTypeId = ball_type_rg.getCheckedRadioButtonId();
+                 RadioButton ballTypeRadioButton = wicketDialogView.findViewById(ballTypeId);
+                 String ballType = ballTypeRadioButton.getText().toString();
+                 //databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballType, "");
+             }
              wicketDialog.dismiss();
              parentDialog.dismiss();
          });

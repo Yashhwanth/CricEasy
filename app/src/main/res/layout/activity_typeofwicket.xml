@@ -66,32 +66,41 @@
             android:text="@string/lbw_rb" />
     </RadioGroup>
 
-    <TextView
-        android:id="@+id/runs_in_wicket_tv"
+    <LinearLayout
+        android:id="@+id/runs_in_wicket_ll"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/runs_in_wicket"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.03"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.223" />
+        android:orientation="vertical"
+        android:visibility="gone">
 
-    <EditText
-        android:id="@+id/runs_input_et"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:autofillHints="none"
-        android:ems="10"
-        android:hint="@string/runs_input"
-        android:inputType="number"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.044"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.295" />
+        <TextView
+            android:id="@+id/runs_in_wicket_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/runs_in_wicket"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.03"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.223" />
+
+        <EditText
+            android:id="@+id/runs_input_et"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:autofillHints="none"
+            android:ems="10"
+            android:hint="@string/runs_input"
+            android:inputType="number"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.044"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.295" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/out_ends_ll"
@@ -189,12 +198,6 @@
                 android:text="@string/normal_ball" />
 
             <RadioButton
-                android:id="@+id/by_lb_rb"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/bye_leg_ball" />
-
-            <RadioButton
                 android:id="@+id/no_ball_rb"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -239,7 +242,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <TextView
             android:id="@+id/stumped_ball_type_tv"
