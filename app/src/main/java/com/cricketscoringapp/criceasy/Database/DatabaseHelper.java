@@ -1246,11 +1246,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (wicketType.equals("BOWLED") || wicketType.equals("CAUGHT") || wicketType.equals("LBW")) {
                 updateQuery += COLUMN_SCORE + " = " + COLUMN_SCORE + " + ? ," +
                         COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 " ;
-                // Case 1: Handle bowled, caught, or lbw
-                // Add logic for these cases here
             } else if (wicketType.equals("STUMPED")) {
-                // Case 2: Handle stumped
-                // Add logic for stumped here
+                Log.d(TAG, "updateBatsmanStatsForWicket: stumped");
+                if(ballType.equals("Wide")){
+                    updateQuery += COLUMN_SCORE + " = " + COLUMN_SCORE + " + ? ," +
+                            COLUMN_BALLS + " = " + COLUMN_BALLS + " + 0 " ;
+                }else if(ballType.equals("Normal")){
+                    updateQuery += COLUMN_SCORE + " = " + COLUMN_SCORE + " + ? ," +
+                            COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 " ;
+                }
             } else if (wicketType.equals("RUN_OUT")) {
                 // Case 3: Handle run out
                 // Add logic for run out here

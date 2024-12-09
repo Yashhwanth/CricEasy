@@ -436,12 +436,13 @@ public class MatchActivity extends AppCompatActivity {
                  int runsFromId = from_bat_rb.getCheckedRadioButtonId();
                  RadioButton runsFromRadioButton = findViewById(runsFromId);
                  String runsFrom = runsFromRadioButton.getText().toString();
-                 //databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, "hi", runsFrom);
+                 databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, "hi", runsFrom, "RUN-OUT");
              }else if(dismissalType.equals("Stumped")){
                  int ballTypeId = ball_type_rg.getCheckedRadioButtonId();
                  RadioButton ballTypeRadioButton = wicketDialogView.findViewById(ballTypeId);
                  String ballType = ballTypeRadioButton.getText().toString();
-                 //databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballType, "");
+                 Log.d(TAG, "showWicketDialog:mmmmmmmmmmmmmmmmmmmmmmm " + ballType);
+                 databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballType, "bat", "STUMPED");
              }
              wicketDialog.dismiss();
              parentDialog.dismiss();
