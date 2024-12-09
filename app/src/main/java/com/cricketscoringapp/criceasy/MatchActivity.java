@@ -363,7 +363,7 @@ public class MatchActivity extends AppCompatActivity {
      }
      private void showWicketDialog(AlertDialog parentDialog){
          View wicketDialogView = getLayoutInflater().inflate(R.layout.activity_typeofwicket, null);
-         // Create the wickets dialog
+
          AlertDialog.Builder wicketsBuilder = new AlertDialog.Builder(this);
          wicketsBuilder.setView(wicketDialogView);
          AlertDialog wicketDialog = wicketsBuilder.create();
@@ -376,39 +376,63 @@ public class MatchActivity extends AppCompatActivity {
 
          Button cancelButton = wicketDialogView.findViewById(R.id.cancel_btn);
          Button submitButton = wicketDialogView.findViewById(R.id.submit_btn);
-         RadioGroup dismissalTypeRadioGroup = wicketDialogView.findViewById(R.id.dismissal_type_rg);
-         LinearLayout runs_input_ll = wicketDialogView.findViewById(R.id.runs_in_wicket_ll);
-         LinearLayout runs_source_ll = wicketDialogView.findViewById(R.id.runs_source_ll);
-         LinearLayout out_ends_ll = wicketDialogView.findViewById(R.id.out_ends_ll);
-         LinearLayout stumped_ll = wicketDialogView.findViewById(R.id.stumped_ball_type_ll);
-         RadioGroup from_bat_rb = wicketDialogView.findViewById(R.id.runs_source_rg);
+
+         RadioGroup dismissalTypeRadioGroup = wicketDialogView.findViewById(R.id.dismissal_type_rg); // dismissal type
+
+         LinearLayout runs_input_layout = wicketDialogView.findViewById(R.id.runs_in_wicket_layout); //runs input
+         LinearLayout out_batsman_layout = wicketDialogView.findViewById(R.id.out_batsman_layout); // out batsman
+         LinearLayout out_end_layout = wicketDialogView.findViewById(R.id.out_end_layout); //out end
+         LinearLayout runs_from_bat_or_by_layout = wicketDialogView.findViewById(R.id.runs_in_runout_layout); // from bat/by layout
+         LinearLayout ball_type_in_run_out_layout = wicketDialogView.findViewById(R.id.ball_type_in_runout_layout); // ball type in run out layout
+         LinearLayout stumped_layout = wicketDialogView.findViewById(R.id.stumped_ball_type_layout); //ball type in run out
+
+         RadioGroup out_batsman_radio_group = wicketDialogView.findViewById(R.id.out_batsman_rg);
+         RadioGroup out_end_radio_group = wicketDialogView.findViewById(R.id.out_end_rg);
+         RadioGroup ball_type_in_run_out_radio_group = wicketDialogView.findViewById(R.id.ball_type_rg);
+         RadioGroup from_bat_or_by_radio_group = wicketDialogView.findViewById(R.id.runs_source_rg);
          RadioGroup stumped_ball_type = wicketDialogView.findViewById(R.id.stumped_ball_type_rg);
-         RadioGroup ball_type_rg = wicketDialogView.findViewById(R.id.ball_type_rg);
+
+
+         runs_input_layout.setVisibility(View.GONE);
+         out_batsman_layout.setVisibility(View.GONE);
+         out_end_layout.setVisibility(View.GONE);
+         runs_from_bat_or_by_layout.setVisibility(View.GONE);
+         ball_type_in_run_out_layout.setVisibility(View.GONE);
+         stumped_layout.setVisibility(View.GONE);
+
+
          // Add listener to RadioGroup to detect selection
          dismissalTypeRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
              if (checkedId == R.id.run_out_rb) {
-                 runs_input_ll.setVisibility(View.VISIBLE);
-                 runs_source_ll.setVisibility(View.VISIBLE);
-                 out_ends_ll.setVisibility(View.VISIBLE);
-                 stumped_ll.setVisibility(View.GONE);
-                 ball_type_rg.setOnCheckedChangeListener((group1, checkedId1) -> {
+                 runs_input_layout.setVisibility(View.VISIBLE);
+                 out_batsman_layout.setVisibility(View.VISIBLE);
+                 out_end_layout.setVisibility(View.VISIBLE);
+                 ball_type_in_run_out_layout.setVisibility(View.VISIBLE);
+                 runs_from_bat_or_by_layout.setVisibility(View.VISIBLE);
+                 stumped_layout.setVisibility(View.GONE);
+                 ball_type_in_run_out_radio_group.setOnCheckedChangeListener((group1, checkedId1) -> {
                      if(checkedId1 == R.id.wide_rb){
-                         from_bat_rb.setVisibility(View.GONE);
+                         runs_from_bat_or_by_layout.setVisibility(View.GONE);
                      }else{
-                         from_bat_rb.setVisibility(View.VISIBLE);
+                         runs_from_bat_or_by_layout.setVisibility(View.VISIBLE);
                      }
                  });
              }else if(checkedId == R.id.stumped_rb) {
-                 runs_input_ll.setVisibility(View.GONE);
-                 runs_source_ll.setVisibility(View.GONE);
-                 out_ends_ll.setVisibility(View.GONE);
-                 stumped_ll.setVisibility(View.VISIBLE);
+                 runs_input_layout.setVisibility(View.GONE);
+                 out_batsman_layout.setVisibility(View.GONE);
+                 out_end_layout.setVisibility(View.GONE);
+                 runs_from_bat_or_by_layout.setVisibility(View.GONE);
+                 ball_type_in_run_out_layout.setVisibility(View.GONE);
+                 stumped_layout.setVisibility(View.GONE);
+                 stumped_layout.setVisibility(View.VISIBLE);
              }else{
                  // Handle other cases, e.g., hide layouts
-                 runs_input_ll.setVisibility(View.GONE);
-                 runs_source_ll.setVisibility(View.GONE);
-                 out_ends_ll.setVisibility(View.GONE);
-                 stumped_ll.setVisibility(View.GONE);
+                 runs_input_layout.setVisibility(View.GONE);
+                 out_batsman_layout.setVisibility(View.GONE);
+                 out_end_layout.setVisibility(View.GONE);
+                 runs_from_bat_or_by_layout.setVisibility(View.GONE);
+                 ball_type_in_run_out_layout.setVisibility(View.GONE);
+                 stumped_layout.setVisibility(View.GONE);
              }
          });
          cancelButton.setOnClickListener(view -> {
@@ -416,6 +440,10 @@ public class MatchActivity extends AppCompatActivity {
          });
          submitButton.setOnClickListener(view -> {
              int dismissalTypeID = dismissalTypeRadioGroup.getCheckedRadioButtonId();
+             if (dismissalTypeID == -1) {
+                 Toast.makeText(this, "Please select a dismissal type.", Toast.LENGTH_SHORT).show();
+                 return;
+             }
              RadioButton dismissalButton = wicketDialogView.findViewById(dismissalTypeID);
              String dismissalType = dismissalButton.getText().toString();
              int runs = 0;
@@ -431,33 +459,57 @@ public class MatchActivity extends AppCompatActivity {
              SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
              long innings_id = sharedPreferences.getLong("Innings_id",-1);
              long striker = sharedPreferences.getLong("striker_id", -1);
-             if(dismissalType.equals("Bowled") || dismissalType.equals("Caught") || dismissalType.equals("LBW")){
-                 databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, null, null, "BOWLED");
-             }else if(dismissalType.equals("Run-Out")){
-                 String runsFrom = "N/A";
-                 int ballTypeRadioButtonIdRO = ball_type_rg.getCheckedRadioButtonId();
-                 RadioButton ballTypeRadioButtonRO = wicketDialogView.findViewById(ballTypeRadioButtonIdRO);
-                 String ballTypeInRo = ballTypeRadioButtonRO.getText().toString();
-                 Log.d(TAG, "showWicketDialog:kiiiiiiiiiiiiiii " + ballTypeInRo);
-                 // Check if the "runsFrom" radio group is visible
-                 if (from_bat_rb.getVisibility() == View.VISIBLE) {
-                     int runsFromId = from_bat_rb.getCheckedRadioButtonId();
-                     if (runsFromId != -1) { // Ensure a radio button is selected
+             switch (dismissalType) {
+                 case "Bowled":
+                 case "Caught":
+                 case "LBW":
+                     databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, null, null, "BOWLED");
+                     break;
+                 case "Run-Out":
+                     Log.d(TAG, "showWicketDialog: " + runs);
+                     int outBatsmanRadioButtonId = out_batsman_radio_group.getCheckedRadioButtonId();
+                     if (outBatsmanRadioButtonId == -1) {
+                         Toast.makeText(this, "Please select the out batsman for run-out.", Toast.LENGTH_SHORT).show();
+                         return;
+                     }
+                     int outEndRadioButtonId = out_end_radio_group.getCheckedRadioButtonId();
+                     if (outEndRadioButtonId == -1) {
+                         Toast.makeText(this, "Please select the out end for run-out.", Toast.LENGTH_SHORT).show();
+                         return;
+                     }
+                     int ballTypeRadioButtonIdRO = ball_type_in_run_out_radio_group.getCheckedRadioButtonId();
+                     if (ballTypeRadioButtonIdRO == -1) {
+                         Toast.makeText(this, "Please select the ball type for run-out.", Toast.LENGTH_SHORT).show();
+                         return;
+                     }
+                     RadioButton ballTypeRadioButtonRO = wicketDialogView.findViewById(ballTypeRadioButtonIdRO);
+                     String ballTypeInRo = ballTypeRadioButtonRO.getText().toString();
+                     String runsFrom = "N/A";
+                     if (!ballTypeInRo.equals("Wide") && from_bat_or_by_radio_group.getVisibility() == View.VISIBLE) {
+                         int runsFromId = from_bat_or_by_radio_group.getCheckedRadioButtonId();
+                         if (runsFromId == -1) {
+                             Toast.makeText(this, "Please select runs from (bat/byes/leg byes).", Toast.LENGTH_SHORT).show();
+                             return;
+                         }
                          RadioButton runsFromRadioButton = wicketDialogView.findViewById(runsFromId);
                          runsFrom = runsFromRadioButton.getText().toString();
                      }
-                 }
-                 databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballTypeInRo, runsFrom, "RUN-OUT");
-             }else if(dismissalType.equals("Stumped")){
-                 int ballTypeId = stumped_ball_type.getCheckedRadioButtonId();
-                 RadioButton ballTypeRadioButton = wicketDialogView.findViewById(ballTypeId);
-                 String ballType = ballTypeRadioButton.getText().toString();
-                 databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballType, null, "STUMPED");
+                     databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballTypeInRo, runsFrom, "RUN-OUT");
+                     break;
+                 case "Stumped":
+                     int ballTypeId = stumped_ball_type.getCheckedRadioButtonId();
+                     if (ballTypeId == -1) {
+                         Toast.makeText(this, "Please select the ball type for stumping.", Toast.LENGTH_SHORT).show();
+                         return;
+                     }
+                     RadioButton ballTypeRadioButton = wicketDialogView.findViewById(ballTypeId);
+                     String ballType = ballTypeRadioButton.getText().toString();
+                     databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballType, null, "STUMPED");
+                     break;
              }
              wicketDialog.dismiss();
              parentDialog.dismiss();
          });
-
      }
 
 }
