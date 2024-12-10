@@ -16,7 +16,7 @@ import static android.content.ContentValues.TAG;
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 8; // Update version
     private static final String DATABASE_NAME = "CricketDB";
-    private Context context;
+    private final Context context;
     private SharedPreferences sharedPreferences;
 
 
@@ -986,7 +986,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close(); // Close the database connection
         }
     }
+    public long insertBallDataForWicket(long overId, String typeOfBall, int runs, long strikerId, long nonStrikerId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            // Calculate the total runs for the ball (add extra runs for wide/no ball)
+            int totalRuns = runs;
+            if (typeOfBall.equals("Wide") || typeOfBall.equals("No-ball")) {
+                totalRuns += 1; // Add 1 extra run for wide/no ball
+            }
 
+            // Create a ContentValues object to hold the values to be inserted
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(COLUMN_OVER_ID, overId); // Over ID
+            contentValues.put(COLUMN_TYPE_OF_BALL, typeOfBall); // Type of ball (Wide/No Ball/Normal)
+            contentValues.put(COLUMN_RUNS, totalRuns); // Total runs for the ball
+            contentValues.put(COLUMN_IS_WICKET, 1); // No wicket for this ball type (unless it's a wicket)
+            contentValues.put(COLUMN_STRIKER, strikerId); // Striker ID
+            contentValues.put(COLUMN_NON_STRIKER, nonStrikerId); // Non-striker ID
+
+            // Insert the data into the balls table
+            long ballId = db.insert(TABLE_BALLS, null, contentValues);
+            Log.d("DatabaseHelper", "Ball data inserted successfully with ID: " + ballId);
+            return ballId; // Return the ID of the inserted ball (auto-generated)
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("DatabaseHelper", "Failed to insert ball data.");
+            return -1; // Indicate failure
+        } finally {
+            db.close(); // Close the database connection
+        }
+    }
 
 
 
@@ -1287,7 +1316,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         statement.bindLong(2, innings_id); // Bind innings_id
                     }
                 } else if (ballType.equals("No-ball")) {
-                    Log.d(TAG, "updateBatsmanStatsForWicket:hiiiiiiiiiiiiiiiii " + ballType);
                     if (runsFrom.equals("From Bat")) {
                         updateQuery += COLUMN_SCORE + " = " + COLUMN_SCORE + " + ? ";
                         updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
@@ -1495,6 +1523,98 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
+    public void updateBowlerStatsForWicket(long innings_id, long bowler_id, int runs, String ballType, String runsFrom, String wicketType) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            String updateQuery = "UPDATE " + TABLE_BOWLER + " SET ";
+            SQLiteStatement statement = null;
+
+            switch (wicketType) {
+                case "BOWLED":
+                case "CAUGHT":
+                case "LBW":
+                    Log.d(TAG, "updateBowlerStatsForWicket: hiiiiiiiiiiiii");
+                    updateQuery += COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 ," +
+                            COLUMN_WK + " = " + COLUMN_WK + " + 1 ";
+                    updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+                    statement = db.compileStatement(updateQuery);
+                    statement.bindLong(1, bowler_id); // Bind bowler_id
+                    statement.bindLong(2, innings_id); // Bind innings_id
+                    break;
+                case "STUMPED":
+                    if (ballType.equals("Wide")) {
+                        updateQuery += COLUMN_WK + " = " + COLUMN_WK + " + 1 ," +
+                                COLUMN_RUNS + " = " + COLUMN_RUNS + " + 1";
+                        updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+                        statement = db.compileStatement(updateQuery);
+                        statement.bindLong(1, bowler_id); // Bind bowler_id
+                        statement.bindLong(2, innings_id); // Bind innings_id
+                    } else if (ballType.equals("Normal")) {
+                        updateQuery += COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 ," +
+                                COLUMN_WK + " = " + COLUMN_WK + " + 1 ";
+                        updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+                        statement = db.compileStatement(updateQuery);
+                        statement.bindLong(1, bowler_id); // Bind bowler_id
+                        statement.bindLong(2, innings_id); // Bind innings_id
+                    }
+                    break;
+                case "RUN-OUT":
+                    switch (ballType) {
+                        case "Normal":
+                            if (ballType.equals("Normal")) {
+                                if (runsFrom.equals("From Bat")) {
+                                    // Construct query and bind together
+                                    updateQuery += COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 ," +
+                                            COLUMN_RUNS + " = " + COLUMN_RUNS + " + ?";
+                                    updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+                                    statement = db.compileStatement(updateQuery);
+                                    statement.bindLong(1, runs); // Bind runs
+                                    statement.bindLong(2, bowler_id); // Bind bowler_id
+                                    statement.bindLong(3, innings_id); // Bind innings_id
+                                } else if (runsFrom.equals("From by/lb")) {
+                                    // Construct query and bind together
+                                    updateQuery += COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1";
+                                    updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+                                    statement = db.compileStatement(updateQuery);
+                                    statement.bindLong(1, bowler_id); // Bind bowler_id
+                                    statement.bindLong(2, innings_id); // Bind innings_id
+                                }
+                            }
+                            break;
+                        case "No-ball":
+                            if (runsFrom.equals("From Bat")) {
+                                updateQuery += COLUMN_RUNS + " = " + COLUMN_RUNS + " + ?";
+                                updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+                                statement = db.compileStatement(updateQuery);
+                                statement.bindLong(1, runs); // Bind runs
+                                statement.bindLong(2, bowler_id); // Bind bowler_id
+                                statement.bindLong(3, innings_id); // Bind innings_id
+                            }
+                            break;
+                        case "Wide":
+                            updateQuery += COLUMN_RUNS + " = " + COLUMN_RUNS + " + 1";
+                            updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+                            statement = db.compileStatement(updateQuery);
+                            statement.bindLong(1, bowler_id); // Bind bowler_id
+
+                            statement.bindLong(2, innings_id); // Bind innings_id
+
+                            break;
+                    }
+                    break;
+            }
+
+            // If the query is valid (not null), execute it
+            if (updateQuery != null && statement != null) {
+                statement.executeUpdateDelete();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.close();
+        }
+    }
+
 
 
 

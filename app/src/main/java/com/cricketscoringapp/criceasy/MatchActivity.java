@@ -459,11 +459,19 @@ public class MatchActivity extends AppCompatActivity {
              SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
              long innings_id = sharedPreferences.getLong("Innings_id",-1);
              long striker = sharedPreferences.getLong("striker_id", -1);
+             long non_striker_id = sharedPreferences.getLong("non_striker_id", -1);
+             long bowler_id = sharedPreferences.getLong("bowler_id", -1);
+             long over_id = sharedPreferences.getLong("over_id", -1);
+
+
+
              switch (dismissalType) {
                  case "Bowled":
                  case "Caught":
                  case "LBW":
                      databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, null, null, "BOWLED");
+                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, null, null, "BOWLED");
+                     databaseHelper.insertBallDataForWicket(over_id, "Legal", runs, striker, non_striker_id);
                      break;
                  case "Run-Out":
                      Log.d(TAG, "showWicketDialog: " + runs);
@@ -495,6 +503,8 @@ public class MatchActivity extends AppCompatActivity {
                          runsFrom = runsFromRadioButton.getText().toString();
                      }
                      databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballTypeInRo, runsFrom, "RUN-OUT");
+                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, ballTypeInRo, runsFrom, "RUN-OUT");
+                     databaseHelper.insertBallDataForWicket(over_id, ballTypeInRo, runs, striker, non_striker_id);
                      break;
                  case "Stumped":
                      int ballTypeId = stumped_ball_type.getCheckedRadioButtonId();
@@ -505,6 +515,8 @@ public class MatchActivity extends AppCompatActivity {
                      RadioButton ballTypeRadioButton = wicketDialogView.findViewById(ballTypeId);
                      String ballType = ballTypeRadioButton.getText().toString();
                      databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballType, null, "STUMPED");
+                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, ballType, null, "STUMPED");
+                     databaseHelper.insertBallDataForWicket(over_id, ballType, runs, striker, non_striker_id);
                      break;
              }
              wicketDialog.dismiss();
