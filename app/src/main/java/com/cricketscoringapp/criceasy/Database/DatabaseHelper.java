@@ -13,8 +13,10 @@ import java.util.HashMap;
 import java.util.Map;
 import static android.content.ContentValues.TAG;
 
+import androidx.annotation.Nullable;
+
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 8; // Update version
+    private static final int DATABASE_VERSION = 11; // Update version
     private static final String DATABASE_NAME = "CricketDB";
     private final Context context;
     private SharedPreferences sharedPreferences;
@@ -327,6 +329,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + "FOREIGN KEY (" + COLUMN_PLAYER + ") REFERENCES Players(player_id), "
             + "FOREIGN KEY (" + COLUMN_INNINGS_ID + ") REFERENCES Innings(innings_id));";
 
+    // Team Statistics Table
+    private static final String TABLE_TEAM_STATISTICS = "TeamStatistics";
+    private static final String COLUMN_TEAM_STATS_ID = "TeamStatsId";
+    private static final String COLUMN_EXTRAS = "extras";
+    private static final String COLUMN_WICKETS = "wickets";
+    // SQL command to create the Team Statistics table
+    private static final String CREATE_TEAM_STATISTICS_TABLE = "CREATE TABLE " + TABLE_TEAM_STATISTICS + " (" +
+            COLUMN_TEAM_STATS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            COLUMN_INNINGS_ID + " INTEGER , " + // Links to Innings table
+            COLUMN_RUNS + " INTEGER DEFAULT 0, " +         // Total runs scored
+            COLUMN_WICKETS + " INTEGER DEFAULT 0, " +      // Total wickets lost
+            COLUMN_BALLS + " INTEGER DEFAULT 0, " +
+            COLUMN_EXTRAS + " INTEGER DEFAULT 0, " +
+            "FOREIGN KEY(" + COLUMN_INNINGS_ID + ") REFERENCES " + TABLE_INNINGS + "(" + COLUMN_INNINGS_ID + ") ON DELETE CASCADE" +
+            ");";
+
 
     // Constructor
     public DatabaseHelper(Context context) {
@@ -351,6 +369,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_EXTRAS_TABLE);
         db.execSQL(CREATE_BATSMAN_TABLE);
         db.execSQL(CREATE_BOWLER_TABLE);
+        db.execSQL(CREATE_TEAM_STATISTICS_TABLE);
     }
 
     @Override
@@ -370,10 +389,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS Extras");
         db.execSQL("DROP TABLE IF EXISTS Batsmans");
         db.execSQL("DROP TABLE IF EXISTS Bowlers");
+        db.execSQL("DROP TABLE IF EXISTS TeamStatistics");
         onCreate(db);
     }
 
 
+
+
+// ---------------------------------------------------------------------------------------------------------------------------------
     // Check if there is an ongoing match
     public Cursor getOngoingMatch() {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -631,8 +654,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.endTransaction();
         }
     }
-
-
     private int getTeamIdFromName(SQLiteDatabase db, String teamName) {
         Cursor cursor = null;
         try {
@@ -713,8 +734,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.insert(TABLE_BOWLER, null, values);
     }
-
-
 
     public void insertPlayer(String playerName, String playerRole, String battingStyle, String bowlingStyle, String playerType) {
         // Get writable database instance
@@ -857,6 +876,80 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
+    public long initializeTeamStats(long inningsId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        long teamStatsId = -1; // Default value if insertion fails
+        try {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("innings_id", inningsId);
+            // Insert and get the row ID
+            teamStatsId = db.insert(TABLE_TEAM_STATISTICS, null, contentValues);
+
+            if (teamStatsId != -1) {
+                Log.d("DatabaseHelper", "Team stats initialized for innings ID: " + inningsId);
+            } else {
+                Log.e("DatabaseHelper", "Failed to initialize team stats.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("DatabaseHelper", "Error during team stats initialization.");
+        } finally {
+            db.close();
+        }
+        return teamStatsId;
+    }
+    public void updateTeamStatsFor0to6(long teamStatsId, int runs) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            // Get the current values of runs and balls
+            String selectQuery = "SELECT " + COLUMN_RUNS + ", " + "balls" + " FROM " + TABLE_TEAM_STATISTICS + " WHERE " + COLUMN_TEAM_STATS_ID + " = ?";
+            Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(teamStatsId)});
+
+            int currentRuns = 0;
+            int currentBalls = 0;
+
+            if (cursor != null && cursor.moveToFirst()) {
+                // Ensure the columns exist by checking the index is not -1
+                int runsIndex = cursor.getColumnIndex(COLUMN_RUNS);
+                int ballsIndex = cursor.getColumnIndex("balls");
+
+                if (runsIndex != -1 && ballsIndex != -1) {
+                    // Only proceed if the column indices are valid
+                    currentRuns = cursor.getInt(runsIndex);
+                    currentBalls = cursor.getInt(ballsIndex);
+                } else {
+                    Log.e("DatabaseHelper", "Column not found.");
+                    return; // Exit the method if column indices are invalid
+                }
+
+                cursor.close();
+            }
+
+            // Increment runs and balls
+            currentRuns += runs;
+            currentBalls += 1;
+
+            // Update the stats in the database
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(COLUMN_RUNS, currentRuns);
+            contentValues.put(COLUMN_BALLS, currentBalls);
+
+            int rowsUpdated = db.update(TABLE_TEAM_STATISTICS, contentValues, COLUMN_TEAM_STATS_ID + " = ?", new String[]{String.valueOf(teamStatsId)});
+
+            if (rowsUpdated > 0) {
+                Log.d("DatabaseHelper", "Team stats updated for ID: " + teamStatsId);
+            } else {
+                Log.e("DatabaseHelper", "Failed to update team stats for ID: " + teamStatsId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("DatabaseHelper", "Error during team stats update for 0 to 6 runs.");
+        } finally {
+            db.close();
+        }
+    }
+
+
 
 
 

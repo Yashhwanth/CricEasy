@@ -57,6 +57,7 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
             if (validateInputs()) {
                 insertSNsBowl();
                 innings_table();
+                team_stats_table();
                 overs_table();
                 partnerships_table();
                 batsman_table();
@@ -198,7 +199,6 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
         long s_id = sharedPreferences.getLong("striker_id", -1);
         long ns_id = sharedPreferences.getLong("non_striker_id", -1);
         long innings_id = sharedPreferences.getLong("Innings_id",-1);
-        Log.d("snsid check", "batsman_table: " + s_id + ns_id);
         databaseHelper.initializeBatsmanStats(s_id,innings_id );
         databaseHelper.initializeBatsmanStats(ns_id,innings_id );
 
@@ -208,7 +208,21 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
         long bowler_id = sharedPreferences.getLong("bowler_id",-1);
         long innings_id = sharedPreferences.getLong("Innings_id",-1);
-        Log.d("bowid check", "batsman_table: " + bowler_id);
         databaseHelper.initializeBowlerStats(bowler_id,innings_id );
     }
+
+    private void team_stats_table() {
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
+        long inningsId = sharedPreferences.getLong("Innings_id", -1); // Get the innings ID from SharedPreferences
+
+        if (inningsId != -1) {
+            long teamStatsId = databaseHelper.initializeTeamStats(inningsId);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putLong("teamStatsId", teamStatsId);
+            editor.apply();
+        } else {
+            Log.e("TeamStats", "Failed to initialize team stats due to invalid innings or team ID.");
+        }
+    }
+
 }

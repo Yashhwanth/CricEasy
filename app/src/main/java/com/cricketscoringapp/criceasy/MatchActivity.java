@@ -123,38 +123,47 @@ public class MatchActivity extends AppCompatActivity {
         // Set up OnClickListeners for the dialog buttons
         btn_0.setOnClickListener(view -> {
             handleScoringFor0To6(0);
+            updateTeamStatsFor0to6(0);
             dialog.dismiss();
         });
         btn_1.setOnClickListener(view -> {
             handleScoringFor0To6(1);
+            updateTeamStatsFor0to6(1);
             dialog.dismiss();
         });
         btn_2.setOnClickListener(view -> {
             handleScoringFor0To6(2);
+            updateTeamStatsFor0to6(2);
             dialog.dismiss();
         });
         btn_3.setOnClickListener(view -> {
             handleScoringFor0To6(3);
+            updateTeamStatsFor0to6(3);
             dialog.dismiss();
         });
         btn_4.setOnClickListener(view -> {
             handleScoringFor0To6(4);
+            updateTeamStatsFor0to6(4);
             dialog.dismiss();
         });
         btn_5.setOnClickListener(view -> {
             handleScoringFor0To6(5);
+            updateTeamStatsFor0to6(5);
             dialog.dismiss();
         });
         btn_6.setOnClickListener(view -> {
             handleScoringFor0To6(6);
+            updateTeamStatsFor0to6(6);
             dialog.dismiss();
         });
         btn_7.setOnClickListener(view -> {
             handleScoringFor0To6(7);
+            updateTeamStatsFor0to6(7);
             dialog.dismiss();
         });
         btn_8.setOnClickListener(view -> {
             handleScoringFor0To6(8);
+            updateTeamStatsFor0to6(8);
             dialog.dismiss();
         });
         btn_bye.setOnClickListener(view -> {
@@ -213,10 +222,7 @@ public class MatchActivity extends AppCompatActivity {
         editor.apply();
     }
     private void showExtrasDialog(String ballType, AlertDialog parentDialog) {
-        // Inflate the extras dialog layout
         View extrasDialogView = getLayoutInflater().inflate(R.layout.activity_dialog_for_extras, null);
-        // Check if the ball type is "No Ball" and set radio group visibility accordingly
-
         EditText extraRunsInput = extrasDialogView.findViewById(R.id.extra_runs_input);
         Button btnCancel = extrasDialogView.findViewById(R.id.btn_cancel);
         Button btnSubmit = extrasDialogView.findViewById(R.id.btn_submit);
@@ -226,9 +232,6 @@ public class MatchActivity extends AppCompatActivity {
         } else {
             radioGroup.setVisibility(View.GONE);  // Hide radio group for other ball types
         }
-
-
-        // Set the ball type label
         TextView ballTypeLabel = extrasDialogView.findViewById(R.id.ball_type_label);
         ballTypeLabel.setText(ballType);
 
@@ -522,6 +525,12 @@ public class MatchActivity extends AppCompatActivity {
              wicketDialog.dismiss();
              parentDialog.dismiss();
          });
+     }
+
+     private void updateTeamStatsFor0to6(int runs){
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        long teamStatsId = sharedPreferences.getLong("teamStatsId", -1);
+        databaseHelper.updateTeamStatsFor0to6(teamStatsId,runs);
      }
 
 }
