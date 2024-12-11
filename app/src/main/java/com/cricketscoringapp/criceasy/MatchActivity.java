@@ -328,7 +328,6 @@ public class MatchActivity extends AppCompatActivity {
          long non_striker_id = sharedPreferences.getLong("non_striker_id", -1);
          long partnership_id = sharedPreferences.getLong("partnership_id", -1);
          switch (runFromWhat){
-
              case "Bat":
                  databaseHelper.updateBatsmanStatsForNb(innings_id, striker, extraRuns, "Bat");
                  databaseHelper.updateBowlerStatsForNb(innings_id, bowler_id, extraRuns, "Bat");
@@ -353,8 +352,7 @@ public class MatchActivity extends AppCompatActivity {
                  databaseHelper.updateExtrasTable(ballll_id, ballType, extraRuns);
                  rotateStrike(extraRuns);
                  break;
-         }
-
+         }updateTeamStatsForNoBall(extraRuns, runFromWhat);
      }
      private void showWicketDialog(AlertDialog parentDialog){
          View wicketDialogView = getLayoutInflater().inflate(R.layout.activity_typeofwicket, null);

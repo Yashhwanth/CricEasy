@@ -1911,10 +1911,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             currentRuns += totalNoBallRuns; // Update total runs
 
             // Update extras
-            if ("from bat".equalsIgnoreCase(runsSource)) {
+            if ("Bat".equalsIgnoreCase(runsSource)) {
                 // Add only the no-ball extra
                 currentExtras += 1;
-            } else if ("byes/lbyes".equalsIgnoreCase(runsSource)) {
+            } else if ("Lb".equalsIgnoreCase(runsSource) || "By".equalsIgnoreCase(runsSource)) {
                 // Add the total runs (runs + 1 for no-ball)
                 currentExtras += totalNoBallRuns;
             } else {
