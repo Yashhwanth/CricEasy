@@ -898,56 +898,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return teamStatsId;
     }
-    public void updateTeamStatsFor0to6(long teamStatsId, int runs) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        try {
-            // Get the current values of runs and balls
-            String selectQuery = "SELECT " + COLUMN_RUNS + ", " + "balls" + " FROM " + TABLE_TEAM_STATISTICS + " WHERE " + COLUMN_TEAM_STATS_ID + " = ?";
-            Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(teamStatsId)});
-
-            int currentRuns = 0;
-            int currentBalls = 0;
-
-            if (cursor != null && cursor.moveToFirst()) {
-                // Ensure the columns exist by checking the index is not -1
-                int runsIndex = cursor.getColumnIndex(COLUMN_RUNS);
-                int ballsIndex = cursor.getColumnIndex("balls");
-
-                if (runsIndex != -1 && ballsIndex != -1) {
-                    // Only proceed if the column indices are valid
-                    currentRuns = cursor.getInt(runsIndex);
-                    currentBalls = cursor.getInt(ballsIndex);
-                } else {
-                    Log.e("DatabaseHelper", "Column not found.");
-                    return; // Exit the method if column indices are invalid
-                }
-
-                cursor.close();
-            }
-
-            // Increment runs and balls
-            currentRuns += runs;
-            currentBalls += 1;
-
-            // Update the stats in the database
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(COLUMN_RUNS, currentRuns);
-            contentValues.put(COLUMN_BALLS, currentBalls);
-
-            int rowsUpdated = db.update(TABLE_TEAM_STATISTICS, contentValues, COLUMN_TEAM_STATS_ID + " = ?", new String[]{String.valueOf(teamStatsId)});
-
-            if (rowsUpdated > 0) {
-                Log.d("DatabaseHelper", "Team stats updated for ID: " + teamStatsId);
-            } else {
-                Log.e("DatabaseHelper", "Failed to update team stats for ID: " + teamStatsId);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.e("DatabaseHelper", "Error during team stats update for 0 to 6 runs.");
-        } finally {
-            db.close();
-        }
-    }
 
 
 
@@ -1775,6 +1725,225 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
+
+//---------------------------------------------team stats---------------------------------------------------
+    public void updateTeamStatsFor0to6(long teamStatsId, int runs) {
+    SQLiteDatabase db = this.getWritableDatabase();
+    try {
+        // Get the current values of runs and balls
+        String selectQuery = "SELECT " + COLUMN_RUNS + ", " + "balls" + " FROM " + TABLE_TEAM_STATISTICS + " WHERE " + COLUMN_TEAM_STATS_ID + " = ?";
+        Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(teamStatsId)});
+
+        int currentRuns = 0;
+        int currentBalls = 0;
+
+        if (cursor != null && cursor.moveToFirst()) {
+            // Ensure the columns exist by checking the index is not -1
+            int runsIndex = cursor.getColumnIndex(COLUMN_RUNS);
+            int ballsIndex = cursor.getColumnIndex("balls");
+
+            if (runsIndex != -1 && ballsIndex != -1) {
+                // Only proceed if the column indices are valid
+                currentRuns = cursor.getInt(runsIndex);
+                currentBalls = cursor.getInt(ballsIndex);
+            } else {
+                Log.e("DatabaseHelper", "Column not found.");
+                return; // Exit the method if column indices are invalid
+            }
+
+            cursor.close();
+        }
+
+        // Increment runs and balls
+        currentRuns += runs;
+        currentBalls += 1;
+
+        // Update the stats in the database
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_RUNS, currentRuns);
+        contentValues.put(COLUMN_BALLS, currentBalls);
+
+        int rowsUpdated = db.update(TABLE_TEAM_STATISTICS, contentValues, COLUMN_TEAM_STATS_ID + " = ?", new String[]{String.valueOf(teamStatsId)});
+
+        if (rowsUpdated > 0) {
+            Log.d("DatabaseHelper", "Team stats updated for ID: " + teamStatsId);
+        } else {
+            Log.e("DatabaseHelper", "Failed to update team stats for ID: " + teamStatsId);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        Log.e("DatabaseHelper", "Error during team stats update for 0 to 6 runs.");
+    } finally {
+        db.close();
+    }
+}
+    public void updateTeamStatsForByesAndLegByes(long teamStatsId, int runs) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            // Get the current values of runs, balls, and extras
+            String selectQuery = "SELECT " + COLUMN_RUNS + ", " + COLUMN_BALLS + ", " + COLUMN_EXTRAS +
+                    " FROM " + TABLE_TEAM_STATISTICS +
+                    " WHERE " + COLUMN_TEAM_STATS_ID + " = ?";
+            Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(teamStatsId)});
+            int currentRuns = 0;
+            int currentBalls = 0;
+            int currentExtras = 0;
+
+            if (cursor != null && cursor.moveToFirst()) {
+                int runsIndex = cursor.getColumnIndex(COLUMN_RUNS);
+                int ballsIndex = cursor.getColumnIndex(COLUMN_BALLS);
+                int extrasIndex = cursor.getColumnIndex(COLUMN_EXTRAS);
+
+                if (runsIndex != -1 && ballsIndex != -1 && extrasIndex != -1) {
+                    currentRuns = cursor.getInt(runsIndex);
+                    currentBalls = cursor.getInt(ballsIndex);
+                    currentExtras = cursor.getInt(extrasIndex);
+                } else {
+                    Log.e("DatabaseHelper", "Column not found.");
+                    return; // Exit the method if column indices are invalid
+                }
+                cursor.close();
+            }
+
+            // Increment runs, balls, and extras for Byes or Leg Byes
+            currentRuns += runs;  // Add runs to total runs
+            currentBalls += 1;    // Increment the ball count
+            currentExtras += runs; // Add runs to extras
+
+            // Update the stats in the database
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(COLUMN_RUNS, currentRuns);
+            contentValues.put(COLUMN_BALLS, currentBalls);
+            contentValues.put(COLUMN_EXTRAS, currentExtras);
+
+            int rowsUpdated = db.update(TABLE_TEAM_STATISTICS, contentValues,
+                    COLUMN_TEAM_STATS_ID + " = ?",
+                    new String[]{String.valueOf(teamStatsId)});
+            if (rowsUpdated > 0) {
+                Log.d("DatabaseHelper", "Team stats updated for ID: " + teamStatsId + " (Byes/Leg Byes)");
+            } else {
+                Log.e("DatabaseHelper", "Failed to update team stats for ID: " + teamStatsId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("DatabaseHelper", "Error during team stats update for Byes/Leg Byes.");
+        } finally {
+            db.close();
+        }
+    }
+    public void updateTeamStatsForWide(long teamStatsId, int runs) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            // Get the current values of runs, extras
+            String selectQuery = "SELECT " + COLUMN_RUNS + ", " + COLUMN_EXTRAS +
+                    " FROM " + TABLE_TEAM_STATISTICS +
+                    " WHERE " + COLUMN_TEAM_STATS_ID + " = ?";
+            Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(teamStatsId)});
+            int currentRuns = 0;
+            int currentExtras = 0;
+
+            if (cursor != null && cursor.moveToFirst()) {
+                int runsIndex = cursor.getColumnIndex(COLUMN_RUNS);
+                int extrasIndex = cursor.getColumnIndex(COLUMN_EXTRAS);
+
+                if (runsIndex != -1 && extrasIndex != -1) {
+                    currentRuns = cursor.getInt(runsIndex);
+                    currentExtras = cursor.getInt(extrasIndex);
+                } else {
+                    Log.e("DatabaseHelper", "Column not found.");
+                    return; // Exit the method if column indices are invalid
+                }
+                cursor.close();
+            }
+
+            // Increment runs and extras for Wides
+            int totalWideRuns = runs + 1; // Add the mandatory extra run for the wide
+            currentRuns += totalWideRuns; // Update total runs
+            currentExtras += totalWideRuns; // Update extras
+
+            // Update the stats in the database
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(COLUMN_RUNS, currentRuns);
+            contentValues.put(COLUMN_EXTRAS, currentExtras);
+
+            int rowsUpdated = db.update(TABLE_TEAM_STATISTICS, contentValues,
+                    COLUMN_TEAM_STATS_ID + " = ?",
+                    new String[]{String.valueOf(teamStatsId)});
+            if (rowsUpdated > 0) {
+                Log.d("DatabaseHelper", "Team stats updated for ID: " + teamStatsId + " (Wides)");
+            } else {
+                Log.e("DatabaseHelper", "Failed to update team stats for ID: " + teamStatsId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("DatabaseHelper", "Error during team stats update for Wides.");
+        } finally {
+            db.close();
+        }
+    }
+    public void updateTeamStatsForNoBall(long teamStatsId, int runs, String runsSource) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            // Get the current values of runs and extras
+            String selectQuery = "SELECT " + COLUMN_RUNS + ", " + COLUMN_EXTRAS +
+                    " FROM " + TABLE_TEAM_STATISTICS +
+                    " WHERE " + COLUMN_TEAM_STATS_ID + " = ?";
+            Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(teamStatsId)});
+            int currentRuns = 0;
+            int currentExtras = 0;
+
+            if (cursor != null && cursor.moveToFirst()) {
+                int runsIndex = cursor.getColumnIndex(COLUMN_RUNS);
+                int extrasIndex = cursor.getColumnIndex(COLUMN_EXTRAS);
+
+                if (runsIndex != -1 && extrasIndex != -1) {
+                    currentRuns = cursor.getInt(runsIndex);
+                    currentExtras = cursor.getInt(extrasIndex);
+                } else {
+                    Log.e("DatabaseHelper", "Column not found.");
+                    return; // Exit the method if column indices are invalid
+                }
+                cursor.close();
+            }
+
+            // Update runs
+            int totalNoBallRuns = runs + 1; // Add 1 run for no-ball
+            currentRuns += totalNoBallRuns; // Update total runs
+
+            // Update extras
+            if ("from bat".equalsIgnoreCase(runsSource)) {
+                // Add only the no-ball extra
+                currentExtras += 1;
+            } else if ("byes/lbyes".equalsIgnoreCase(runsSource)) {
+                // Add the total runs (runs + 1 for no-ball)
+                currentExtras += totalNoBallRuns;
+            } else {
+                Log.e("DatabaseHelper", "Invalid runs source.");
+                return; // Exit if the source is invalid
+            }
+
+            // Save updates in the database
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(COLUMN_RUNS, currentRuns);
+            contentValues.put(COLUMN_EXTRAS, currentExtras);
+
+            int rowsUpdated = db.update(TABLE_TEAM_STATISTICS, contentValues,
+                    COLUMN_TEAM_STATS_ID + " = ?",
+                    new String[]{String.valueOf(teamStatsId)});
+            if (rowsUpdated > 0) {
+                Log.d("DatabaseHelper", "Team stats updated for ID: " + teamStatsId + " (No-Ball)");
+            } else {
+                Log.e("DatabaseHelper", "Failed to update team stats for ID: " + teamStatsId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("DatabaseHelper", "Error during team stats update for No-Ball.");
+        } finally {
+            db.close();
+        }
+    }
+
+
 
 
 

@@ -123,47 +123,38 @@ public class MatchActivity extends AppCompatActivity {
         // Set up OnClickListeners for the dialog buttons
         btn_0.setOnClickListener(view -> {
             handleScoringFor0To6(0);
-            updateTeamStatsFor0to6(0);
             dialog.dismiss();
         });
         btn_1.setOnClickListener(view -> {
             handleScoringFor0To6(1);
-            updateTeamStatsFor0to6(1);
             dialog.dismiss();
         });
         btn_2.setOnClickListener(view -> {
             handleScoringFor0To6(2);
-            updateTeamStatsFor0to6(2);
             dialog.dismiss();
         });
         btn_3.setOnClickListener(view -> {
             handleScoringFor0To6(3);
-            updateTeamStatsFor0to6(3);
             dialog.dismiss();
         });
         btn_4.setOnClickListener(view -> {
             handleScoringFor0To6(4);
-            updateTeamStatsFor0to6(4);
             dialog.dismiss();
         });
         btn_5.setOnClickListener(view -> {
             handleScoringFor0To6(5);
-            updateTeamStatsFor0to6(5);
             dialog.dismiss();
         });
         btn_6.setOnClickListener(view -> {
             handleScoringFor0To6(6);
-            updateTeamStatsFor0to6(6);
             dialog.dismiss();
         });
         btn_7.setOnClickListener(view -> {
             handleScoringFor0To6(7);
-            updateTeamStatsFor0to6(7);
             dialog.dismiss();
         });
         btn_8.setOnClickListener(view -> {
             handleScoringFor0To6(8);
-            updateTeamStatsFor0to6(8);
             dialog.dismiss();
         });
         btn_bye.setOnClickListener(view -> {
@@ -296,6 +287,7 @@ public class MatchActivity extends AppCompatActivity {
         rotateStrike(runs);
         databaseHelper.updateBatsmanStatsFor0To6(innings_id, striker, runs);
         databaseHelper.updateBowlerStatsFor0to6(innings_id, bowler, runs);
+        updateTeamStatsFor0to6(runs);
         Toast.makeText(this, "Runs scored: " + runs + ball_id, Toast.LENGTH_SHORT).show();
     }
      private void handleScoringForByesAndLegByes(int extraRuns, String ballType) {
@@ -310,6 +302,7 @@ public class MatchActivity extends AppCompatActivity {
          databaseHelper.updateBowlerForByLBes(innings_id, bowler_id, ballType);
          databaseHelper.updatePartnershipForByLByes(1);
          databaseHelper.updateExtrasTable(ball_id, ballType, extraRuns);
+         updateTeamStatsForByLegBy(extraRuns);
          rotateStrike(extraRuns);
      }
      private void handleScoringForWide(int extraRuns, String ballType){
@@ -322,6 +315,8 @@ public class MatchActivity extends AppCompatActivity {
          long ball_id = databaseHelper.insertBallDataForWide(over_id, extraRuns, batsman_id, non_striker_id);
          databaseHelper.updateBowlerForWide(innings_id, bowler_id, extraRuns);
          databaseHelper.updateExtrasTable(ball_id, ballType, extraRuns);
+         updateTeamStatsForWide(extraRuns);
+         rotateStrike(extraRuns);
 
      }
      private void handleScoringForNoBall(int extraRuns, String ballType, String runFromWhat){
@@ -341,7 +336,6 @@ public class MatchActivity extends AppCompatActivity {
                  long ball_id = databaseHelper.insertBallDataForNb(over_id, extraRuns, striker, non_striker_id);
                  databaseHelper.updateExtrasTable(ball_id, ballType, extraRuns);
                  rotateStrike(extraRuns);
-                 //call();
                  break;
              case "Lb":
                  databaseHelper.updateBatsmanStatsForNb(innings_id, striker, extraRuns, "Bye");
@@ -350,7 +344,6 @@ public class MatchActivity extends AppCompatActivity {
                  long balll_id = databaseHelper.insertBallDataForNb(over_id, extraRuns, striker, non_striker_id);
                  databaseHelper.updateExtrasTable(balll_id, ballType, extraRuns);
                  rotateStrike(extraRuns);
-                 //call();
                  break;
              case "By":
                  databaseHelper.updateBatsmanStatsForNb(innings_id, striker, extraRuns, "Leg Bye");
@@ -359,7 +352,6 @@ public class MatchActivity extends AppCompatActivity {
                  long ballll_id = databaseHelper.insertBallDataForNb(over_id, extraRuns, striker, non_striker_id);
                  databaseHelper.updateExtrasTable(ballll_id, ballType, extraRuns);
                  rotateStrike(extraRuns);
-                 //call();
                  break;
          }
 
@@ -530,7 +522,24 @@ public class MatchActivity extends AppCompatActivity {
      private void updateTeamStatsFor0to6(int runs){
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
         long teamStatsId = sharedPreferences.getLong("teamStatsId", -1);
-        databaseHelper.updateTeamStatsFor0to6(teamStatsId,runs);
+        databaseHelper.updateTeamStatsFor0to6(teamStatsId, runs);
      }
+
+     private void updateTeamStatsForByLegBy(int runs){
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+        long teamStatsId = sharedPreferences.getLong("teamStatsId", -1);
+        databaseHelper.updateTeamStatsForByesAndLegByes(teamStatsId, runs);
+     }
+
+    private void updateTeamStatsForWide(int runs){
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+        long teamStatsId = sharedPreferences.getLong("teamStatsId", -1);
+        databaseHelper.updateTeamStatsForWide(teamStatsId, runs);
+    }
+    private void updateTeamStatsForNoBall(int runs, String runsSource){
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+        long teamStatsId = sharedPreferences.getLong("teamStatsId", -1);
+        databaseHelper.updateTeamStatsForNoBall(teamStatsId, runs, runsSource);
+    }
 
 }
