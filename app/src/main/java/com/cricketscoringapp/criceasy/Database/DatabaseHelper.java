@@ -1942,13 +1942,49 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
+    public void updateTeamStatsForBowCauLbw(long teamStatsId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "UPDATE " + TABLE_TEAM_STATISTICS +
+                " SET " +
+                COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1, " +
+                COLUMN_WICKETS + " = " + COLUMN_WICKETS + " + 1 " +
+                "WHERE " + COLUMN_TEAM_STATS_ID + " = ?";
+        SQLiteStatement statement = db.compileStatement(query);
+        statement.bindLong(1, teamStatsId);
+        statement.executeUpdateDelete();
+        statement.close();
+    }
+    public void updateTeamStatsForStumping(long teamStatsId, String ballType) {
+        Log.d(TAG, "updateTeamStatsForStumping: hiiiiiiiiiiiiiiiiii");
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query;
 
+        if ("Wide".equalsIgnoreCase(ballType)) {
+            // Case: Stumping on a Wide Ball
+            query = "UPDATE " + TABLE_TEAM_STATISTICS +
+                    " SET " +
+                    COLUMN_EXTRAS + " = " + COLUMN_EXTRAS + " + 1, " + // Add wide to extras
+                    COLUMN_RUNS + " = " + COLUMN_RUNS + " + 1, " +      // Add wide to total score
+                    COLUMN_WICKETS + " = " + COLUMN_WICKETS + " + 1 " + // Increment wicket count
+                    "WHERE " + COLUMN_TEAM_STATS_ID + " = ?";
+        } else if ("Normal".equalsIgnoreCase(ballType)) {
+            // Case: Stumping on a Normal Ball
+            query = "UPDATE " + TABLE_TEAM_STATISTICS +
+                    " SET " +
+                    COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1, " + // Increment ball count
+                    COLUMN_WICKETS + " = " + COLUMN_WICKETS + " + 1 " + // Increment wicket count
+                    "WHERE " + COLUMN_TEAM_STATS_ID + " = ?";
+        } else {
+            // Invalid ball type, log error or throw exception
+            Log.e("DatabaseHelper", "Invalid ball type: " + ballType);
+            return;
+        }
 
-
-
-
-
-
+        SQLiteStatement statement = db.compileStatement(query);
+        statement.bindLong(1, teamStatsId); // Bind the TeamStatsId
+        statement.executeUpdateDelete(); // Execute the update query
+        statement.close();
+    }
 }
 
 

@@ -174,8 +174,6 @@ public class MatchActivity extends AppCompatActivity {
         });
 
     }
-
-
     private void showFragment(Fragment fragment) {
         // Begin a fragment transaction to replace the current fragment
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -189,7 +187,6 @@ public class MatchActivity extends AppCompatActivity {
         editor.putString("current_activity", getClass().getSimpleName()); // Store the current activity name
         editor.apply(); // Save changes asynchronously
     }
-    //striker rotating
     private void rotateStrike(int runs) {
         // Access the SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
@@ -212,6 +209,7 @@ public class MatchActivity extends AppCompatActivity {
         editor.putLong("non_striker_id", nonStrikerId);
         editor.apply();
     }
+    private void rotateStrikeWhileWicket(){}
     private void showExtrasDialog(String ballType, AlertDialog parentDialog) {
         View extrasDialogView = getLayoutInflater().inflate(R.layout.activity_dialog_for_extras, null);
         EditText extraRunsInput = extrasDialogView.findViewById(R.id.extra_runs_input);
@@ -246,7 +244,11 @@ public class MatchActivity extends AppCompatActivity {
             String extraRunsStr = extraRunsInput.getText().toString();
             int radioBtnId = radioGroup.getCheckedRadioButtonId(); // Get the selected RadioButton ID
             String runFromWhat = null; // Variable to store the tag value
-            if (radioBtnId != -1) { // Check if a RadioButton is selected
+            // Validate RadioGroup input
+            if (radioBtnId == -1) { // Check if no RadioButton is selected
+                Toast.makeText(this, "Please select the source of runs (From bat or Byes/Leg Byes).", Toast.LENGTH_SHORT).show();
+                return; // Stop further execution
+            } else {
                 RadioButton radioBtn = extrasDialogView.findViewById(radioBtnId);
                 runFromWhat = (String) radioBtn.getTag(); // Get the tag of the selected RadioButton
             }
@@ -272,6 +274,169 @@ public class MatchActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Please enter the extra runs.", Toast.LENGTH_SHORT).show();
             }
+        });
+    }
+    private void showWicketDialog(AlertDialog parentDialog){
+        View wicketDialogView = getLayoutInflater().inflate(R.layout.activity_typeofwicket, null);
+
+        AlertDialog.Builder wicketsBuilder = new AlertDialog.Builder(this);
+        wicketsBuilder.setView(wicketDialogView);
+        AlertDialog wicketDialog = wicketsBuilder.create();
+        wicketDialog.show();
+
+        if (wicketDialog.getWindow() != null) {
+            wicketDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+        EditText runs_input = wicketDialogView.findViewById(R.id.runs_input_et);
+
+        Button cancelButton = wicketDialogView.findViewById(R.id.cancel_btn);
+        Button submitButton = wicketDialogView.findViewById(R.id.submit_btn);
+
+        RadioGroup dismissalTypeRadioGroup = wicketDialogView.findViewById(R.id.dismissal_type_rg); // dismissal type
+
+        LinearLayout runs_input_layout = wicketDialogView.findViewById(R.id.runs_in_wicket_layout); //runs input
+        LinearLayout out_batsman_layout = wicketDialogView.findViewById(R.id.out_batsman_layout); // out batsman
+        LinearLayout out_end_layout = wicketDialogView.findViewById(R.id.out_end_layout); //out end
+        LinearLayout runs_from_bat_or_by_layout = wicketDialogView.findViewById(R.id.runs_in_runout_layout); // from bat/by layout
+        LinearLayout ball_type_in_run_out_layout = wicketDialogView.findViewById(R.id.ball_type_in_runout_layout); // ball type in run out layout
+        LinearLayout stumped_layout = wicketDialogView.findViewById(R.id.stumped_ball_type_layout); //ball type in run out
+
+        RadioGroup out_batsman_radio_group = wicketDialogView.findViewById(R.id.out_batsman_rg);
+        RadioGroup out_end_radio_group = wicketDialogView.findViewById(R.id.out_end_rg);
+        RadioGroup ball_type_in_run_out_radio_group = wicketDialogView.findViewById(R.id.ball_type_rg);
+        RadioGroup from_bat_or_by_radio_group = wicketDialogView.findViewById(R.id.runs_source_rg);
+        RadioGroup stumped_ball_type = wicketDialogView.findViewById(R.id.stumped_ball_type_rg);
+
+
+        runs_input_layout.setVisibility(View.GONE);
+        out_batsman_layout.setVisibility(View.GONE);
+        out_end_layout.setVisibility(View.GONE);
+        runs_from_bat_or_by_layout.setVisibility(View.GONE);
+        ball_type_in_run_out_layout.setVisibility(View.GONE);
+        stumped_layout.setVisibility(View.GONE);
+
+
+        // Add listener to RadioGroup to detect selection
+        dismissalTypeRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.run_out_rb) {
+                runs_input_layout.setVisibility(View.VISIBLE);
+                out_batsman_layout.setVisibility(View.VISIBLE);
+                out_end_layout.setVisibility(View.VISIBLE);
+                ball_type_in_run_out_layout.setVisibility(View.VISIBLE);
+                runs_from_bat_or_by_layout.setVisibility(View.VISIBLE);
+                stumped_layout.setVisibility(View.GONE);
+                ball_type_in_run_out_radio_group.setOnCheckedChangeListener((group1, checkedId1) -> {
+                    if(checkedId1 == R.id.wide_rb){
+                        runs_from_bat_or_by_layout.setVisibility(View.GONE);
+                    }else{
+                        runs_from_bat_or_by_layout.setVisibility(View.VISIBLE);
+                    }
+                });
+            }else if(checkedId == R.id.stumped_rb) {
+                runs_input_layout.setVisibility(View.GONE);
+                out_batsman_layout.setVisibility(View.GONE);
+                out_end_layout.setVisibility(View.GONE);
+                runs_from_bat_or_by_layout.setVisibility(View.GONE);
+                ball_type_in_run_out_layout.setVisibility(View.GONE);
+                stumped_layout.setVisibility(View.GONE);
+                stumped_layout.setVisibility(View.VISIBLE);
+            }else{
+                // Handle other cases, e.g., hide layouts
+                runs_input_layout.setVisibility(View.GONE);
+                out_batsman_layout.setVisibility(View.GONE);
+                out_end_layout.setVisibility(View.GONE);
+                runs_from_bat_or_by_layout.setVisibility(View.GONE);
+                ball_type_in_run_out_layout.setVisibility(View.GONE);
+                stumped_layout.setVisibility(View.GONE);
+            }
+        });
+        cancelButton.setOnClickListener(view -> {
+            wicketDialog.dismiss();
+        });
+        submitButton.setOnClickListener(view -> {
+            int dismissalTypeID = dismissalTypeRadioGroup.getCheckedRadioButtonId();
+            if (dismissalTypeID == -1) {
+                Toast.makeText(this, "Please select a dismissal type.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            RadioButton dismissalButton = wicketDialogView.findViewById(dismissalTypeID);
+            String dismissalType = dismissalButton.getText().toString();
+            int runs = 0;
+            String runsInput = runs_input.getText().toString();
+            if (!runsInput.isEmpty()) {
+                try {
+                    runs = Integer.parseInt(runsInput);
+                } catch (NumberFormatException e) {
+                    // Handle the case where the number format is invalid (e.g., non-numeric input)
+                    runs = 0; // Set to default if there's a parsing error
+                }
+            }
+            SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+            long innings_id = sharedPreferences.getLong("Innings_id",-1);
+            long striker = sharedPreferences.getLong("striker_id", -1);
+            long non_striker_id = sharedPreferences.getLong("non_striker_id", -1);
+            long bowler_id = sharedPreferences.getLong("bowler_id", -1);
+            long over_id = sharedPreferences.getLong("over_id", -1);
+            long team_stats_id = sharedPreferences.getLong("teamStatsId", -1);
+            switch (dismissalType) {
+                case "Bowled":
+                case "Caught":
+                case "LBW":
+                    databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, null, null, "BOWLED");
+                    databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, null, null, "BOWLED");
+                    databaseHelper.insertBallDataForWicket(over_id, "Legal", runs, striker, non_striker_id);
+                    databaseHelper.updateTeamStatsForBowCauLbw(team_stats_id);
+                    break;
+                case "Run-Out":
+                    Log.d(TAG, "showWicketDialog: " + runs);
+                    int outBatsmanRadioButtonId = out_batsman_radio_group.getCheckedRadioButtonId();
+                    if (outBatsmanRadioButtonId == -1) {
+                        Toast.makeText(this, "Please select the out batsman for run-out.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    int outEndRadioButtonId = out_end_radio_group.getCheckedRadioButtonId();
+                    if (outEndRadioButtonId == -1) {
+                        Toast.makeText(this, "Please select the out end for run-out.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    int ballTypeRadioButtonIdRO = ball_type_in_run_out_radio_group.getCheckedRadioButtonId();
+                    if (ballTypeRadioButtonIdRO == -1) {
+                        Toast.makeText(this, "Please select the ball type for run-out.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    RadioButton ballTypeRadioButtonRO = wicketDialogView.findViewById(ballTypeRadioButtonIdRO);
+                    String ballTypeInRo = ballTypeRadioButtonRO.getText().toString();
+                    String runsFrom = "N/A";
+                    if (!ballTypeInRo.equals("Wide") && from_bat_or_by_radio_group.getVisibility() == View.VISIBLE) {
+                        int runsFromId = from_bat_or_by_radio_group.getCheckedRadioButtonId();
+                        if (runsFromId == -1) {
+                            Toast.makeText(this, "Please select runs from (bat/byes/leg byes).", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        RadioButton runsFromRadioButton = wicketDialogView.findViewById(runsFromId);
+                        runsFrom = runsFromRadioButton.getText().toString();
+                    }
+                    databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballTypeInRo, runsFrom, "RUN-OUT");
+                    databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, ballTypeInRo, runsFrom, "RUN-OUT");
+                    databaseHelper.insertBallDataForWicket(over_id, ballTypeInRo, runs, striker, non_striker_id);
+                    break;
+                case "Stumped":
+                    Log.d(TAG, "showWicketDialog: hiiiiiiiiiiiibiiiiiiiiiiiiiii");
+                    int ballTypeId = stumped_ball_type.getCheckedRadioButtonId();
+                    if (ballTypeId == -1) {
+                        Toast.makeText(this, "Please select the ball type for stumping.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    RadioButton ballTypeRadioButton = wicketDialogView.findViewById(ballTypeId);
+                    String ballType = ballTypeRadioButton.getText().toString();
+                    databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballType, null, "STUMPED");
+                    databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, ballType, null, "STUMPED");
+                    databaseHelper.insertBallDataForWicket(over_id, ballType, runs, striker, non_striker_id);
+                    databaseHelper.updateTeamStatsForStumping(team_stats_id, ballType);
+                    break;
+            }
+            wicketDialog.dismiss();
+            parentDialog.dismiss();
         });
     }
     private void handleScoringFor0To6(int runs) {
@@ -354,181 +519,16 @@ public class MatchActivity extends AppCompatActivity {
                  break;
          }updateTeamStatsForNoBall(extraRuns, runFromWhat);
      }
-     private void showWicketDialog(AlertDialog parentDialog){
-         View wicketDialogView = getLayoutInflater().inflate(R.layout.activity_typeofwicket, null);
-
-         AlertDialog.Builder wicketsBuilder = new AlertDialog.Builder(this);
-         wicketsBuilder.setView(wicketDialogView);
-         AlertDialog wicketDialog = wicketsBuilder.create();
-         wicketDialog.show();
-
-         if (wicketDialog.getWindow() != null) {
-             wicketDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-         }
-         EditText runs_input = wicketDialogView.findViewById(R.id.runs_input_et);
-
-         Button cancelButton = wicketDialogView.findViewById(R.id.cancel_btn);
-         Button submitButton = wicketDialogView.findViewById(R.id.submit_btn);
-
-         RadioGroup dismissalTypeRadioGroup = wicketDialogView.findViewById(R.id.dismissal_type_rg); // dismissal type
-
-         LinearLayout runs_input_layout = wicketDialogView.findViewById(R.id.runs_in_wicket_layout); //runs input
-         LinearLayout out_batsman_layout = wicketDialogView.findViewById(R.id.out_batsman_layout); // out batsman
-         LinearLayout out_end_layout = wicketDialogView.findViewById(R.id.out_end_layout); //out end
-         LinearLayout runs_from_bat_or_by_layout = wicketDialogView.findViewById(R.id.runs_in_runout_layout); // from bat/by layout
-         LinearLayout ball_type_in_run_out_layout = wicketDialogView.findViewById(R.id.ball_type_in_runout_layout); // ball type in run out layout
-         LinearLayout stumped_layout = wicketDialogView.findViewById(R.id.stumped_ball_type_layout); //ball type in run out
-
-         RadioGroup out_batsman_radio_group = wicketDialogView.findViewById(R.id.out_batsman_rg);
-         RadioGroup out_end_radio_group = wicketDialogView.findViewById(R.id.out_end_rg);
-         RadioGroup ball_type_in_run_out_radio_group = wicketDialogView.findViewById(R.id.ball_type_rg);
-         RadioGroup from_bat_or_by_radio_group = wicketDialogView.findViewById(R.id.runs_source_rg);
-         RadioGroup stumped_ball_type = wicketDialogView.findViewById(R.id.stumped_ball_type_rg);
-
-
-         runs_input_layout.setVisibility(View.GONE);
-         out_batsman_layout.setVisibility(View.GONE);
-         out_end_layout.setVisibility(View.GONE);
-         runs_from_bat_or_by_layout.setVisibility(View.GONE);
-         ball_type_in_run_out_layout.setVisibility(View.GONE);
-         stumped_layout.setVisibility(View.GONE);
-
-
-         // Add listener to RadioGroup to detect selection
-         dismissalTypeRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-             if (checkedId == R.id.run_out_rb) {
-                 runs_input_layout.setVisibility(View.VISIBLE);
-                 out_batsman_layout.setVisibility(View.VISIBLE);
-                 out_end_layout.setVisibility(View.VISIBLE);
-                 ball_type_in_run_out_layout.setVisibility(View.VISIBLE);
-                 runs_from_bat_or_by_layout.setVisibility(View.VISIBLE);
-                 stumped_layout.setVisibility(View.GONE);
-                 ball_type_in_run_out_radio_group.setOnCheckedChangeListener((group1, checkedId1) -> {
-                     if(checkedId1 == R.id.wide_rb){
-                         runs_from_bat_or_by_layout.setVisibility(View.GONE);
-                     }else{
-                         runs_from_bat_or_by_layout.setVisibility(View.VISIBLE);
-                     }
-                 });
-             }else if(checkedId == R.id.stumped_rb) {
-                 runs_input_layout.setVisibility(View.GONE);
-                 out_batsman_layout.setVisibility(View.GONE);
-                 out_end_layout.setVisibility(View.GONE);
-                 runs_from_bat_or_by_layout.setVisibility(View.GONE);
-                 ball_type_in_run_out_layout.setVisibility(View.GONE);
-                 stumped_layout.setVisibility(View.GONE);
-                 stumped_layout.setVisibility(View.VISIBLE);
-             }else{
-                 // Handle other cases, e.g., hide layouts
-                 runs_input_layout.setVisibility(View.GONE);
-                 out_batsman_layout.setVisibility(View.GONE);
-                 out_end_layout.setVisibility(View.GONE);
-                 runs_from_bat_or_by_layout.setVisibility(View.GONE);
-                 ball_type_in_run_out_layout.setVisibility(View.GONE);
-                 stumped_layout.setVisibility(View.GONE);
-             }
-         });
-         cancelButton.setOnClickListener(view -> {
-             wicketDialog.dismiss();
-         });
-         submitButton.setOnClickListener(view -> {
-             int dismissalTypeID = dismissalTypeRadioGroup.getCheckedRadioButtonId();
-             if (dismissalTypeID == -1) {
-                 Toast.makeText(this, "Please select a dismissal type.", Toast.LENGTH_SHORT).show();
-                 return;
-             }
-             RadioButton dismissalButton = wicketDialogView.findViewById(dismissalTypeID);
-             String dismissalType = dismissalButton.getText().toString();
-             int runs = 0;
-             String runsInput = runs_input.getText().toString();
-             if (!runsInput.isEmpty()) {
-                 try {
-                     runs = Integer.parseInt(runsInput);
-                 } catch (NumberFormatException e) {
-                     // Handle the case where the number format is invalid (e.g., non-numeric input)
-                     runs = 0; // Set to default if there's a parsing error
-                 }
-             }
-             SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
-             long innings_id = sharedPreferences.getLong("Innings_id",-1);
-             long striker = sharedPreferences.getLong("striker_id", -1);
-             long non_striker_id = sharedPreferences.getLong("non_striker_id", -1);
-             long bowler_id = sharedPreferences.getLong("bowler_id", -1);
-             long over_id = sharedPreferences.getLong("over_id", -1);
-
-
-
-             switch (dismissalType) {
-                 case "Bowled":
-                 case "Caught":
-                 case "LBW":
-                     databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, null, null, "BOWLED");
-                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, null, null, "BOWLED");
-                     databaseHelper.insertBallDataForWicket(over_id, "Legal", runs, striker, non_striker_id);
-                     break;
-                 case "Run-Out":
-                     Log.d(TAG, "showWicketDialog: " + runs);
-                     int outBatsmanRadioButtonId = out_batsman_radio_group.getCheckedRadioButtonId();
-                     if (outBatsmanRadioButtonId == -1) {
-                         Toast.makeText(this, "Please select the out batsman for run-out.", Toast.LENGTH_SHORT).show();
-                         return;
-                     }
-                     int outEndRadioButtonId = out_end_radio_group.getCheckedRadioButtonId();
-                     if (outEndRadioButtonId == -1) {
-                         Toast.makeText(this, "Please select the out end for run-out.", Toast.LENGTH_SHORT).show();
-                         return;
-                     }
-                     int ballTypeRadioButtonIdRO = ball_type_in_run_out_radio_group.getCheckedRadioButtonId();
-                     if (ballTypeRadioButtonIdRO == -1) {
-                         Toast.makeText(this, "Please select the ball type for run-out.", Toast.LENGTH_SHORT).show();
-                         return;
-                     }
-                     RadioButton ballTypeRadioButtonRO = wicketDialogView.findViewById(ballTypeRadioButtonIdRO);
-                     String ballTypeInRo = ballTypeRadioButtonRO.getText().toString();
-                     String runsFrom = "N/A";
-                     if (!ballTypeInRo.equals("Wide") && from_bat_or_by_radio_group.getVisibility() == View.VISIBLE) {
-                         int runsFromId = from_bat_or_by_radio_group.getCheckedRadioButtonId();
-                         if (runsFromId == -1) {
-                             Toast.makeText(this, "Please select runs from (bat/byes/leg byes).", Toast.LENGTH_SHORT).show();
-                             return;
-                         }
-                         RadioButton runsFromRadioButton = wicketDialogView.findViewById(runsFromId);
-                         runsFrom = runsFromRadioButton.getText().toString();
-                     }
-                     databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballTypeInRo, runsFrom, "RUN-OUT");
-                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, ballTypeInRo, runsFrom, "RUN-OUT");
-                     databaseHelper.insertBallDataForWicket(over_id, ballTypeInRo, runs, striker, non_striker_id);
-                     break;
-                 case "Stumped":
-                     int ballTypeId = stumped_ball_type.getCheckedRadioButtonId();
-                     if (ballTypeId == -1) {
-                         Toast.makeText(this, "Please select the ball type for stumping.", Toast.LENGTH_SHORT).show();
-                         return;
-                     }
-                     RadioButton ballTypeRadioButton = wicketDialogView.findViewById(ballTypeId);
-                     String ballType = ballTypeRadioButton.getText().toString();
-                     databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballType, null, "STUMPED");
-                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, ballType, null, "STUMPED");
-                     databaseHelper.insertBallDataForWicket(over_id, ballType, runs, striker, non_striker_id);
-                     break;
-             }
-             wicketDialog.dismiss();
-             parentDialog.dismiss();
-         });
-     }
-
      private void updateTeamStatsFor0to6(int runs){
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
         long teamStatsId = sharedPreferences.getLong("teamStatsId", -1);
         databaseHelper.updateTeamStatsFor0to6(teamStatsId, runs);
      }
-
      private void updateTeamStatsForByLegBy(int runs){
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
         long teamStatsId = sharedPreferences.getLong("teamStatsId", -1);
         databaseHelper.updateTeamStatsForByesAndLegByes(teamStatsId, runs);
      }
-
     private void updateTeamStatsForWide(int runs){
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
         long teamStatsId = sharedPreferences.getLong("teamStatsId", -1);
