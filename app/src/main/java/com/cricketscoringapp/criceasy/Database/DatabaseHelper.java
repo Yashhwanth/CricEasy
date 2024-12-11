@@ -1955,7 +1955,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         statement.close();
     }
     public void updateTeamStatsForStumping(long teamStatsId, String ballType) {
-        Log.d(TAG, "updateTeamStatsForStumping: hiiiiiiiiiiiiiiiiii");
         SQLiteDatabase db = this.getWritableDatabase();
         String query;
 
@@ -1985,6 +1984,88 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         statement.executeUpdateDelete(); // Execute the update query
         statement.close();
     }
+    public void updateTeamStatsForRunOut(long teamStatsId, int runs, String ballType, String runsFrom) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = null;
+        SQLiteStatement statement;
+
+        if ("Wide".equalsIgnoreCase(ballType)) {
+            // Wide case: Add runs + 1 for wide to both total runs and extras, increment wicket
+            query = "UPDATE " + TABLE_TEAM_STATISTICS +
+                    " SET " +
+                    COLUMN_EXTRAS + " = " + COLUMN_EXTRAS + " + ?, " +
+                    COLUMN_RUNS + " = " + COLUMN_RUNS + " + ?, " +
+                    COLUMN_WICKETS + " = " + COLUMN_WICKETS + " + 1 " +
+                    "WHERE " + COLUMN_TEAM_STATS_ID + " = ?";
+            statement = db.compileStatement(query);
+            statement.bindLong(1, runs + 1); // Extras: runs + 1 for wide
+            statement.bindLong(2, runs + 1); // Total runs: runs + 1 for wide
+            statement.bindLong(3, teamStatsId);
+            statement.executeUpdateDelete();
+            statement.close();
+        } else if ("No-ball".equalsIgnoreCase(ballType)) {
+            if ("From Bat".equalsIgnoreCase(runsFrom)) {
+                // No-ball from bat: Add runs + 1 for no-ball to total runs, increment wicket
+                query = "UPDATE " + TABLE_TEAM_STATISTICS +
+                        " SET " +
+                        COLUMN_RUNS + " = " + COLUMN_RUNS + " + ?, " +
+                        COLUMN_WICKETS + " = " + COLUMN_WICKETS + " + 1 " +
+                        "WHERE " + COLUMN_TEAM_STATS_ID + " = ?";
+                statement = db.compileStatement(query);
+                statement.bindLong(1, runs + 1); // Total runs: runs + 1 for no-ball
+                statement.bindLong(2, teamStatsId);
+                statement.executeUpdateDelete();
+                statement.close();
+            } else if ("From by/lb".equalsIgnoreCase(runsFrom)) {
+                // No-ball from byes/leg-byes: Add runs + 1 for no-ball to both extras and total runs, increment wicket
+                query = "UPDATE " + TABLE_TEAM_STATISTICS +
+                        " SET " +
+                        COLUMN_EXTRAS + " = " + COLUMN_EXTRAS + " + ?, " +
+                        COLUMN_RUNS + " = " + COLUMN_RUNS + " + ?, " +
+                        COLUMN_WICKETS + " = " + COLUMN_WICKETS + " + 1 " +
+                        "WHERE " + COLUMN_TEAM_STATS_ID + " = ?";
+                statement = db.compileStatement(query);
+                statement.bindLong(1, runs + 1); // Extras: runs + 1 for no-ball
+                statement.bindLong(2, runs + 1); // Total runs: runs + 1 for no-ball
+                statement.bindLong(3, teamStatsId);
+                statement.executeUpdateDelete();
+                statement.close();
+            }
+        } else if ("Normal".equalsIgnoreCase(ballType)) {
+            if ("From Bat".equalsIgnoreCase(runsFrom)) {
+                // Normal from bat: Add runs to total runs, increment ball and wicket
+                query = "UPDATE " + TABLE_TEAM_STATISTICS +
+                        " SET " +
+                        COLUMN_RUNS + " = " + COLUMN_RUNS + " + ?, " +
+                        COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1, " +
+                        COLUMN_WICKETS + " = " + COLUMN_WICKETS + " + 1 " +
+                        "WHERE " + COLUMN_TEAM_STATS_ID + " = ?";
+                statement = db.compileStatement(query);
+                statement.bindLong(1, runs); // Total runs: runs from bat
+                statement.bindLong(2, teamStatsId);
+                statement.executeUpdateDelete();
+                statement.close();
+            } else if ("From by/lb".equalsIgnoreCase(runsFrom)) {
+                // Normal from byes/leg-byes: Add runs to both extras and total runs, increment ball and wicket
+                query = "UPDATE " + TABLE_TEAM_STATISTICS +
+                        " SET " +
+                        COLUMN_EXTRAS + " = " + COLUMN_EXTRAS + " + ?, " +
+                        COLUMN_RUNS + " = " + COLUMN_RUNS + " + ?, " +
+                        COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1, " +
+                        COLUMN_WICKETS + " = " + COLUMN_WICKETS + " + 1 " +
+                        "WHERE " + COLUMN_TEAM_STATS_ID + " = ?";
+                statement = db.compileStatement(query);
+                statement.bindLong(1, runs); // Extras: runs from byes/lb
+                statement.bindLong(2, runs); // Total runs: runs from byes/lb
+                statement.bindLong(3, teamStatsId);
+                statement.executeUpdateDelete();
+                statement.close();
+            }
+        } else {
+            Log.e("DatabaseHelper", "Invalid ball type: " + ballType);
+        }
+    }
+
 }
 
 

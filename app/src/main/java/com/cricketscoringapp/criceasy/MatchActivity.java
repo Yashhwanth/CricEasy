@@ -244,13 +244,13 @@ public class MatchActivity extends AppCompatActivity {
             String extraRunsStr = extraRunsInput.getText().toString();
             int radioBtnId = radioGroup.getCheckedRadioButtonId(); // Get the selected RadioButton ID
             String runFromWhat = null; // Variable to store the tag value
-            // Validate RadioGroup input
-            if (radioBtnId == -1) { // Check if no RadioButton is selected
-                Toast.makeText(this, "Please select the source of runs (From bat or Byes/Leg Byes).", Toast.LENGTH_SHORT).show();
-                return; // Stop further execution
-            } else {
-                RadioButton radioBtn = extrasDialogView.findViewById(radioBtnId);
-                runFromWhat = (String) radioBtn.getTag(); // Get the tag of the selected RadioButton
+            if (radioGroup.getVisibility() == View.VISIBLE) {
+                if (radioBtnId == -1) { // No RadioButton is selected
+                    Toast.makeText(this, "Please select the source of runs (From bat or Byes/Leg Byes).", Toast.LENGTH_SHORT).show();
+                } else { // A RadioButton is selected
+                    RadioButton radioBtn = extrasDialogView.findViewById(radioBtnId);
+                    runFromWhat = (String) radioBtn.getTag(); // Get the tag of the selected RadioButton
+                }
             }
             if (!extraRunsStr.isEmpty()) {
                 int extraRuns = Integer.parseInt(extraRunsStr);
@@ -419,9 +419,9 @@ public class MatchActivity extends AppCompatActivity {
                     databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballTypeInRo, runsFrom, "RUN-OUT");
                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, ballTypeInRo, runsFrom, "RUN-OUT");
                     databaseHelper.insertBallDataForWicket(over_id, ballTypeInRo, runs, striker, non_striker_id);
+                    databaseHelper.updateTeamStatsForRunOut(team_stats_id, runs, ballTypeInRo, runsFrom);
                     break;
                 case "Stumped":
-                    Log.d(TAG, "showWicketDialog: hiiiiiiiiiiiibiiiiiiiiiiiiiii");
                     int ballTypeId = stumped_ball_type.getCheckedRadioButtonId();
                     if (ballTypeId == -1) {
                         Toast.makeText(this, "Please select the ball type for stumping.", Toast.LENGTH_SHORT).show();
