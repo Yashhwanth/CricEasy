@@ -43,11 +43,11 @@
     <string name="no_ball_by_lby">From by/lb</string>
     <string name="runs_from">Runs from</string>
     <string name="out_batsman">Out Batsman</string>
-    <string name="striker_out">Striker</string>
-    <string name="non_striker_out">Non-Striker</string>
+    <string name="striker_out">striker</string>
+    <string name="non_striker_out">non-striker</string>
     <string name="out_end">Out-End</string>
-    <string name="striker_end">Striker end</string>
-    <string name="non_striker_end">Non-striker end</string>
+    <string name="striker_end">striker</string>
+    <string name="non_striker_end">non-striker</string>
     <string name="submit">Submit</string>
     <string name="cancel">Cancel</string>
     <string name="stumped_ball_type">Ball type while Stumping</string>

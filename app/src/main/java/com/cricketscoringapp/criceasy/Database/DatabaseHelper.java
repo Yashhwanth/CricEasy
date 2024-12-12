@@ -707,7 +707,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.insert(TABLE_BATSMAN, null, values);
     }
-
     public void initializeBowlerStats(long playerId, long inningsId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -776,8 +775,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Close the database connection
         db.close();
     }
-
-    //start first innings
     public void startFirstInnings(long matchId, long battingTeamId) {
 
         // Check if the necessary data is available
@@ -820,7 +817,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
-
     public void insertOver(long inningsId, int over, long playerId, int isMaiden) {
         SQLiteDatabase db = this.getWritableDatabase();
         try {
@@ -849,7 +845,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
-
     public void insertPartnership(long innings_id, long bat1_id, long bat2_id, int runs,int balls){
         SQLiteDatabase db = this.getWritableDatabase();
         try{

@@ -19,13 +19,11 @@ public class SelectingPlayersActivity extends AppCompatActivity {
 
 
         //UI
-        EditText editText = findViewById(R.id.editTextText2);
-        Button submit_btn = findViewById(R.id.button4);
+        EditText editText = findViewById(R.id.player_name_edit_text);
+        Button submit_btn = findViewById(R.id.submit_button);
         role_radio_group = findViewById(R.id.radioGroup);
         bat_style_radio_group = findViewById(R.id.batGroup);
         bowl_style_radio_group = findViewById(R.id.bowlStyleRadioGroup);
-
-
 
 
         submit_btn.setOnClickListener(view ->{
@@ -54,9 +52,6 @@ public class SelectingPlayersActivity extends AppCompatActivity {
         String role = role_button.getTag().toString();
         String bat_style = bat_style_button.getTag().toString();
         String bowl_style = bowl_style_button.getTag().toString();
-
-
-
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         String player_type = sharedPreferences.getString("player_type",null);

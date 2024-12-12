@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
             // Save the match ID to SharedPreferences after creating or resuming a match
             saveMatchIdToPreferences();
             // Proceed to the MatchInfoActivity
-            Intent intent = new Intent(MainActivity.this, MatchInfoActivity.class);
+            Intent intent = new Intent(MainActivity.this, MatchActivity.class);
             startActivity(intent);
         });
     }

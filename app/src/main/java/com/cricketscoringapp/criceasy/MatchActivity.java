@@ -2,10 +2,12 @@ package com.cricketscoringapp.criceasy;
 
 import static android.content.ContentValues.TAG;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -32,6 +34,7 @@ public class MatchActivity extends AppCompatActivity {
 
     private FloatingActionButton floatingbutton;
     private DatabaseHelper databaseHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -209,7 +212,11 @@ public class MatchActivity extends AppCompatActivity {
         editor.putLong("non_striker_id", nonStrikerId);
         editor.apply();
     }
-    private void rotateStrikeWhileWicket(){}
+//    private String rotateStrikeWhileRunOut(String outBatsman, String outEnd){
+//        if(outBatsman.equals("Striker")){
+//            if(outEnd.equals("Striker"))
+//        }
+//    }
     private void showExtrasDialog(String ballType, AlertDialog parentDialog) {
         View extrasDialogView = getLayoutInflater().inflate(R.layout.activity_dialog_for_extras, null);
         EditText extraRunsInput = extrasDialogView.findViewById(R.id.extra_runs_input);
@@ -354,6 +361,7 @@ public class MatchActivity extends AppCompatActivity {
             wicketDialog.dismiss();
         });
         submitButton.setOnClickListener(view -> {
+            String playerType = "striker";
             int dismissalTypeID = dismissalTypeRadioGroup.getCheckedRadioButtonId();
             if (dismissalTypeID == -1) {
                 Toast.makeText(this, "Please select a dismissal type.", Toast.LENGTH_SHORT).show();
@@ -394,11 +402,15 @@ public class MatchActivity extends AppCompatActivity {
                         Toast.makeText(this, "Please select the out batsman for run-out.", Toast.LENGTH_SHORT).show();
                         return;
                     }
+                    RadioButton outBatsmanRadioButton = wicketDialogView.findViewById(outBatsmanRadioButtonId);
+                    String outBatsman = outBatsmanRadioButton.getText().toString();
                     int outEndRadioButtonId = out_end_radio_group.getCheckedRadioButtonId();
                     if (outEndRadioButtonId == -1) {
                         Toast.makeText(this, "Please select the out end for run-out.", Toast.LENGTH_SHORT).show();
                         return;
                     }
+                    RadioButton outEndRadioButton = wicketDialogView.findViewById(outEndRadioButtonId);
+                    String outEnd = outEndRadioButton.getText().toString();
                     int ballTypeRadioButtonIdRO = ball_type_in_run_out_radio_group.getCheckedRadioButtonId();
                     if (ballTypeRadioButtonIdRO == -1) {
                         Toast.makeText(this, "Please select the ball type for run-out.", Toast.LENGTH_SHORT).show();
@@ -420,6 +432,8 @@ public class MatchActivity extends AppCompatActivity {
                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, ballTypeInRo, runsFrom, "RUN-OUT");
                     databaseHelper.insertBallDataForWicket(over_id, ballTypeInRo, runs, striker, non_striker_id);
                     databaseHelper.updateTeamStatsForRunOut(team_stats_id, runs, ballTypeInRo, runsFrom);
+                    playerType = outBatsman.equals("non-striker") ? "non_striker" : "striker";
+                    //rotateStrikeWhileRunOut(outBatsman, outEnd);
                     break;
                 case "Stumped":
                     int ballTypeId = stumped_ball_type.getCheckedRadioButtonId();
@@ -435,6 +449,7 @@ public class MatchActivity extends AppCompatActivity {
                     databaseHelper.updateTeamStatsForStumping(team_stats_id, ballType);
                     break;
             }
+            setNewBatsman(playerType);
             wicketDialog.dismiss();
             parentDialog.dismiss();
         });
@@ -539,5 +554,83 @@ public class MatchActivity extends AppCompatActivity {
         long teamStatsId = sharedPreferences.getLong("teamStatsId", -1);
         databaseHelper.updateTeamStatsForNoBall(teamStatsId, runs, runsSource);
     }
+    private void setNewBatsman(String player_type) {
+        // Inflate your dialog layout
+        View batsmanDialogView = getLayoutInflater().inflate(R.layout.activity_selecting_players, null);
+
+        // Create and configure the dialog
+        AlertDialog.Builder batsmanBuilder = new AlertDialog.Builder(this);
+        batsmanBuilder.setView(batsmanDialogView);
+        AlertDialog batsmanDialog = batsmanBuilder.create();
+
+        // Show the dialog
+        batsmanDialog.show();
+
+        // Set dialog width and height to match your desired values
+        if (batsmanDialog.getWindow() != null) {
+            batsmanDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+
+        // Find buttons and input fields in the dialog
+        EditText editText = batsmanDialogView.findViewById(R.id.player_name_edit_text);
+        Button submit_btn = batsmanDialogView.findViewById(R.id.submit_button);
+        Button back_btn = batsmanDialogView.findViewById(R.id.back_button);
+        RadioGroup role_radio_group = batsmanDialogView.findViewById(R.id.radioGroup);
+        Log.d(TAG, "setNewBatsman: bye macha" + role_radio_group);
+        RadioGroup bat_style_radio_group = batsmanDialogView.findViewById(R.id.batGroup);
+        RadioGroup bowl_style_radio_group = batsmanDialogView.findViewById(R.id.bowlStyleRadioGroup);
+
+
+
+        // Submit Button Click Handler
+        submit_btn.setOnClickListener(v -> {
+            String player_name = String.valueOf(editText.getText());
+            int role_button_id = role_radio_group.getCheckedRadioButtonId();
+            int bat_style_button_id = bat_style_radio_group.getCheckedRadioButtonId();
+            int bowl_style_button_id = bowl_style_radio_group.getCheckedRadioButtonId();
+            if(role_button_id == -1 || bat_style_button_id == -1 || bowl_style_button_id == -1 || player_name.isEmpty()){
+                Toast.makeText(this, "Please make all selections", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            else {
+                RadioButton role_button = batsmanDialogView.findViewById(role_button_id);
+                RadioButton bat_button = batsmanDialogView.findViewById(bat_style_button_id);
+                RadioButton bowl_button = batsmanDialogView.findViewById(bowl_style_button_id);
+                String role = role_button.getTag().toString();
+                String bat_style = bat_button.getTag().toString();
+                String bowl_style = bowl_button.getTag().toString();
+                updatePlayerDataInSp(player_type, player_name, role, bat_style, bowl_style);
+                // Update the database (add your database logic here)
+                //updateDatabase();
+                // Dismiss the dialog after saving data
+                batsmanDialog.dismiss();
+            }
+        });
+        // Back Button Click Handler
+        back_btn.setOnClickListener(v -> {
+            // Just dismiss the dialog without saving
+            batsmanDialog.dismiss();
+        });
+        // Show the dialog
+        batsmanDialog.show();
+    }
+    private void updatePlayerDataInSp(String player_type, String player_name, String role, String bat_style, String bowl_style){
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(player_type + " name",player_name);
+        editor.putString(player_type + " ROLE",role);
+        editor.putString(player_type + " BS",bat_style);
+        editor.putString(player_type + " BOS",bowl_style);
+        editor.apply();
+    }
+
+    // Method to update player details in the database
+    private void updatePlayerDatabase(String name, String role, String batStyle, String bowlStyle) {
+        // Add logic to insert the player details into your SQLite database
+        // Example:
+        // String query = "INSERT INTO players (name, role, bat_style, bowl_style) VALUES (?, ?, ?, ?)";
+        // Use SQLiteDatabase to execute the query
+    }
+
 
 }
