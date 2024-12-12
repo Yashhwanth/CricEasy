@@ -617,19 +617,19 @@ public class MatchActivity extends AppCompatActivity {
     private void updatePlayerDataInSp(String player_type, String player_name, String role, String bat_style, String bowl_style){
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
+        long innings_id  = sharedPreferences.getLong("Innings_id", -1);
         editor.putString(player_type + " name",player_name);
         editor.putString(player_type + " ROLE",role);
         editor.putString(player_type + " BS",bat_style);
         editor.putString(player_type + " BOS",bowl_style);
         editor.apply();
+        updatePlayerDatabase(player_name, role, bat_style, bowl_style, player_type, innings_id);
     }
 
     // Method to update player details in the database
-    private void updatePlayerDatabase(String name, String role, String batStyle, String bowlStyle) {
-        // Add logic to insert the player details into your SQLite database
-        // Example:
-        // String query = "INSERT INTO players (name, role, bat_style, bowl_style) VALUES (?, ?, ?, ?)";
-        // Use SQLiteDatabase to execute the query
+    private void updatePlayerDatabase(String name, String role, String batStyle, String bowlStyle, String player_type, long innings_id) {
+        long player_id = databaseHelper.insertPlayer(name, role, batStyle, bowlStyle, player_type);
+        databaseHelper.initializeBatsmanStats(player_id, innings_id);
     }
 
 

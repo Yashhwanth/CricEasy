@@ -734,7 +734,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(TABLE_BOWLER, null, values);
     }
 
-    public void insertPlayer(String playerName, String playerRole, String battingStyle, String bowlingStyle, String playerType) {
+    public long insertPlayer(String playerName, String playerRole, String battingStyle, String bowlingStyle, String playerType) {
         // Get writable database instance
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -774,6 +774,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         // Close the database connection
         db.close();
+        return result;
     }
     public void startFirstInnings(long matchId, long battingTeamId) {
 
