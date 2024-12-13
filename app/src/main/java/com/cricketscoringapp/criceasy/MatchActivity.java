@@ -386,6 +386,7 @@ public class MatchActivity extends AppCompatActivity {
             long bowler_id = sharedPreferences.getLong("bowler_id", -1);
             long over_id = sharedPreferences.getLong("over_id", -1);
             long team_stats_id = sharedPreferences.getLong("teamStatsId", -1);
+            long partnership_id = sharedPreferences.getLong("partnership_id", -1);
             switch (dismissalType) {
                 case "Bowled":
                 case "Caught":
@@ -393,6 +394,7 @@ public class MatchActivity extends AppCompatActivity {
                     databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, null, null, "BOWLED");
                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, null, null, "BOWLED");
                     databaseHelper.insertBallDataForWicket(over_id, "Legal", runs, striker, non_striker_id);
+                    databaseHelper.updatePartnershipForRunOut(partnership_id, runs, null, null);
                     databaseHelper.updateTeamStatsForBowCauLbw(team_stats_id);
                     break;
                 case "Run-Out":
@@ -432,6 +434,7 @@ public class MatchActivity extends AppCompatActivity {
                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, ballTypeInRo, runsFrom, "RUN-OUT");
                     databaseHelper.insertBallDataForWicket(over_id, ballTypeInRo, runs, striker, non_striker_id);
                     databaseHelper.updateTeamStatsForRunOut(team_stats_id, runs, ballTypeInRo, runsFrom);
+                    databaseHelper.updatePartnershipForRunOut(partnership_id, runs, ballTypeInRo, runsFrom);
                     playerType = outBatsman.equals("non-striker") ? "non_striker" : "striker";
                     //rotateStrikeWhileRunOut(outBatsman, outEnd);
                     break;
@@ -446,6 +449,7 @@ public class MatchActivity extends AppCompatActivity {
                     databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballType, null, "STUMPED");
                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, ballType, null, "STUMPED");
                     databaseHelper.insertBallDataForWicket(over_id, ballType, runs, striker, non_striker_id);
+                    databaseHelper.updatePartnershipForRunOut(partnership_id, runs, null,null);
                     databaseHelper.updateTeamStatsForStumping(team_stats_id, ballType);
                     break;
             }
@@ -600,9 +604,6 @@ public class MatchActivity extends AppCompatActivity {
                 String bat_style = bat_button.getTag().toString();
                 String bowl_style = bowl_button.getTag().toString();
                 updatePlayerDataInSp(player_type, player_name, role, bat_style, bowl_style);
-                // Update the database (add your database logic here)
-                //updateDatabase();
-                // Dismiss the dialog after saving data
                 batsmanDialog.dismiss();
             }
         });
@@ -629,7 +630,11 @@ public class MatchActivity extends AppCompatActivity {
     // Method to update player details in the database
     private void updatePlayerDatabase(String name, String role, String batStyle, String bowlStyle, String player_type, long innings_id) {
         long player_id = databaseHelper.insertPlayer(name, role, batStyle, bowlStyle, player_type);
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        String batter = player_type.equals("striker") ? "non_striker_id" : "striker_id";
         databaseHelper.initializeBatsmanStats(player_id, innings_id);
+        long player2_id = sharedPreferences.getLong(batter, -1);
+        databaseHelper.insertPartnership(innings_id,player_id, player2_id, 0, 0);
     }
 
 

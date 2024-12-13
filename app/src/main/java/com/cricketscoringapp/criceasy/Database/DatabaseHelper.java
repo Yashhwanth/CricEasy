@@ -1159,6 +1159,46 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
+    public void updatePartnershipForRunOut(long partnershipId, int runsScored, String ballType, String runsFrom) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Log.d(TAG, "updatePartnershipForRunOut: Ball Type: " + ballType + ", Runs From: " + runsFrom);
+
+        try {
+            String query = "UPDATE " + TABLE_PARTNERSHIPS + " SET ";
+            boolean addComma = false;
+
+            // Add runs if they are from the bat
+            if (runsFrom.equals("From Bat")) {
+                query += COLUMN_RUNS + " = " + COLUMN_RUNS + " + ?";
+                addComma = true;
+            }
+
+            // Add balls if the ball type is normal
+            if (ballType.equals("Normal")) {
+                if (addComma) {
+                    query += ", ";
+                }
+                query += COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1";
+            }
+
+            // Add WHERE condition to the query
+            query += " WHERE " + COLUMN_PARTNERSHIP_ID + " = ?";
+
+            // Execute the update query
+            if (runsFrom.equals("From Bat")) {
+                db.execSQL(query, new Object[]{runsScored, partnershipId});
+            } else {
+                db.execSQL(query, new Object[]{partnershipId});
+            }
+
+            Log.d("DatabaseHelper", "Partnership updated successfully for run out.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("DatabaseHelper", "Failed to update partnership for run out.");
+        } finally {
+            db.close();
+        }
+    }
 
 
 
