@@ -212,11 +212,28 @@ public class MatchActivity extends AppCompatActivity {
         editor.putLong("non_striker_id", nonStrikerId);
         editor.apply();
     }
-//    private String rotateStrikeWhileRunOut(String outBatsman, String outEnd){
-//        if(outBatsman.equals("Striker")){
-//            if(outEnd.equals("Striker"))
-//        }
-//    }
+    private String rotateStrikeWhileRunOut(String outBatsman, String outEnd){
+        Log.d(TAG, "rotateStrikeWhileRunOut: " + outBatsman + outEnd);
+        String replacePlayer = "striker";
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        long strikerIdFromSp = sharedPreferences.getLong("striker_id", -1);
+        long NonStrikerIdFromSp = sharedPreferences.getLong("non_striker_id", -1);
+        if(outEnd.equals("non_striker")) replacePlayer = "non_striker";
+        if(outBatsman.equals("striker")){
+            if(outEnd.equals("non_striker")){
+                editor.putLong("striker_id", NonStrikerIdFromSp);
+                editor.putLong("non_striker_id", strikerIdFromSp);
+                editor.apply();
+            }
+        }else if(outBatsman.equals("non_striker")){
+            if(outEnd.equals("striker")){
+                editor.putLong("striker_id", NonStrikerIdFromSp);
+                editor.putLong("non_striker_id", strikerIdFromSp);
+                editor.apply();
+            }
+        }return replacePlayer;
+    }
     private void showExtrasDialog(String ballType, AlertDialog parentDialog) {
         View extrasDialogView = getLayoutInflater().inflate(R.layout.activity_dialog_for_extras, null);
         EditText extraRunsInput = extrasDialogView.findViewById(R.id.extra_runs_input);
@@ -394,7 +411,6 @@ public class MatchActivity extends AppCompatActivity {
                     databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, null, null, "BOWLED");
                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, null, null, "BOWLED");
                     databaseHelper.insertBallDataForWicket(over_id, "Legal", runs, striker, non_striker_id);
-                    databaseHelper.updatePartnershipForRunOut(partnership_id, runs, null, null);
                     databaseHelper.updateTeamStatsForBowCauLbw(team_stats_id);
                     break;
                 case "Run-Out":
@@ -435,8 +451,9 @@ public class MatchActivity extends AppCompatActivity {
                     databaseHelper.insertBallDataForWicket(over_id, ballTypeInRo, runs, striker, non_striker_id);
                     databaseHelper.updateTeamStatsForRunOut(team_stats_id, runs, ballTypeInRo, runsFrom);
                     databaseHelper.updatePartnershipForRunOut(partnership_id, runs, ballTypeInRo, runsFrom);
-                    playerType = outBatsman.equals("non-striker") ? "non_striker" : "striker";
-                    //rotateStrikeWhileRunOut(outBatsman, outEnd);
+                    outBatsman = outBatsman.equals("non-striker") ? "non_striker" : "striker";
+                    outEnd = outEnd.equals("non-striker") ? "non_striker" : "striker";
+                    playerType = rotateStrikeWhileRunOut(outBatsman, outEnd);
                     break;
                 case "Stumped":
                     int ballTypeId = stumped_ball_type.getCheckedRadioButtonId();
@@ -449,7 +466,6 @@ public class MatchActivity extends AppCompatActivity {
                     databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballType, null, "STUMPED");
                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, ballType, null, "STUMPED");
                     databaseHelper.insertBallDataForWicket(over_id, ballType, runs, striker, non_striker_id);
-                    databaseHelper.updatePartnershipForRunOut(partnership_id, runs, null,null);
                     databaseHelper.updateTeamStatsForStumping(team_stats_id, ballType);
                     break;
             }
@@ -560,6 +576,7 @@ public class MatchActivity extends AppCompatActivity {
     }
     private void setNewBatsman(String player_type) {
         // Inflate your dialog layout
+        Log.d(TAG, "setNewBatsman: " + player_type);
         View batsmanDialogView = getLayoutInflater().inflate(R.layout.activity_selecting_players, null);
 
         // Create and configure the dialog
@@ -580,7 +597,6 @@ public class MatchActivity extends AppCompatActivity {
         Button submit_btn = batsmanDialogView.findViewById(R.id.submit_button);
         Button back_btn = batsmanDialogView.findViewById(R.id.back_button);
         RadioGroup role_radio_group = batsmanDialogView.findViewById(R.id.radioGroup);
-        Log.d(TAG, "setNewBatsman: bye macha" + role_radio_group);
         RadioGroup bat_style_radio_group = batsmanDialogView.findViewById(R.id.batGroup);
         RadioGroup bowl_style_radio_group = batsmanDialogView.findViewById(R.id.bowlStyleRadioGroup);
 
@@ -634,8 +650,10 @@ public class MatchActivity extends AppCompatActivity {
         String batter = player_type.equals("striker") ? "non_striker_id" : "striker_id";
         databaseHelper.initializeBatsmanStats(player_id, innings_id);
         long player2_id = sharedPreferences.getLong(batter, -1);
+        Log.d(TAG, "striker" + player_id + "non striker" + player2_id);
         databaseHelper.insertPartnership(innings_id,player_id, player2_id, 0, 0);
     }
+
 
 
 }
