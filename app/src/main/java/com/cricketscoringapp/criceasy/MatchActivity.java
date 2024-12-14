@@ -679,6 +679,7 @@ public class MatchActivity extends AppCompatActivity {
             setNewBatsman("bowler");
         }
         if(playedBalls == totalBalls) {
+
             handleInningsEnd(currentInnings);
         }
     }
