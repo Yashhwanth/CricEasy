@@ -34,10 +34,11 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-//        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        editor.clear();
-//        editor.apply();
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putLong("playedBalls", 0);
+        //editor.clear();
+        editor.apply();
 
 
         // Initialize database helper
@@ -68,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
             // Save the match ID to SharedPreferences after creating or resuming a match
             saveMatchIdToPreferences();
             // Proceed to the MatchInfoActivity
-            Intent intent = new Intent(MainActivity.this, MatchActivity.class);
+            Intent intent = new Intent(MainActivity.this, MatchInfoActivity.class);
             startActivity(intent);
         });
     }

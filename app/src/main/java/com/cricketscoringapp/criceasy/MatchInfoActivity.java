@@ -242,8 +242,9 @@ public class MatchInfoActivity extends AppCompatActivity {
         boolean isInserted = databaseHelper.insertMatchBasicInfo1(matchId, matchType, noOfOvers, ballType, place, dateTime, isCompleted);
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putLong("remainingBalls", Long.parseLong(noOfOvers) * 6);
+        editor.putLong("totalBalls", Long.parseLong(noOfOvers) * 6);
         editor.putLong("playedBalls", 0);
+        editor.putBoolean("isLegalBall", true);
         editor.apply();
         if (isInserted) {
             showToast("Match Info Saved Successfully!");

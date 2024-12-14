@@ -34,7 +34,6 @@ public class MatchActivity extends AppCompatActivity {
 
     private FloatingActionButton floatingbutton;
     private DatabaseHelper databaseHelper;
-    private final SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,14 +52,7 @@ public class MatchActivity extends AppCompatActivity {
         floatingbutton = findViewById(R.id.floatingbutton);
 
         floatingbutton.setOnClickListener(view ->{
-            Long teamStatsId = sharedPreferences.getLong("teamStatsId", -1);
-            long totalBalls = sharedPreferences.getLong("remainingBalls", -1);
-            long remainingBalls = databaseHelper.getRemainingBalls(teamStatsId);
-            while(remainingBalls < totalBalls){
                 popup();
-                remainingBalls = databaseHelper.getRemainingBalls(teamStatsId);
-            }
-
         });
 
         // Set onClickListeners to show the corresponding fragments
@@ -418,6 +410,7 @@ public class MatchActivity extends AppCompatActivity {
                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, null, null, "BOWLED");
                     databaseHelper.insertBallDataForWicket(over_id, "Legal", runs, striker, non_striker_id);
                     databaseHelper.updateTeamStatsForBowCauLbw(team_stats_id);
+                    incrementPlayedBalls();
                     break;
                 case "Run-Out":
                     Log.d(TAG, "showWicketDialog: " + runs);
@@ -452,6 +445,7 @@ public class MatchActivity extends AppCompatActivity {
                         RadioButton runsFromRadioButton = wicketDialogView.findViewById(runsFromId);
                         runsFrom = runsFromRadioButton.getText().toString();
                     }
+                    if(ballTypeInRo.equals("Normal"))    incrementPlayedBalls();
                     databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballTypeInRo, runsFrom, "RUN-OUT");
                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, ballTypeInRo, runsFrom, "RUN-OUT");
                     databaseHelper.insertBallDataForWicket(over_id, ballTypeInRo, runs, striker, non_striker_id);
@@ -469,6 +463,7 @@ public class MatchActivity extends AppCompatActivity {
                     }
                     RadioButton ballTypeRadioButton = wicketDialogView.findViewById(ballTypeId);
                     String ballType = ballTypeRadioButton.getText().toString();
+                    if(ballType.equals("Normal"))    incrementPlayedBalls();
                     databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballType, null, "STUMPED");
                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, ballType, null, "STUMPED");
                     databaseHelper.insertBallDataForWicket(over_id, ballType, runs, striker, non_striker_id);
@@ -494,6 +489,7 @@ public class MatchActivity extends AppCompatActivity {
         databaseHelper.updateBatsmanStatsFor0To6(innings_id, striker, runs);
         databaseHelper.updateBowlerStatsFor0to6(innings_id, bowler, runs);
         updateTeamStatsFor0to6(runs);
+        incrementPlayedBalls();
         Toast.makeText(this, "Runs scored: " + runs + ball_id, Toast.LENGTH_SHORT).show();
     }
      private void handleScoringForByesAndLegByes(int extraRuns, String ballType) {
@@ -510,6 +506,7 @@ public class MatchActivity extends AppCompatActivity {
          databaseHelper.updateExtrasTable(ball_id, ballType, extraRuns);
          updateTeamStatsForByLegBy(extraRuns);
          rotateStrike(extraRuns);
+         incrementPlayedBalls();
      }
      private void handleScoringForWide(int extraRuns, String ballType){
          SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
@@ -659,6 +656,25 @@ public class MatchActivity extends AppCompatActivity {
         Log.d(TAG, "striker" + player_id + "non striker" + player2_id);
         databaseHelper.insertPartnership(innings_id,player_id, player2_id, 0, 0);
     }
+    private void incrementPlayedBalls() {
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        long playedBalls = sharedPreferences.getLong("playedBalls", 0);
+        playedBalls++;
+        editor.putLong("playedBalls", playedBalls);
+        editor.apply();
+        Log.d(TAG, "incrementPlayedBalls:  balls incremented by 1 and current balls are " + playedBalls);
+        checkAndHandleOverEnd(playedBalls);
+    }
+
+    public void checkAndHandleOverEnd(long playedBalls) {
+        if (playedBalls % 6 == 0 && playedBalls != 0) {
+            Log.d(TAG, "checkAndHandleOverEnd:" + playedBalls / 6 + "Over has ended");
+            //showBowlerInputDialog();
+        }
+    }
+
+
 
 
 

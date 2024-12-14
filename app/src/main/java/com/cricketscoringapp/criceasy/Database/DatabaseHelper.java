@@ -1159,6 +1159,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
+    //need to edit
     public void updatePartnershipForRunOut(long partnershipId, int runsScored, String ballType, String runsFrom) {
         SQLiteDatabase db = this.getWritableDatabase();
         Log.d(TAG, "updatePartnershipForRunOut: Ball Type: " + ballType + ", Runs From: " + runsFrom);
@@ -1166,7 +1167,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             String query = "UPDATE " + TABLE_PARTNERSHIPS + " SET ";
             boolean addComma = false;
-
             // Add runs if they are from the bat
             if (runsFrom.equals("From Bat")) {
                 query += COLUMN_RUNS + " = " + COLUMN_RUNS + " + ?";
