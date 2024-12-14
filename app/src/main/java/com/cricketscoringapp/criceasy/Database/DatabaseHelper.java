@@ -2101,28 +2101,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Log.e("DatabaseHelper", "Invalid ball type: " + ballType);
         }
     }
+    public int getTarget(long teamStatsId) {
+        int target = 0; // Default value if no result is found
+        SQLiteDatabase db = this.getReadableDatabase(); // Access readable database
 
-    public long getRemainingBalls(Long teamStatsId) {
-        SQLiteDatabase db = this.getReadableDatabase(); // Get readable instance of the database
-        long remainingBalls = 0; // Default value if query fails
-        String query = "SELECT " + COLUMN_BALLS + " FROM " + TABLE_TEAM_STATISTICS
-                + " WHERE " + COLUMN_TEAM_STATS_ID + " = " + teamStatsId;
+        String query = "SELECT " + COLUMN_RUNS +
+                " FROM " + TABLE_TEAM_STATISTICS +
+                " WHERE " + COLUMN_TEAM_STATS_ID + " = " + teamStatsId;
+
         Cursor cursor = null;
+
         try {
-            cursor = db.rawQuery(query, null); // Execute query
-            if (cursor != null && cursor.moveToFirst()) {
-                // Extract the value of COLUMN_BALLS
-                remainingBalls = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_BALLS));
+            cursor = db.rawQuery(query, null); // Execute the query
+            if (cursor.moveToFirst()) { // Check if at least one row is returned
+                int columnIndex = cursor.getColumnIndex(COLUMN_RUNS); // Get column index
+                if (columnIndex != -1) { // Ensure the column exists
+                    target = cursor.getInt(columnIndex); // Fetch value from the 'runs' column
+                }
             }
         } catch (Exception e) {
-            e.printStackTrace(); // Handle exceptions
+            Log.e("DB_ERROR", "Error while getting target runs", e);
         } finally {
-            if (cursor != null) {
-                cursor.close(); // Close cursor
-            }
-            db.close(); // Close database connection
+            if (cursor != null) cursor.close(); // Close cursor
+            db.close(); // Close database
         }
-        return remainingBalls; // Return result
+
+        return target; // Return the target value
     }
 
 }

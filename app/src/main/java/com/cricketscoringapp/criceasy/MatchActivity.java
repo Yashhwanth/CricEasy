@@ -672,7 +672,6 @@ public class MatchActivity extends AppCompatActivity {
 
     public void checkAndHandleOverEnd(long playedBalls) {
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
         long totalBalls = sharedPreferences.getLong("totalBalls", 0);
         String currentInnings = sharedPreferences.getString("currentInnings","");
         if (playedBalls % 6 == 0 && playedBalls != 0 && playedBalls != totalBalls) {
@@ -680,20 +679,24 @@ public class MatchActivity extends AppCompatActivity {
             setNewBatsman("bowler");
         }
         if(playedBalls == totalBalls) {
-            if(currentInnings.equals("first")){
-                editor.putString("currentInnings", "second");
-                editor.putLong("target", 50);
-                editor.putLong("playedBalls", 0);
-                editor.apply();
-            }else{
-                editor.putString("currentInnings", "matchOver");
-                editor.putLong("target", -10000);
-                editor.apply();
-            }
-
+            handleInningsEnd(currentInnings);
         }
-
-
+    }
+    public void handleInningsEnd(String currentInnings){
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        long teamStatsId = sharedPreferences.getLong("teamStatsId", -1);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if(currentInnings.equals("first")){
+            int target = databaseHelper.getTarget(teamStatsId);
+            editor.putString("currentInnings", "second");
+            editor.putLong("target", target + 1);
+            editor.putLong("playedBalls", 0);
+            editor.apply();
+        }else{
+            editor.putString("currentInnings", "matchOver");
+            editor.putLong("target", -10000);
+            editor.apply();
+        }
     }
 
 
