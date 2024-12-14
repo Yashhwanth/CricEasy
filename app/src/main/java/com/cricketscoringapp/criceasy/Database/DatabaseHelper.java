@@ -2102,6 +2102,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    public long getRemainingBalls(Long teamStatsId) {
+        SQLiteDatabase db = this.getReadableDatabase(); // Get readable instance of the database
+        long remainingBalls = 0; // Default value if query fails
+        String query = "SELECT " + COLUMN_BALLS + " FROM " + TABLE_TEAM_STATISTICS
+                + " WHERE " + COLUMN_TEAM_STATS_ID + " = " + teamStatsId;
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery(query, null); // Execute query
+            if (cursor != null && cursor.moveToFirst()) {
+                // Extract the value of COLUMN_BALLS
+                remainingBalls = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_BALLS));
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // Handle exceptions
+        } finally {
+            if (cursor != null) {
+                cursor.close(); // Close cursor
+            }
+            db.close(); // Close database connection
+        }
+        return remainingBalls; // Return result
+    }
+
 }
 
 

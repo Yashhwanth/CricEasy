@@ -34,7 +34,7 @@ public class MatchActivity extends AppCompatActivity {
 
     private FloatingActionButton floatingbutton;
     private DatabaseHelper databaseHelper;
-
+    private final SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +53,14 @@ public class MatchActivity extends AppCompatActivity {
         floatingbutton = findViewById(R.id.floatingbutton);
 
         floatingbutton.setOnClickListener(view ->{
-            popup();
+            Long teamStatsId = sharedPreferences.getLong("teamStatsId", -1);
+            long totalBalls = sharedPreferences.getLong("remainingBalls", -1);
+            long remainingBalls = databaseHelper.getRemainingBalls(teamStatsId);
+            while(remainingBalls < totalBalls){
+                popup();
+                remainingBalls = databaseHelper.getRemainingBalls(teamStatsId);
+            }
+
         });
 
         // Set onClickListeners to show the corresponding fragments
@@ -175,7 +182,6 @@ public class MatchActivity extends AppCompatActivity {
         btn_wicket.setOnClickListener(view ->{
             showWicketDialog(dialog);
         });
-
     }
     private void showFragment(Fragment fragment) {
         // Begin a fragment transaction to replace the current fragment

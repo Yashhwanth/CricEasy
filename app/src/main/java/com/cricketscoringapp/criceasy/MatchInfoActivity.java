@@ -237,12 +237,14 @@ public class MatchInfoActivity extends AppCompatActivity {
         // Default value for is_completed (0 means not completed)
         int isCompleted = 0;  // You can update this based on the match status
 
-        // Call the method to get the place_id (or insert if not found)
-        //long placeId = databaseHelper.getOrInsertPlaceId(place);
 
         // Call the function to save the match info to the database
         boolean isInserted = databaseHelper.insertMatchBasicInfo1(matchId, matchType, noOfOvers, ballType, place, dateTime, isCompleted);
-
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putLong("remainingBalls", Long.parseLong(noOfOvers) * 6);
+        editor.putLong("playedBalls", 0);
+        editor.apply();
         if (isInserted) {
             showToast("Match Info Saved Successfully!");
         } else {
