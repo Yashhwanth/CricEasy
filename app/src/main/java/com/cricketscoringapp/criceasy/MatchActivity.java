@@ -2,12 +2,10 @@ package com.cricketscoringapp.criceasy;
 
 import static android.content.ContentValues.TAG;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -643,11 +641,12 @@ public class MatchActivity extends AppCompatActivity {
         editor.putString(player_type + " BS",bat_style);
         editor.putString(player_type + " BOS",bowl_style);
         editor.apply();
-        updatePlayerDatabase(player_name, role, bat_style, bowl_style, player_type, innings_id);
+        if(player_type.equals("bowler")) updateNewBowlerToDB(player_name, role, bat_style, bowl_style, player_type, innings_id);
+        else updateNewBatsmanToDB(player_name, role, bat_style, bowl_style, player_type, innings_id);
     }
 
     // Method to update player details in the database
-    private void updatePlayerDatabase(String name, String role, String batStyle, String bowlStyle, String player_type, long innings_id) {
+    private void updateNewBatsmanToDB(String name, String role, String batStyle, String bowlStyle, String player_type, long innings_id) {
         long player_id = databaseHelper.insertPlayer(name, role, batStyle, bowlStyle, player_type);
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
         String batter = player_type.equals("striker") ? "non_striker_id" : "striker_id";
@@ -655,6 +654,10 @@ public class MatchActivity extends AppCompatActivity {
         long player2_id = sharedPreferences.getLong(batter, -1);
         Log.d(TAG, "striker" + player_id + "non striker" + player2_id);
         databaseHelper.insertPartnership(innings_id,player_id, player2_id, 0, 0);
+    }
+    private void updateNewBowlerToDB(String name, String role, String batStyle, String bowlStyle, String player_type, long innings_id) {
+        long player_id = databaseHelper.insertPlayer(name, role, batStyle, bowlStyle, player_type);
+        databaseHelper.initializeBowlerStats(player_id, innings_id);
     }
     private void incrementPlayedBalls() {
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
@@ -670,7 +673,7 @@ public class MatchActivity extends AppCompatActivity {
     public void checkAndHandleOverEnd(long playedBalls) {
         if (playedBalls % 6 == 0 && playedBalls != 0) {
             Log.d(TAG, "checkAndHandleOverEnd:" + playedBalls / 6 + "Over has ended");
-            //showBowlerInputDialog();
+            setNewBatsman("bowler");
         }
     }
 
