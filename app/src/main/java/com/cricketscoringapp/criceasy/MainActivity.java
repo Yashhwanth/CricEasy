@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putLong("playedBalls", 0);
+        editor.putString("currentInnings", "first");
         //editor.clear();
         editor.apply();
 

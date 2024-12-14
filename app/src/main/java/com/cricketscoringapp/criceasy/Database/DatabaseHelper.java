@@ -733,7 +733,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.insert(TABLE_BOWLER, null, values);
     }
-
     public long insertPlayer(String playerName, String playerRole, String battingStyle, String bowlingStyle, String playerType) {
         // Get writable database instance
         SQLiteDatabase db = this.getWritableDatabase();
@@ -807,6 +806,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putLong("Innings_id", inningsId); // Save inningsId in SharedPreferences
+                editor.putString("currentInnings", "first");
                 editor.apply(); // Commit changes
                 Log.d("DatabaseHelper", "First innings started with inningsId: " + inningsId);
             }

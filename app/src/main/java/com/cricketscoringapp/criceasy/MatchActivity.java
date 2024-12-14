@@ -671,10 +671,29 @@ public class MatchActivity extends AppCompatActivity {
     }
 
     public void checkAndHandleOverEnd(long playedBalls) {
-        if (playedBalls % 6 == 0 && playedBalls != 0) {
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        long totalBalls = sharedPreferences.getLong("totalBalls", 0);
+        String currentInnings = sharedPreferences.getString("currentInnings","");
+        if (playedBalls % 6 == 0 && playedBalls != 0 && playedBalls != totalBalls) {
             Log.d(TAG, "checkAndHandleOverEnd:" + playedBalls / 6 + "Over has ended");
             setNewBatsman("bowler");
         }
+        if(playedBalls == totalBalls) {
+            if(currentInnings.equals("first")){
+                editor.putString("currentInnings", "second");
+                editor.putLong("target", 50);
+                editor.putLong("playedBalls", 0);
+                editor.apply();
+            }else{
+                editor.putString("currentInnings", "matchOver");
+                editor.putLong("target", -10000);
+                editor.apply();
+            }
+
+        }
+
+
     }
 
 
