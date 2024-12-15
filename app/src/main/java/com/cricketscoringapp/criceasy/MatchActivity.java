@@ -495,8 +495,8 @@ public class MatchActivity extends AppCompatActivity {
         databaseHelper.updateBowlerStatsFor0to6(innings_id, bowler, runs);
         updateTeamStatsFor0to6(runs);
         incrementPlayedBalls();
-        checkAndHandleOverEnd();
         updateScoreInSharedPreferences(type_of_ball, runs);
+        checkAndHandleOverEnd();
         Toast.makeText(this, "Runs scored: " + runs + ball_id, Toast.LENGTH_SHORT).show();
     }
      private void handleScoringForByesAndLegByes(int extraRuns, String ballType) {
@@ -514,8 +514,8 @@ public class MatchActivity extends AppCompatActivity {
          updateTeamStatsForByLegBy(extraRuns);
          rotateStrike(extraRuns);
          incrementPlayedBalls();
-         checkAndHandleOverEnd();
          updateScoreInSharedPreferences(ballType, extraRuns);
+         checkAndHandleOverEnd();
      }
      private void handleScoringForWide(int extraRuns, String ballType){
          SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
@@ -529,8 +529,8 @@ public class MatchActivity extends AppCompatActivity {
          databaseHelper.updateExtrasTable(ball_id, ballType, extraRuns);
          updateTeamStatsForWide(extraRuns);
          rotateStrike(extraRuns);
-         checkAndHandleOverEnd();
          updateScoreInSharedPreferences(ballType, extraRuns);
+         checkAndHandleOverEnd();
      }
      private void handleScoringForNoBall(int extraRuns, String ballType, String runFromWhat){
          SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
@@ -690,7 +690,8 @@ public class MatchActivity extends AppCompatActivity {
         String currentInnings = sharedPreferences.getString("currentInnings","");
         Log.d(TAG, "checkAndHandleOverEnd: current ongoing innings " + currentInnings);
         long teamStatsId =sharedPreferences.getLong("teamStatsId",-1);
-        int currentScore = databaseHelper.getTarget(teamStatsId);
+        //int currentScore = databaseHelper.getTarget(teamStatsId);
+        int currentScore = sharedPreferences.getInt("score", -1);
         if (playedBalls % 6 == 0 && playedBalls != 0 && playedBalls != totalBalls) {
             Log.d(TAG, "checkAndHandleOverEnd:" + playedBalls / 6 + "Over has ended");
             setNewBatsman("bowler");
@@ -704,6 +705,7 @@ public class MatchActivity extends AppCompatActivity {
         long teamStatsId = sharedPreferences.getLong("teamStatsId", -1);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         if(currentInnings.equals("first")){
+            Log.d(TAG, "handleInningsEnd: first innings is ended and second innimngs starts");
             int target = databaseHelper.getTarget(teamStatsId);
             editor.putString("currentInnings", "second");
             editor.putInt("score", 0);
@@ -711,6 +713,7 @@ public class MatchActivity extends AppCompatActivity {
             editor.putLong("playedBalls", 0);
             editor.apply();
         }else{
+            Log.d(TAG, "handleInningsEnd: match is over");
             editor.putString("currentInnings", "matchOver");
             editor.putLong("target", -10000);
             editor.apply();
@@ -723,6 +726,7 @@ public class MatchActivity extends AppCompatActivity {
         if(ballType.equals("Normal")) score += runs;
         else if(ballType.equals("No-ball") || ballType.equals("Wide") || ballType.equals("No Ball")) score += runs + 1;
         else score += runs;
+        Log.d(TAG, "updateScoreInSharedPreferences: " + score);
         editor.putInt("score", score);
         editor.apply();
     }
