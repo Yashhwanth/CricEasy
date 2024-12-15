@@ -692,7 +692,6 @@ public class MatchActivity extends AppCompatActivity {
         long target = sharedPreferences.getLong("target", -1);
         String currentInnings = sharedPreferences.getString("currentInnings","");
         Log.d(TAG, "checkAndHandleOverEnd: current ongoing innings " + currentInnings);
-        //int currentScore = databaseHelper.getTarget(teamStatsId);
         int currentScore = sharedPreferences.getInt("score", -1);
         if (playedBalls % 6 == 0 && playedBalls != 0 && playedBalls != totalBalls) {
             Log.d(TAG, "checkAndHandleOverEnd:" + playedBalls / 6 + "Over has ended");
@@ -704,10 +703,8 @@ public class MatchActivity extends AppCompatActivity {
     }
     public void handleInningsEnd(String currentInnings){
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
-        long teamStatsId = sharedPreferences.getLong("teamStatsId", -1);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         if(currentInnings.equals("first")){
-            showInningsEndDialog("First Innings Completed", "Second Innings Starting Soon!", 5);
             Log.d(TAG, "handleInningsEnd: first innings is ended and second innings starts");
             int target = sharedPreferences.getInt("score", -1);
             editor.putString("currentInnings", "second");
@@ -715,12 +712,16 @@ public class MatchActivity extends AppCompatActivity {
             editor.putLong("target", target + 1);
             editor.putLong("playedBalls", 0);
             editor.apply();
+            showInningsEndDialog("First Innings Completed", "Second Innings Starting Soon!", 5);
+
         }else{
-            showInningsEndDialog("Match Over", "Thanks for Playing!", 3);
             Log.d(TAG, "handleInningsEnd: match is over");
             editor.putString("currentInnings", "matchOver");
             editor.putLong("target", -10000);
             editor.apply();
+            showInningsEndDialog("Match Over", "Thanks for Playing!", 3);
+            floatingbutton.setEnabled(false);
+            floatingbutton.setAlpha(0.5f);     // Optional: Change visual appearance
         }
     }
     public void updateScoreInSharedPreferences(String ballType, int runs){
