@@ -805,8 +805,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 // Successfully inserted, store inningsId in SharedPreferences
                 SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putLong("playedBalls", 0);
                 editor.putLong("Innings_id", inningsId); // Save inningsId in SharedPreferences
                 editor.putString("currentInnings", "first");
+                editor.putLong("target", 10000);
+                editor.putInt("score",0);
                 editor.apply(); // Commit changes
                 Log.d("DatabaseHelper", "First innings started with inningsId: " + inningsId);
             }

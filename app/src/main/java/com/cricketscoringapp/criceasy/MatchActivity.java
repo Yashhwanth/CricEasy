@@ -409,6 +409,7 @@ public class MatchActivity extends AppCompatActivity {
                     databaseHelper.insertBallDataForWicket(over_id, "Legal", runs, striker, non_striker_id);
                     databaseHelper.updateTeamStatsForBowCauLbw(team_stats_id);
                     incrementPlayedBalls();
+                    updateScoreInSharedPreferences("Normal", runs);
                     break;
                 case "Run-Out":
                     Log.d(TAG, "showWicketDialog: " + runs);
@@ -433,6 +434,9 @@ public class MatchActivity extends AppCompatActivity {
                     }
                     RadioButton ballTypeRadioButtonRO = wicketDialogView.findViewById(ballTypeRadioButtonIdRO);
                     String ballTypeInRo = ballTypeRadioButtonRO.getText().toString();
+//                    if(ballTypeInRo.equals("Normal"))      updateScoreInSharedPreferences(runs);
+//                    else if(ballTypeInRo.equals("wide"))    updateScoreInSharedPreferences(runs + 1);
+//                    else if(ballTypeInRo.equals("No-ball"))  updateScoreInSharedPreferences(runs + 1);
                     String runsFrom = "N/A";
                     if (!ballTypeInRo.equals("Wide") && from_bat_or_by_radio_group.getVisibility() == View.VISIBLE) {
                         int runsFromId = from_bat_or_by_radio_group.getCheckedRadioButtonId();
@@ -444,6 +448,7 @@ public class MatchActivity extends AppCompatActivity {
                         runsFrom = runsFromRadioButton.getText().toString();
                     }
                     if(ballTypeInRo.equals("Normal"))    incrementPlayedBalls();
+                    updateScoreInSharedPreferences(ballTypeInRo ,runs);
                     databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballTypeInRo, runsFrom, "RUN-OUT");
                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, ballTypeInRo, runsFrom, "RUN-OUT");
                     databaseHelper.insertBallDataForWicket(over_id, ballTypeInRo, runs, striker, non_striker_id);
@@ -462,6 +467,7 @@ public class MatchActivity extends AppCompatActivity {
                     RadioButton ballTypeRadioButton = wicketDialogView.findViewById(ballTypeId);
                     String ballType = ballTypeRadioButton.getText().toString();
                     if(ballType.equals("Normal"))    incrementPlayedBalls();
+                    updateScoreInSharedPreferences(ballType, runs);
                     databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballType, null, "STUMPED");
                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, ballType, null, "STUMPED");
                     databaseHelper.insertBallDataForWicket(over_id, ballType, runs, striker, non_striker_id);
@@ -469,6 +475,7 @@ public class MatchActivity extends AppCompatActivity {
                     break;
             }
             setNewBatsman(playerType);
+            checkAndHandleOverEnd();
             wicketDialog.dismiss();
             parentDialog.dismiss();
         });
@@ -477,7 +484,7 @@ public class MatchActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
         long innings_id = sharedPreferences.getLong("Innings_id",-1);
         long over_id = sharedPreferences.getLong("over_id", -1);
-        String type_of_ball = "Legal";
+        String type_of_ball = "Normal";
         long striker = sharedPreferences.getLong("striker_id", -1);
         long non_striker = sharedPreferences.getLong("non_striker_id", -1);
         long bowler = sharedPreferences.getLong("bowler_id",-1);
@@ -488,6 +495,8 @@ public class MatchActivity extends AppCompatActivity {
         databaseHelper.updateBowlerStatsFor0to6(innings_id, bowler, runs);
         updateTeamStatsFor0to6(runs);
         incrementPlayedBalls();
+        checkAndHandleOverEnd();
+        updateScoreInSharedPreferences(type_of_ball, runs);
         Toast.makeText(this, "Runs scored: " + runs + ball_id, Toast.LENGTH_SHORT).show();
     }
      private void handleScoringForByesAndLegByes(int extraRuns, String ballType) {
@@ -505,6 +514,8 @@ public class MatchActivity extends AppCompatActivity {
          updateTeamStatsForByLegBy(extraRuns);
          rotateStrike(extraRuns);
          incrementPlayedBalls();
+         checkAndHandleOverEnd();
+         updateScoreInSharedPreferences(ballType, extraRuns);
      }
      private void handleScoringForWide(int extraRuns, String ballType){
          SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
@@ -518,7 +529,8 @@ public class MatchActivity extends AppCompatActivity {
          databaseHelper.updateExtrasTable(ball_id, ballType, extraRuns);
          updateTeamStatsForWide(extraRuns);
          rotateStrike(extraRuns);
-
+         checkAndHandleOverEnd();
+         updateScoreInSharedPreferences(ballType, extraRuns);
      }
      private void handleScoringForNoBall(int extraRuns, String ballType, String runFromWhat){
          SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
@@ -554,6 +566,8 @@ public class MatchActivity extends AppCompatActivity {
                  rotateStrike(extraRuns);
                  break;
          }updateTeamStatsForNoBall(extraRuns, runFromWhat);
+         updateScoreInSharedPreferences(ballType, extraRuns);
+         checkAndHandleOverEnd();
      }
      private void updateTeamStatsFor0to6(int runs){
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
@@ -645,7 +659,6 @@ public class MatchActivity extends AppCompatActivity {
         else updateNewBatsmanToDB(player_name, role, bat_style, bowl_style, player_type, innings_id);
     }
 
-    // Method to update player details in the database
     private void updateNewBatsmanToDB(String name, String role, String batStyle, String bowlStyle, String player_type, long innings_id) {
         long player_id = databaseHelper.insertPlayer(name, role, batStyle, bowlStyle, player_type);
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
@@ -667,19 +680,22 @@ public class MatchActivity extends AppCompatActivity {
         editor.putLong("playedBalls", playedBalls);
         editor.apply();
         Log.d(TAG, "incrementPlayedBalls:  balls incremented by 1 and current balls are " + playedBalls);
-        checkAndHandleOverEnd(playedBalls);
+        //checkAndHandleOverEnd(playedBalls);
     }
-
-    public void checkAndHandleOverEnd(long playedBalls) {
+    public void checkAndHandleOverEnd() {
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        long playedBalls = sharedPreferences.getLong("playedBalls", -1);
         long totalBalls = sharedPreferences.getLong("totalBalls", 0);
+        long target = sharedPreferences.getLong("target", -1);
         String currentInnings = sharedPreferences.getString("currentInnings","");
+        Log.d(TAG, "checkAndHandleOverEnd: current ongoing innings " + currentInnings);
+        long teamStatsId =sharedPreferences.getLong("teamStatsId",-1);
+        int currentScore = databaseHelper.getTarget(teamStatsId);
         if (playedBalls % 6 == 0 && playedBalls != 0 && playedBalls != totalBalls) {
             Log.d(TAG, "checkAndHandleOverEnd:" + playedBalls / 6 + "Over has ended");
             setNewBatsman("bowler");
         }
-        if(playedBalls == totalBalls) {
-
+        if(playedBalls == totalBalls || currentScore >= target) {
             handleInningsEnd(currentInnings);
         }
     }
@@ -690,6 +706,7 @@ public class MatchActivity extends AppCompatActivity {
         if(currentInnings.equals("first")){
             int target = databaseHelper.getTarget(teamStatsId);
             editor.putString("currentInnings", "second");
+            editor.putInt("score", 0);
             editor.putLong("target", target + 1);
             editor.putLong("playedBalls", 0);
             editor.apply();
@@ -698,6 +715,16 @@ public class MatchActivity extends AppCompatActivity {
             editor.putLong("target", -10000);
             editor.apply();
         }
+    }
+    public void updateScoreInSharedPreferences(String ballType, int runs){
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        int score = sharedPreferences.getInt("score", -1);
+        if(ballType.equals("Normal")) score += runs;
+        else if(ballType.equals("No-ball") || ballType.equals("Wide") || ballType.equals("No Ball")) score += runs + 1;
+        else score += runs;
+        editor.putInt("score", score);
+        editor.apply();
     }
 
 

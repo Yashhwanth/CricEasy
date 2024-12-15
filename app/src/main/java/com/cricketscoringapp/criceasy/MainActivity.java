@@ -34,16 +34,12 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putLong("playedBalls", 0);
-        editor.putString("currentInnings", "first");
-        //editor.clear();
-        editor.apply();
-
-
         // Initialize database helper
         databaseHelper = new DatabaseHelper(this);
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
 
 
 
