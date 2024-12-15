@@ -2,8 +2,11 @@ package com.cricketscoringapp.criceasy;
 
 import static android.content.ContentValues.TAG;
 
+import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -689,7 +692,6 @@ public class MatchActivity extends AppCompatActivity {
         long target = sharedPreferences.getLong("target", -1);
         String currentInnings = sharedPreferences.getString("currentInnings","");
         Log.d(TAG, "checkAndHandleOverEnd: current ongoing innings " + currentInnings);
-        long teamStatsId =sharedPreferences.getLong("teamStatsId",-1);
         //int currentScore = databaseHelper.getTarget(teamStatsId);
         int currentScore = sharedPreferences.getInt("score", -1);
         if (playedBalls % 6 == 0 && playedBalls != 0 && playedBalls != totalBalls) {
@@ -705,14 +707,16 @@ public class MatchActivity extends AppCompatActivity {
         long teamStatsId = sharedPreferences.getLong("teamStatsId", -1);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         if(currentInnings.equals("first")){
-            Log.d(TAG, "handleInningsEnd: first innings is ended and second innimngs starts");
-            int target = databaseHelper.getTarget(teamStatsId);
+            showInningsEndDialog("First Innings Completed", "Second Innings Starting Soon!", 5);
+            Log.d(TAG, "handleInningsEnd: first innings is ended and second innings starts");
+            int target = sharedPreferences.getInt("score", -1);
             editor.putString("currentInnings", "second");
             editor.putInt("score", 0);
             editor.putLong("target", target + 1);
             editor.putLong("playedBalls", 0);
             editor.apply();
         }else{
+            showInningsEndDialog("Match Over", "Thanks for Playing!", 3);
             Log.d(TAG, "handleInningsEnd: match is over");
             editor.putString("currentInnings", "matchOver");
             editor.putLong("target", -10000);
@@ -730,6 +734,31 @@ public class MatchActivity extends AppCompatActivity {
         editor.putInt("score", score);
         editor.apply();
     }
+
+    private void showInningsEndDialog(String title, String message, int durationInSeconds) {
+        // Create a dialog
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.activity_innings_end); // Use a custom layout if needed
+        dialog.setCancelable(false); // Prevent manual dismissal
+
+        // Set the title and message
+        TextView titleText = dialog.findViewById(R.id.dialogTitle);
+        TextView messageText = dialog.findViewById(R.id.dialogMessage);
+        titleText.setText(title);
+        messageText.setText(message);
+
+        // Show the dialog
+        dialog.show();
+
+        // Auto-dismiss the dialog after specified duration
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                dialog.dismiss();
+            }
+        }, durationInSeconds * 1000L); // Convert seconds to milliseconds
+    }
+
 
 
 
