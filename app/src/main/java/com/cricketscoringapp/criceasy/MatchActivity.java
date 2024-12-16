@@ -639,7 +639,6 @@ public class MatchActivity extends AppCompatActivity {
                 String bat_style = bat_button.getTag().toString();
                 String bowl_style = bowl_button.getTag().toString();
                 updatePlayerDataInSp(player_type, player_name, role, bat_style, bowl_style);
-                insertOver();
                 batsmanDialog.dismiss();
             }
         });
@@ -700,6 +699,7 @@ public class MatchActivity extends AppCompatActivity {
             Log.d(TAG, "checkAndHandleOverEnd:" + playedBalls / 6 + "Over has ended");
             if(currentOverScore == 0) insertMaidenOver();
             setNewBatsman("bowler");
+            insertOver();
         }
         if(playedBalls == totalBalls || currentScore >= target) {
             handleInningsEnd(currentInnings);
