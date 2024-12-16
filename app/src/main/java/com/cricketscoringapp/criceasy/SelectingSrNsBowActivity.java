@@ -1,5 +1,7 @@
 package com.cricketscoringapp.criceasy;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,9 +25,11 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
         setContentView(R.layout.activity_s_ns_bowler); // Make sure this layout file exists
         updateCurrentActivityInPreferences();
 
+
         databaseHelper = new DatabaseHelper(this);
 
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+        String currentInnings = sharedPreferences.getString("currentInnings", "");
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
 
@@ -62,7 +66,13 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
                 partnerships_table();
                 batsman_table();
                 bowler_table();
-                lets_play(); // Navigate to the scoring page
+                if (currentInnings.equals("second")) {
+                    Log.d("InningsCheck", "Second innings setup completed, closing the activity.");
+                    finish(); // Close the page when it's the second innings
+                } else {
+                    Log.d("InningsCheck", "First innings setup completed, starting scoring page.");
+                    lets_play(); // Navigate to the scoring page for the first innings
+                }
             }
         });
 

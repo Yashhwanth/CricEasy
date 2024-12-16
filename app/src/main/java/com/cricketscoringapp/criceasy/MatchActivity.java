@@ -3,6 +3,7 @@ package com.cricketscoringapp.criceasy;
 import static android.content.ContentValues.TAG;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -663,7 +664,6 @@ public class MatchActivity extends AppCompatActivity {
         if(player_type.equals("bowler")) updateNewBowlerToDB(player_name, role, bat_style, bowl_style, player_type, innings_id);
         else updateNewBatsmanToDB(player_name, role, bat_style, bowl_style, player_type, innings_id);
     }
-
     private void updateNewBatsmanToDB(String name, String role, String batStyle, String bowlStyle, String player_type, long innings_id) {
         long player_id = databaseHelper.insertPlayer(name, role, batStyle, bowlStyle, player_type);
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
@@ -717,8 +717,7 @@ public class MatchActivity extends AppCompatActivity {
             editor.putLong("playedBalls", 0);
             editor.apply();
             showInningsEndDialog("First Innings Completed", "Second Innings Starting Soon!", 5);
-            startSecondInnings();
-
+            //startSecondInnings();
         }else{
             Log.d(TAG, "handleInningsEnd: match is over");
             editor.putString("currentInnings", "matchOver");
@@ -753,6 +752,9 @@ public class MatchActivity extends AppCompatActivity {
     }
 
     private void showInningsEndDialog(String title, String message, int durationInSeconds) {
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        String currentInnings = sharedPreferences.getString("currentInnings", "");
+        Log.d(TAG, "showInningsEndDialog:  in the dialog -=-==-=-=-=-==-=-=-=-=-=-=-=-=" + currentInnings);
         // Create a dialog
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.activity_innings_end); // Use a custom layout if needed
@@ -766,13 +768,15 @@ public class MatchActivity extends AppCompatActivity {
 
         // Show the dialog
         dialog.show();
-
-
-
         // Auto-dismiss the dialog after specified duration
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
+                Log.d(TAG, "run: dialog about to be closed");
+                if (dialog.isShowing() && currentInnings.equals("first")) {
+                    dialog.dismiss();
+                    secondInnings();
+                }
                 dialog.dismiss();
             }
         }, durationInSeconds * 1000L); // Convert seconds to milliseconds
@@ -796,6 +800,12 @@ public class MatchActivity extends AppCompatActivity {
         long battingTeamId = sharedPreferences.getLong("teamB_id", -1);
         databaseHelper.startSecondInnings(matchId, battingTeamId);
     }
+    private void secondInnings(){
+        Log.d(TAG, "secondInnings: entered second innings");
+        Intent intent = new Intent(MatchActivity.this, SelectingSrNsBowActivity.class);
+        startActivity(intent);
+    }
+
 
 
 
