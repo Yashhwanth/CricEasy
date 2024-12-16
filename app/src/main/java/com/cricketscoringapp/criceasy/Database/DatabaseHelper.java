@@ -821,6 +821,52 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
+    public void startSecondInnings(long matchId, long battingTeamId) {
+
+        // Check if the necessary data is available
+        if (matchId == -1 || battingTeamId == -1) {
+            // Handle error: return or show a message that necessary data is missing
+            Log.e("DatabaseHelper", "Missing data for match or team in SharedPreferences");
+            return;
+        }
+
+        // Create a writable database
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        try {
+            // Insert a new row to start the first innings
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_INNINGS_NUMBER, 2); // First innings
+            values.put(COLUMN_MATCH_ID, matchId); // Match ID
+            values.put(COLUMN_TEAM_BATTING, battingTeamId); // Batting team ID
+            values.put(COLUMN_IS_COMPLETED, 0); // Incomplete innings
+
+            // Insert into the INNINGS table
+            long inningsId = db.insert(TABLE_INNINGS, null, values);
+
+            if (inningsId == -1) {
+                // Handle failure to insert
+                Log.e("DatabaseHelper", "Failed to start first innings.");
+            } else {
+                // Successfully inserted, store inningsId in SharedPreferences
+                SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putLong("playedBalls", 0);
+                editor.putLong("Innings_id", inningsId); // Save inningsId in SharedPreferences
+                editor.putString("currentInnings", "second");
+                editor.putInt("score",0);
+                editor.apply(); // Commit changes
+                Log.d("DatabaseHelper", "Second innings started with inningsId: " + inningsId);
+            }
+        } catch (Exception e) {
+            // Handle any exceptions
+            e.printStackTrace();
+        } finally {
+            // Close the database
+            db.close();
+        }
+    }
+
     public void insertOver(long inningsId, int over, long playerId, int isMaiden) {
         SQLiteDatabase db = this.getWritableDatabase();
         try {
@@ -846,6 +892,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         } finally {
             // Close the database
+            db.close();
+        }
+    }
+    public void insertMaidenOver(long overId){
+        SQLiteDatabase db = this.getWritableDatabase();
+        try{
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_IS_MAIDEN, 1);
+            db.update(TABLE_OVERS, values, COLUMN_OVER_ID + " = ?", new String[]{String.valueOf(overId)});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
             db.close();
         }
     }

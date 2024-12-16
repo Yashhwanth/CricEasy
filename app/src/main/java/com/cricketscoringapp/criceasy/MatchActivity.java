@@ -28,6 +28,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.shadow.ShadowRenderer;
 
 
 public class MatchActivity extends AppCompatActivity {
@@ -596,7 +597,6 @@ public class MatchActivity extends AppCompatActivity {
         // Inflate your dialog layout
         Log.d(TAG, "setNewBatsman: " + player_type);
         View batsmanDialogView = getLayoutInflater().inflate(R.layout.activity_selecting_players, null);
-
         // Create and configure the dialog
         AlertDialog.Builder batsmanBuilder = new AlertDialog.Builder(this);
         batsmanBuilder.setView(batsmanDialogView);
@@ -638,6 +638,7 @@ public class MatchActivity extends AppCompatActivity {
                 String bat_style = bat_button.getTag().toString();
                 String bowl_style = bowl_button.getTag().toString();
                 updatePlayerDataInSp(player_type, player_name, role, bat_style, bowl_style);
+                insertOver();
                 batsmanDialog.dismiss();
             }
         });
@@ -657,6 +658,7 @@ public class MatchActivity extends AppCompatActivity {
         editor.putString(player_type + " ROLE",role);
         editor.putString(player_type + " BS",bat_style);
         editor.putString(player_type + " BOS",bowl_style);
+        editor.putInt("currentOverScore", 0);
         editor.apply();
         if(player_type.equals("bowler")) updateNewBowlerToDB(player_name, role, bat_style, bowl_style, player_type, innings_id);
         else updateNewBatsmanToDB(player_name, role, bat_style, bowl_style, player_type, innings_id);
@@ -690,11 +692,13 @@ public class MatchActivity extends AppCompatActivity {
         long playedBalls = sharedPreferences.getLong("playedBalls", -1);
         long totalBalls = sharedPreferences.getLong("totalBalls", 0);
         long target = sharedPreferences.getLong("target", -1);
+        int currentOverScore = sharedPreferences.getInt("currentOverScore", -1);
         String currentInnings = sharedPreferences.getString("currentInnings","");
         Log.d(TAG, "checkAndHandleOverEnd: current ongoing innings " + currentInnings);
         int currentScore = sharedPreferences.getInt("score", -1);
         if (playedBalls % 6 == 0 && playedBalls != 0 && playedBalls != totalBalls) {
             Log.d(TAG, "checkAndHandleOverEnd:" + playedBalls / 6 + "Over has ended");
+            if(currentOverScore == 0) insertMaidenOver();
             setNewBatsman("bowler");
         }
         if(playedBalls == totalBalls || currentScore >= target) {
@@ -713,6 +717,7 @@ public class MatchActivity extends AppCompatActivity {
             editor.putLong("playedBalls", 0);
             editor.apply();
             showInningsEndDialog("First Innings Completed", "Second Innings Starting Soon!", 5);
+            startSecondInnings();
 
         }else{
             Log.d(TAG, "handleInningsEnd: match is over");
@@ -728,11 +733,22 @@ public class MatchActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         int score = sharedPreferences.getInt("score", -1);
-        if(ballType.equals("Normal")) score += runs;
-        else if(ballType.equals("No-ball") || ballType.equals("Wide") || ballType.equals("No Ball")) score += runs + 1;
-        else score += runs;
+        int currentOverScore = sharedPreferences.getInt("currentOverScore", -1);
+        if(ballType.equals("Normal")){
+            score += runs;
+            currentOverScore += runs;
+        }
+        else if(ballType.equals("No-ball") || ballType.equals("Wide") || ballType.equals("No Ball")) {
+            score += runs + 1;
+            currentOverScore += runs + 1;
+        }
+        else {
+            score += runs;
+            currentOverScore += runs;
+        }
         Log.d(TAG, "updateScoreInSharedPreferences: " + score);
         editor.putInt("score", score);
+        editor.putInt("currentOverScore", currentOverScore);
         editor.apply();
     }
 
@@ -751,6 +767,8 @@ public class MatchActivity extends AppCompatActivity {
         // Show the dialog
         dialog.show();
 
+
+
         // Auto-dismiss the dialog after specified duration
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
@@ -758,6 +776,25 @@ public class MatchActivity extends AppCompatActivity {
                 dialog.dismiss();
             }
         }, durationInSeconds * 1000L); // Convert seconds to milliseconds
+    }
+    private void insertOver(){
+        Log.d(TAG, "insertOver: inside the insert over");
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        long inningsId = sharedPreferences.getLong("Innings_id", -1);
+        long bowlerId = sharedPreferences.getLong("bowler_id", -1);
+        databaseHelper.insertOver(inningsId, 2, bowlerId, 0);
+    }
+
+    private void insertMaidenOver(){
+        SharedPreferences sharedPreferences =getSharedPreferences("match_prefs", MODE_PRIVATE);
+        long overId = sharedPreferences.getLong("over_id", -1);
+        databaseHelper.insertMaidenOver(overId);
+    }
+    private void startSecondInnings(){
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+        long matchId = sharedPreferences.getLong("match_id", -1);
+        long battingTeamId = sharedPreferences.getLong("teamB_id", -1);
+        databaseHelper.startSecondInnings(matchId, battingTeamId);
     }
 
 

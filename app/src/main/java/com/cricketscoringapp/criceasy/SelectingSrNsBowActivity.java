@@ -171,7 +171,6 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
     }
 
     private void innings_table(){
-        // Get SharedPreferences to retrieve the required values
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
         long matchId = sharedPreferences.getLong("match_id", -1); // Get the match ID from SharedPreferences
         long battingTeamId = sharedPreferences.getLong("teamA_id", -1); // Get the batting team ID (team1_id)
@@ -180,10 +179,12 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
 
     private void overs_table(){
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
         long inningsId = sharedPreferences.getLong("Innings_id", -1);  // Get the innings ID from SharedPreferences
         long bowlerId = sharedPreferences.getLong("bowler_id",-1);
-        databaseHelper.insertOver(inningsId, 1, bowlerId,0  );
-
+        databaseHelper.insertOver(inningsId, 1, bowlerId,0);
+        editor.putInt("currentOverScore", 0);
+        editor.apply();
     }
 
     private void partnerships_table(){
@@ -201,7 +202,6 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
         long innings_id = sharedPreferences.getLong("Innings_id",-1);
         databaseHelper.initializeBatsmanStats(s_id,innings_id );
         databaseHelper.initializeBatsmanStats(ns_id,innings_id );
-
     }
 
     private void bowler_table(){
@@ -214,7 +214,6 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
     private void team_stats_table() {
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
         long inningsId = sharedPreferences.getLong("Innings_id", -1); // Get the innings ID from SharedPreferences
-
         if (inningsId != -1) {
             long teamStatsId = databaseHelper.initializeTeamStats(inningsId);
             SharedPreferences.Editor editor = sharedPreferences.edit();
