@@ -58,8 +58,24 @@
     <string name="commentaryButton">Commentary</string>
     <string name="teamsButton">Teams</string>
     <string name="floatingButtonContentDescription">Open the Scoring Popup</string>
-<!--    <string name="stumped_ball_type">Ball type while Stumping</string>-->
-<!--    <string name="stumped_ball_type">Ball type while Stumping</string>-->
+    activity scoring
+    <string name="zeroScoringButton">0</string>
+    <string name="oneScoringButton">1</string>
+    <string name="twoScoringButton">2</string>
+    <string name="threeScoringButton">3</string>
+    <string name="fourScoringButton">4</string>
+    <string name="fiveScoringButton">5</string>
+    <string name="sixScoringButton">6</string>
+    <string name="sevenScoringButton">7</string>
+    <string name="eightScoringButton">8</string>
+    <string name="wideScoringButton">Wide</string>
+    <string name="noBallScoringButton">No-Ball</string>
+    <string name="byeScoringButton">Bye</string>
+    <string name="legByeScoringButton">legBye</string>
+    <string name="wicketScoringButton">Wicket</string>
+    <string name="deadScoringButton">Dead</string>
+    <string name="undoScoringButton">Undo</string>
+
 
 
 

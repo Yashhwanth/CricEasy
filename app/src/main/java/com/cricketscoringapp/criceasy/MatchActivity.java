@@ -90,23 +90,22 @@ public class MatchActivity extends AppCompatActivity {
 
 
     public void popup() {
-        // Inflate the scoring layout
         View dialogView = getLayoutInflater().inflate(R.layout.activity_scoring, null);
         Button btn_0, btn_1, btn_2, btn_3, btn_4, btn_5, btn_6, btn_7, btn_8, btn_bye, btn_leg_bye, btn_wide, btn_noball, btn_wicket;
-        btn_0 = dialogView.findViewById(R.id.button21);
-        btn_1 = dialogView.findViewById(R.id.button22);
-        btn_2 = dialogView.findViewById(R.id.button23);
-        btn_3 = dialogView.findViewById(R.id.button20);
-        btn_4 = dialogView.findViewById(R.id.button19);
-        btn_5 = dialogView.findViewById(R.id.button17);
-        btn_6 = dialogView.findViewById(R.id.button18);
-        btn_7 = dialogView.findViewById(R.id.button15);
-        btn_8 = dialogView.findViewById(R.id.button16);
-        btn_bye = dialogView.findViewById(R.id.button9);
-        btn_leg_bye = dialogView.findViewById(R.id.button10);
-        btn_wide = dialogView.findViewById(R.id.button14);
-        btn_noball = dialogView.findViewById(R.id.button12);
-        btn_wicket = dialogView.findViewById(R.id.button24);
+        btn_0 = dialogView.findViewById(R.id.zeroScoringButton);
+        btn_1 = dialogView.findViewById(R.id.oneScoringButton);
+        btn_2 = dialogView.findViewById(R.id.twoScoringButton);
+        btn_3 = dialogView.findViewById(R.id.threeScoringButton);
+        btn_4 = dialogView.findViewById(R.id.fourScoringButton);
+        btn_5 = dialogView.findViewById(R.id.fiveScoringButton);
+        btn_6 = dialogView.findViewById(R.id.sixScoringButton);
+        btn_7 = dialogView.findViewById(R.id.sevenScoringButton);
+        btn_8 = dialogView.findViewById(R.id.eightScoringButton);
+        btn_bye = dialogView.findViewById(R.id.byeScoringButton);
+        btn_leg_bye = dialogView.findViewById(R.id.legByeScoringButton);
+        btn_wide = dialogView.findViewById(R.id.wideScoringButton);
+        btn_noball = dialogView.findViewById(R.id.noBallScoringButton);
+        btn_wicket = dialogView.findViewById(R.id.wicketScoringButton);
 
 
         // Create the dialog

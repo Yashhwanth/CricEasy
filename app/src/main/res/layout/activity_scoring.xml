@@ -2,10 +2,12 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scoringActivityLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TableLayout
+        android:id="@+id/scoringButtonsTable"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -17,148 +19,157 @@
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
+            android:layout_height="match_parent"
+            style="?android:attr/buttonBarStyle">
             <Button
-                android:id="@+id/button21"
+                android:id="@+id/zeroScoringButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="scorebutton"
-                android:text="0"
-                android:tag="0" />
+                style="?android:attr/buttonBarButtonStyle"
+                android:tag="0"
+                android:text="@string/zeroScoringButton" />
 
             <Button
-                android:id="@+id/button22"
+                android:id="@+id/oneScoringButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="scorebutton"
-                android:text="1"
-                android:tag="1" />
+                style="?android:attr/buttonBarButtonStyle"
+                android:tag="1"
+                android:text="@string/oneScoringButton" />
 
             <Button
-                android:id="@+id/button23"
+                android:id="@+id/twoScoringButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="scorebutton"
-                android:text="2"
-                android:tag="2" />
+                style="?android:attr/buttonBarButtonStyle"
+                android:tag="2"
+                android:text="@string/twoScoringButton" />
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            style="?android:attr/buttonBarStyle">
+
 
             <Button
-                android:id="@+id/button20"
+                android:id="@+id/threeScoringButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="scorebutton"
-                android:text="3"
-                android:tag="3" />
+                style="?android:attr/buttonBarButtonStyle"
+                android:tag="3"
+                android:text="@string/threeScoringButton" />
 
             <Button
-                android:id="@+id/button19"
+                android:id="@+id/fourScoringButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="scorebutton"
-                android:text="4"
-                android:tag="4" />
+                style="?android:attr/buttonBarButtonStyle"
+                android:tag="4"
+                android:text="@string/fourScoringButton" />
 
             <Button
-                android:id="@+id/button18"
+                android:id="@+id/sixScoringButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="scorebutton"
-                android:text="6"
-                android:tag="6" />
+                style="?android:attr/buttonBarButtonStyle"
+                android:tag="6"
+                android:text="@string/sixScoringButton" />
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            style="?android:attr/buttonBarStyle">
 
-            <Button
-                android:id="@+id/button17"
+        <Button
+                android:id="@+id/fiveScoringButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="scorebutton"
-                android:text="5"
-                android:tag="5" />
+                style="?android:attr/buttonBarButtonStyle"
+                android:tag="5"
+                android:text="@string/fiveScoringButton" />
 
             <Button
-                android:id="@+id/button15"
+                android:id="@+id/sevenScoringButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="scorebutton"
-                android:text="7" />
+                style="?android:attr/buttonBarButtonStyle"
+                android:text="@string/sevenScoringButton" />
 
             <Button
-                android:id="@+id/button16"
+                android:id="@+id/eightScoringButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="scorebutton"
-                android:text="8" />
+                style="?android:attr/buttonBarButtonStyle"
+                android:text="@string/eightScoringButton" />
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            style="?android:attr/buttonBarStyle">
 
-            <Button
-                android:id="@+id/button14"
+        <Button
+                android:id="@+id/wideScoringButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
-                android:text="wide" />
+                style="?android:attr/buttonBarButtonStyle"
+                android:text="@string/wideScoringButton" />
 
             <Button
-                android:id="@+id/button12"
+                android:id="@+id/noBallScoringButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
-                android:text="noball" />
+                style="?android:attr/buttonBarButtonStyle"
+                android:text="@string/noBallScoringButton" />
 
             <Button
                 android:id="@+id/button13"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="scorebutton"
-                android:text="dead" />
+                style="?android:attr/buttonBarButtonStyle"
+                android:text="@string/deadScoringButton" />
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            style="?android:attr/buttonBarStyle">
+
 
             <Button
-                android:id="@+id/button9"
+                android:id="@+id/byeScoringButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
-                android:text="bye" />
+                style="?android:attr/buttonBarButtonStyle"
+                android:text="@string/byeScoringButton" />
 
             <Button
-                android:id="@+id/button10"
+                android:id="@+id/legByeScoringButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="leg bye" />
+                style="?android:attr/buttonBarButtonStyle"
+                android:text="@string/legByeScoringButton" />
 
             <Button
                 android:id="@+id/button11"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="undo" />
+                style="?android:attr/buttonBarButtonStyle"
+                android:text="@string/undoScoringButton" />
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <Button
-                android:id="@+id/button24"
+            android:layout_height="match_parent"
+            style="?android:attr/buttonBarStyle">
+        <Button
+                android:id="@+id/wicketScoringButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Out" />
+                style="?android:attr/buttonBarButtonStyle"
+                android:text="@string/wicketScoringButton" />
         </TableRow>
 
     </TableLayout>

@@ -15,10 +15,10 @@ public class ScoringActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scoring); // Make sure this layout file exists
 
-        Button dialogbuttonwide = findViewById(R.id.button14);
-        Button dialogbuttonnb = findViewById(R.id.button12);
-        Button dialogbuttonbyes = findViewById(R.id.button9);
-        Button dialogbuttonlbyes = findViewById(R.id.button10);
+        Button dialogbuttonwide = findViewById(R.id.wideScoringButton);
+        Button dialogbuttonnb = findViewById(R.id.noBallScoringButton);
+        Button dialogbuttonbyes = findViewById(R.id.byeScoringButton);
+        Button dialogbuttonlbyes = findViewById(R.id.legByeScoringButton);
 
         dialogbuttonwide.setOnClickListener(view -> dialog(ScoringActivity.this));
         dialogbuttonnb.setOnClickListener(view -> dialog(ScoringActivity.this));
