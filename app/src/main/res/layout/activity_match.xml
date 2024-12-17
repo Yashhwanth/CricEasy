@@ -2,12 +2,13 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/matchActivityLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:ignore="ExtraText">
 
     <HorizontalScrollView
-        android:id="@+id/horizontalScrollView"
+        android:id="@+id/scrollableButtonsView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -18,50 +19,56 @@
         app:layout_constraintVertical_bias="0.089999974">
 
         <LinearLayout
+            android:id="@+id/scrollableButtonsLinearLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            style="?android:attr/buttonBarStyle">
 
             <Button
-                android:id="@+id/button5"
+                android:id="@+id/infoFragmentButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-
-                android:text="Info" />
+                android:text="@string/infoButton"
+                style="?android:attr/buttonBarButtonStyle"/>
 
             <Button
-                android:id="@+id/button7"
+                android:id="@+id/summaryFragmentButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Summary/live" />
+                android:text="@string/summaryButton"
+                style="?android:attr/buttonBarButtonStyle"/>
 
             <Button
-                android:id="@+id/button6"
+                android:id="@+id/scorecardFragmentButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="scorecard" />
+                android:text="@string/scorecardButton"
+                style="?android:attr/buttonBarButtonStyle"/>
 
             <Button
-                android:id="@+id/button8"
+                android:id="@+id/commentaryFragmentButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="commentary" />
+                android:text="@string/commentaryButton"
+                style="?android:attr/buttonBarButtonStyle"/>
 
             <Button
-                android:id="@+id/button25"
+                android:id="@+id/teamsFragmentButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="teams" />
+                android:text="@string/teamsButton"
+                style="?android:attr/buttonBarButtonStyle"/>
         </LinearLayout>
     </HorizontalScrollView>
 
     <FrameLayout
-        android:id="@+id/frameLayout"
+        android:id="@+id/fragmentLayout"
         android:layout_width="364dp"
         android:layout_height="506dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -78,40 +85,48 @@
         app:layout_constraintVertical_bias="1.0"
 
         <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/lay1"
+            android:id="@+id/infoFragmentView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-
-            />
-
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/lay2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            tools:layout="@layout/activity_mp_info" />
 
         <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/lay3"
+            android:id="@+id/summaryFragmentView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            tools:layout="@layout/activity_mp_info" />
 
         <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/lay4"
+            android:id="@+id/scorecardFragmentView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            tools:layout="@layout/activity_mp_info" />
 
         <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/lay5"
+            android:id="@+id/commentaryFragmentView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            tools:layout="@layout/activity_mp_info" />
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/teamsFragmentView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            tools:layout="@layout/activity_mp_info" />
 
     </FrameLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floatingbutton"
+        android:id="@+id/floatingButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
         android:focusable="true"
+        android:contentDescription="@string/floatingButtonContentDescription"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.84"

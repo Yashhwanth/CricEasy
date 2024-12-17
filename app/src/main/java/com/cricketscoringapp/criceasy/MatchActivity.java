@@ -29,46 +29,35 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.shadow.ShadowRenderer;
 
 
 public class MatchActivity extends AppCompatActivity {
-    private Button btnLayout1, btnLayout2, btnLayout3, btnLayout4, btnLayout5;
-
-    private FloatingActionButton floatingbutton;
+    private Button infoFragmentButton, summaryFragmentButton, scorecardFragmentButton, commentaryFragmentButton, teamsFragmentButton;
+    private FloatingActionButton floatingButton;
     private DatabaseHelper databaseHelper;
+    private SharedPreferences sharedPreferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_match); // Make sure this layout file exists
-        updateCurrentActivityInPreferences();
-
-        // Initialize the DatabaseHelper
+        setContentView(R.layout.activity_match);
         databaseHelper = new DatabaseHelper(this);
-
-
-        btnLayout1 = findViewById(R.id.button5);
-        btnLayout2 = findViewById(R.id.button6);
-        btnLayout3 = findViewById(R.id.button7);
-        btnLayout4 = findViewById(R.id.button8);
-        btnLayout5 = findViewById(R.id.button25);
-        floatingbutton = findViewById(R.id.floatingbutton);
-
-        floatingbutton.setOnClickListener(view ->{
-                popup();
-        });
-
-        // Set onClickListeners to show the corresponding fragments
-        btnLayout1.setOnClickListener(view -> showFragment(new InfoFragment()));
-        btnLayout2.setOnClickListener(view -> showFragment(new liveFragment()));
-//        btnLayout3.setOnClickListener(view -> showFragment(new Fragment3()));
-//        btnLayout4.setOnClickListener(view -> showFragment(new Fragment4()));
-//        btnLayout5.setOnClickListener(view -> showFragment(new Fragment5()));
+        setupUI(savedInstanceState);
+        updateCurrentActivityInPreferences();
+//        floatingButton.setOnClickListener(view ->{
+//                popup();
+//        });
+//
+//        // Set onClickListeners to show the corresponding fragments
+//        infoFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
+//        summaryFragmentButton.setOnClickListener(view -> showFragment(new liveFragment()));
+//        scorecardFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
+//        commentaryFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
+//        teamsFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
 
         // Load the first fragment by default
-        if (savedInstanceState == null) {
-            showFragment(new liveFragment());
-        }
+//        if (savedInstanceState == null) {
+//            showFragment(new liveFragment());
+//        }
 
     }
 
@@ -77,6 +66,26 @@ public class MatchActivity extends AppCompatActivity {
         super.onResume();
         // Update current activity in SharedPreferences
         updateCurrentActivityInPreferences();
+    }
+
+    private void setupUI(Bundle savedInstanceState){
+        infoFragmentButton = findViewById(R.id.infoFragmentButton);
+        summaryFragmentButton = findViewById(R.id.summaryFragmentButton);
+        scorecardFragmentButton = findViewById(R.id.scorecardFragmentButton);
+        commentaryFragmentButton = findViewById(R.id.commentaryFragmentButton);
+        teamsFragmentButton = findViewById(R.id.teamsFragmentButton);
+        floatingButton = findViewById(R.id.floatingButton);
+        infoFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
+        summaryFragmentButton.setOnClickListener(view -> showFragment(new liveFragment()));
+        scorecardFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
+        commentaryFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
+        teamsFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
+        floatingButton.setOnClickListener(view ->{
+            popup();
+        });
+        if (savedInstanceState == null) {
+            showFragment(new liveFragment());
+        }
     }
 
 
@@ -181,7 +190,7 @@ public class MatchActivity extends AppCompatActivity {
     private void showFragment(Fragment fragment) {
         // Begin a fragment transaction to replace the current fragment
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.frameLayout, fragment); // fragmentContainer is the container where the fragments will be loaded
+        transaction.replace(R.id.fragmentLayout, fragment); // fragmentContainer is the container where the fragments will be loaded
         transaction.addToBackStack(null); // Optionally, add the transaction to the back stack if you want to handle back navigation
         transaction.commit();
     }
@@ -486,10 +495,10 @@ public class MatchActivity extends AppCompatActivity {
         });
     }
     private void handleScoringFor0To6(int runs) {
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+        //SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+        String type_of_ball = "Normal";
         long innings_id = sharedPreferences.getLong("Innings_id",-1);
         long over_id = sharedPreferences.getLong("over_id", -1);
-        String type_of_ball = "Normal";
         long striker = sharedPreferences.getLong("striker_id", -1);
         long non_striker = sharedPreferences.getLong("non_striker_id", -1);
         long bowler = sharedPreferences.getLong("bowler_id",-1);
@@ -716,16 +725,16 @@ public class MatchActivity extends AppCompatActivity {
             editor.putLong("target", target + 1);
             editor.putLong("playedBalls", 0);
             editor.apply();
-            showInningsEndDialog("First Innings Completed", "Second Innings Starting Soon!", 5);
-            //startSecondInnings();
+            //showInningsEndDialog("First Innings Completed", "Second Innings Starting Soon!", 5);
+            secondInnings();
         }else{
             Log.d(TAG, "handleInningsEnd: match is over");
             editor.putString("currentInnings", "matchOver");
             editor.putLong("target", -10000);
             editor.apply();
             showInningsEndDialog("Match Over", "Thanks for Playing!", 3);
-            floatingbutton.setEnabled(false);
-            floatingbutton.setAlpha(0.5f);     // Optional: Change visual appearance
+            floatingButton.setEnabled(false);
+            floatingButton.setAlpha(0.5f);     // Optional: Change visual appearance
         }
     }
     public void updateScoreInSharedPreferences(String ballType, int runs){
@@ -752,6 +761,7 @@ public class MatchActivity extends AppCompatActivity {
     }
 
     private void showInningsEndDialog(String title, String message, int durationInSeconds) {
+        boolean isDialogClosed = false;
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
         String currentInnings = sharedPreferences.getString("currentInnings", "");
         Log.d(TAG, "showInningsEndDialog:  in the dialog -=-==-=-=-=-==-=-=-=-=-=-=-=-=" + currentInnings);
@@ -773,9 +783,9 @@ public class MatchActivity extends AppCompatActivity {
             @Override
             public void run() {
                 Log.d(TAG, "run: dialog about to be closed");
-                if (dialog.isShowing() && currentInnings.equals("first")) {
+                if (dialog.isShowing()) {
                     dialog.dismiss();
-                    secondInnings();
+                    //secondInnings();
                 }
                 dialog.dismiss();
             }
@@ -794,12 +804,12 @@ public class MatchActivity extends AppCompatActivity {
         long overId = sharedPreferences.getLong("over_id", -1);
         databaseHelper.insertMaidenOver(overId);
     }
-    private void startSecondInnings(){
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
-        long matchId = sharedPreferences.getLong("match_id", -1);
-        long battingTeamId = sharedPreferences.getLong("teamB_id", -1);
-        databaseHelper.startSecondInnings(matchId, battingTeamId);
-    }
+//    private void startSecondInnings(){
+//        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+//        long matchId = sharedPreferences.getLong("match_id", -1);
+//        long battingTeamId = sharedPreferences.getLong("teamB_id", -1);
+//        databaseHelper.startSecondInnings(matchId, battingTeamId);
+//    }
     private void secondInnings(){
         Log.d(TAG, "secondInnings: entered second innings");
         Intent intent = new Intent(MatchActivity.this, SelectingSrNsBowActivity.class);

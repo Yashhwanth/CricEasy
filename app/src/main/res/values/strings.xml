@@ -51,6 +51,16 @@
     <string name="submit">Submit</string>
     <string name="cancel">Cancel</string>
     <string name="stumped_ball_type">Ball type while Stumping</string>
+    activity match
+    <string name="infoButton">Info</string>
+    <string name="summaryButton">Summary/Live</string>
+    <string name="scorecardButton">Scorecard</string>
+    <string name="commentaryButton">Commentary</string>
+    <string name="teamsButton">Teams</string>
+    <string name="floatingButtonContentDescription">Open the Scoring Popup</string>
+<!--    <string name="stumped_ball_type">Ball type while Stumping</string>-->
+<!--    <string name="stumped_ball_type">Ball type while Stumping</string>-->
+
 
 
 
