@@ -69,9 +69,9 @@
     <string name="sevenScoringButton">7</string>
     <string name="eightScoringButton">8</string>
     <string name="wideScoringButton">Wide</string>
-    <string name="noBallScoringButton">No-Ball</string>
+    <string name="noBallScoringButton">NoBall</string>
     <string name="byeScoringButton">Bye</string>
-    <string name="legByeScoringButton">legBye</string>
+    <string name="legByeScoringButton">LegBye</string>
     <string name="wicketScoringButton">Wicket</string>
     <string name="deadScoringButton">Dead</string>
     <string name="undoScoringButton">Undo</string>

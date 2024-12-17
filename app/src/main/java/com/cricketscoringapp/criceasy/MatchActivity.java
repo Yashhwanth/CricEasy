@@ -81,40 +81,34 @@ public class MatchActivity extends AppCompatActivity {
         commentaryFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
         teamsFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
         floatingButton.setOnClickListener(view ->{
-            popup();
+            openScoringPopup();
         });
         if (savedInstanceState == null) {
             showFragment(new liveFragment());
         }
     }
-
-
-    public void popup() {
+    public void openScoringPopup() {
         View dialogView = getLayoutInflater().inflate(R.layout.activity_scoring, null);
-        Button btn_0, btn_1, btn_2, btn_3, btn_4, btn_5, btn_6, btn_7, btn_8, btn_bye, btn_leg_bye, btn_wide, btn_noball, btn_wicket;
-        btn_0 = dialogView.findViewById(R.id.zeroScoringButton);
-        btn_1 = dialogView.findViewById(R.id.oneScoringButton);
-        btn_2 = dialogView.findViewById(R.id.twoScoringButton);
-        btn_3 = dialogView.findViewById(R.id.threeScoringButton);
-        btn_4 = dialogView.findViewById(R.id.fourScoringButton);
-        btn_5 = dialogView.findViewById(R.id.fiveScoringButton);
-        btn_6 = dialogView.findViewById(R.id.sixScoringButton);
-        btn_7 = dialogView.findViewById(R.id.sevenScoringButton);
-        btn_8 = dialogView.findViewById(R.id.eightScoringButton);
-        btn_bye = dialogView.findViewById(R.id.byeScoringButton);
-        btn_leg_bye = dialogView.findViewById(R.id.legByeScoringButton);
-        btn_wide = dialogView.findViewById(R.id.wideScoringButton);
-        btn_noball = dialogView.findViewById(R.id.noBallScoringButton);
-        btn_wicket = dialogView.findViewById(R.id.wicketScoringButton);
-
-
+        Button zeroScoringButton, oneScoringButton, twoScoringButton, threeScoringButton, fourScoringButton, fiveScoringButton, sixScoringButton, sevenScoringButton, eightScoringButton, byeScoringButton, legByeScoringButton, wideScoringButton, noBallScoringButton, wicketScoringButton;
+        zeroScoringButton = dialogView.findViewById(R.id.zeroScoringButton);
+        oneScoringButton = dialogView.findViewById(R.id.oneScoringButton);
+        twoScoringButton = dialogView.findViewById(R.id.twoScoringButton);
+        threeScoringButton = dialogView.findViewById(R.id.threeScoringButton);
+        fourScoringButton = dialogView.findViewById(R.id.fourScoringButton);
+        fiveScoringButton = dialogView.findViewById(R.id.fiveScoringButton);
+        sixScoringButton = dialogView.findViewById(R.id.sixScoringButton);
+        sevenScoringButton = dialogView.findViewById(R.id.sevenScoringButton);
+        eightScoringButton = dialogView.findViewById(R.id.eightScoringButton);
+        byeScoringButton = dialogView.findViewById(R.id.byeScoringButton);
+        legByeScoringButton = dialogView.findViewById(R.id.legByeScoringButton);
+        wideScoringButton = dialogView.findViewById(R.id.wideScoringButton);
+        noBallScoringButton = dialogView.findViewById(R.id.noBallScoringButton);
+        wicketScoringButton = dialogView.findViewById(R.id.wicketScoringButton);
         // Create the dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(dialogView);
-
         // Create the dialog object
         AlertDialog dialog = builder.create();
-
         // Set the custom size for the dialog (width and height)
         dialog.show();
         if (dialog.getWindow() != null) {
@@ -124,7 +118,6 @@ public class MatchActivity extends AppCompatActivity {
                     ViewGroup.LayoutParams.WRAP_CONTENT   // Set height to wrap content
             );
         }
-
         // Optionally: Set dialog gravity or other properties
         if (dialog.getWindow() != null) {
             Window window = dialog.getWindow();
@@ -132,57 +125,56 @@ public class MatchActivity extends AppCompatActivity {
             params.gravity = Gravity.CENTER; // Center the dialog on the screen
             window.setAttributes(params);
         }
-
         // Set up OnClickListeners for the dialog buttons
-        btn_0.setOnClickListener(view -> {
+        zeroScoringButton.setOnClickListener(view -> {
             handleScoringFor0To6(0);
             dialog.dismiss();
         });
-        btn_1.setOnClickListener(view -> {
+        oneScoringButton.setOnClickListener(view -> {
             handleScoringFor0To6(1);
             dialog.dismiss();
         });
-        btn_2.setOnClickListener(view -> {
+        twoScoringButton.setOnClickListener(view -> {
             handleScoringFor0To6(2);
             dialog.dismiss();
         });
-        btn_3.setOnClickListener(view -> {
+        threeScoringButton.setOnClickListener(view -> {
             handleScoringFor0To6(3);
             dialog.dismiss();
         });
-        btn_4.setOnClickListener(view -> {
+        fourScoringButton.setOnClickListener(view -> {
             handleScoringFor0To6(4);
             dialog.dismiss();
         });
-        btn_5.setOnClickListener(view -> {
+        fiveScoringButton.setOnClickListener(view -> {
             handleScoringFor0To6(5);
             dialog.dismiss();
         });
-        btn_6.setOnClickListener(view -> {
+        sixScoringButton.setOnClickListener(view -> {
             handleScoringFor0To6(6);
             dialog.dismiss();
         });
-        btn_7.setOnClickListener(view -> {
+        sevenScoringButton.setOnClickListener(view -> {
             handleScoringFor0To6(7);
             dialog.dismiss();
         });
-        btn_8.setOnClickListener(view -> {
+        eightScoringButton.setOnClickListener(view -> {
             handleScoringFor0To6(8);
             dialog.dismiss();
         });
-        btn_bye.setOnClickListener(view -> {
+        byeScoringButton.setOnClickListener(view -> {
             showExtrasDialog("Bye", dialog);
         });
-        btn_leg_bye.setOnClickListener(view -> {
+        legByeScoringButton.setOnClickListener(view -> {
             showExtrasDialog("Leg Bye", dialog);
         });
-        btn_wide.setOnClickListener(view -> {
+        wideScoringButton.setOnClickListener(view -> {
             showExtrasDialog("Wide", dialog);
         });
-        btn_noball.setOnClickListener(view -> {
+        noBallScoringButton.setOnClickListener(view -> {
             showExtrasDialog("No Ball", dialog);
         });
-        btn_wicket.setOnClickListener(view ->{
+        wicketScoringButton.setOnClickListener(view ->{
             showWicketDialog(dialog);
         });
     }
@@ -494,7 +486,7 @@ public class MatchActivity extends AppCompatActivity {
         });
     }
     private void handleScoringFor0To6(int runs) {
-        //SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
         String type_of_ball = "Normal";
         long innings_id = sharedPreferences.getLong("Innings_id",-1);
         long over_id = sharedPreferences.getLong("over_id", -1);
@@ -705,6 +697,7 @@ public class MatchActivity extends AppCompatActivity {
         int currentScore = sharedPreferences.getInt("score", -1);
         if (playedBalls % 6 == 0 && playedBalls != 0 && playedBalls != totalBalls) {
             Log.d(TAG, "checkAndHandleOverEnd:" + playedBalls / 6 + "Over has ended");
+            rotateStrike(1);
             if(currentOverScore == 0) insertMaidenOver();
             setNewBatsman("bowler");
             insertOver();
