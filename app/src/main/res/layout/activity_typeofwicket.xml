@@ -2,19 +2,20 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/wicketActivityLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="20dp">
 
     <LinearLayout
-        android:id="@+id/dismissal_type_layout"
+        android:id="@+id/wicketTypeLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/dismissal_type_tv"
+            android:id="@+id/wicketTypetextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/wicket_type"
@@ -26,7 +27,7 @@
             app:layout_constraintVertical_bias="0.073" />
 
         <RadioGroup
-            android:id="@+id/dismissal_type_rg"
+            android:id="@+id/wicketTypeRadioGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -37,35 +38,35 @@
             app:layout_constraintVertical_bias="0.13">
 
             <RadioButton
-                android:id="@+id/bowled_rb"
+                android:id="@+id/bowledRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/bowled_rb" />
 
             <RadioButton
-                android:id="@+id/caught_rb"
+                android:id="@+id/caughtRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/caught_rb" />
 
             <RadioButton
-                android:id="@+id/run_out_rb"
+                android:id="@+id/runOutRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/run_out_rb" />
 
             <RadioButton
-                android:id="@+id/stumped_rb"
+                android:id="@+id/stumpedRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/stumped_rb" />
 
             <RadioButton
-                android:id="@+id/lbw_rb"
+                android:id="@+id/lbwRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -74,14 +75,14 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/runs_in_wicket_layout"
+        android:id="@+id/runsInWicketLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="visible">
 
         <TextView
-            android:id="@+id/runs_in_wicket_tv"
+            android:id="@+id/runsInWicketTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/runs_in_wicket"
@@ -93,7 +94,7 @@
             app:layout_constraintVertical_bias="0.223" />
 
         <EditText
-            android:id="@+id/runs_input_et"
+            android:id="@+id/runsInWicketEditText"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:autofillHints="none"
@@ -110,7 +111,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/out_batsman_layout"
+        android:id="@+id/outBatsmanLayout"
         android:layout_width="350dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -123,25 +124,25 @@
         app:layout_constraintVertical_bias="0.635">
 
         <TextView
-            android:id="@+id/out_batsman_tv"
+            android:id="@+id/outBatsmanTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/out_batsman" />
 
         <RadioGroup
-            android:id="@+id/out_batsman_rg"
+            android:id="@+id/outBatsmanRadioGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <RadioButton
-                android:id="@+id/striker_rb"
+                android:id="@+id/strikerRadioButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/striker_out" />
 
             <RadioButton
-                android:id="@+id/non_striker_rb"
+                android:id="@+id/nonStrikerRadioButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/non_striker_out" />
@@ -150,31 +151,31 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/out_end_layout"
+        android:id="@+id/outEndLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/out_end_tv"
+            android:id="@+id/outEndTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/out_end" />
 
         <RadioGroup
-            android:id="@+id/out_end_rg"
+            android:id="@+id/outEndRadioGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <RadioButton
-                android:id="@+id/striker_end_rb"
+                android:id="@+id/strikerEndRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/striker_end" />
 
             <RadioButton
-                android:id="@+id/non_striker_end_rb"
+                android:id="@+id/nonStrikerEndRadioGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/non_striker_end" />
@@ -183,7 +184,7 @@
 
 
     <LinearLayout
-        android:id="@+id/ball_type_in_runout_layout"
+        android:id="@+id/ballTypeInWicketLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -194,31 +195,31 @@
         app:layout_constraintVertical_bias="0.42000002">
 
         <TextView
-            android:id="@+id/delivery_type_tv"
+            android:id="@+id/ballTypeInWicketTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/type_of_ball" />
 
         <RadioGroup
-            android:id="@+id/ball_type_rg"
+            android:id="@+id/ballTypeInWicketRadioGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <RadioButton
-                android:id="@+id/normal_rb"
+                android:id="@+id/normalBallRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/normal_ball" />
 
             <RadioButton
-                android:id="@+id/no_ball_rb"
+                android:id="@+id/noBallRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/no_ball" />
 
             <RadioButton
-                android:id="@+id/wide_rb"
+                android:id="@+id/wideBallRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/wide_ball" />
@@ -226,7 +227,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/runs_in_runout_layout"
+        android:id="@+id/runsInRunOutLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -237,26 +238,26 @@
         app:layout_constraintVertical_bias="0.42000002">
 
         <TextView
-            android:id="@+id/runs_from_tv"
+            android:id="@+id/runsInRunOutTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/runs_from" />
 
         <RadioGroup
-            android:id="@+id/runs_source_rg"
+            android:id="@+id/runsInRunOutRadioGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:visibility="visible">
 
             <RadioButton
-                android:id="@+id/from_bat_rb"
+                android:id="@+id/fromBatRadioButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/no_ball_bat" />
 
             <RadioButton
-                android:id="@+id/from_bylb_rb"
+                android:id="@+id/fromByeLegByeRadioButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/no_ball_by_lby" />
@@ -265,32 +266,32 @@
 
 
     <LinearLayout
-        android:id="@+id/stumped_ball_type_layout"
+        android:id="@+id/ballTypeInStumpingLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="visible">
 
         <TextView
-            android:id="@+id/stumped_ball_type_tv"
+            android:id="@+id/ballTypeInStumpingTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/stumped_ball_type" />
 
         <RadioGroup
-            android:id="@+id/stumped_ball_type_rg"
+            android:id="@+id/ballTypeInStumpingRadioGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <RadioButton
-                android:id="@+id/stumped_ball_type_normal_rb"
+                android:id="@+id/normalBallInStumpingRadioButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/normal_ball" />
 
             <RadioButton
-                android:id="@+id/stumped_ball_type_wide_tv"
+                android:id="@+id/wideBallInStumpingRadioButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/wide_ball" />
@@ -299,15 +300,16 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/activityNavigationButtonsLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/cancel_btn"
+            android:id="@+id/cancelButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/cancel"
+            android:text="@string/cancelButton"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.303"
@@ -316,11 +318,11 @@
             app:layout_constraintVertical_bias="0.935" />
 
         <Button
-            android:id="@+id/submit_btn"
+            android:id="@+id/submitButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="okay"
-            android:text="@string/submit"
+            android:text="@string/submitButton"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.688"

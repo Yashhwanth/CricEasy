@@ -308,25 +308,25 @@ public class MatchActivity extends AppCompatActivity {
         if (wicketDialog.getWindow() != null) {
             wicketDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
-        EditText runs_input = wicketDialogView.findViewById(R.id.runs_input_et);
 
-        Button cancelButton = wicketDialogView.findViewById(R.id.cancel_btn);
-        Button submitButton = wicketDialogView.findViewById(R.id.submit_btn);
+        EditText runs_input = wicketDialogView.findViewById(R.id.runsInWicketEditText);
+        Button cancelButton = wicketDialogView.findViewById(R.id.cancelButton);
+        Button submitButton = wicketDialogView.findViewById(R.id.submitButton);
 
-        RadioGroup dismissalTypeRadioGroup = wicketDialogView.findViewById(R.id.dismissal_type_rg); // dismissal type
+        RadioGroup dismissalTypeRadioGroup = wicketDialogView.findViewById(R.id.wicketTypeRadioGroup); // dismissal type
 
-        LinearLayout runs_input_layout = wicketDialogView.findViewById(R.id.runs_in_wicket_layout); //runs input
-        LinearLayout out_batsman_layout = wicketDialogView.findViewById(R.id.out_batsman_layout); // out batsman
-        LinearLayout out_end_layout = wicketDialogView.findViewById(R.id.out_end_layout); //out end
-        LinearLayout runs_from_bat_or_by_layout = wicketDialogView.findViewById(R.id.runs_in_runout_layout); // from bat/by layout
-        LinearLayout ball_type_in_run_out_layout = wicketDialogView.findViewById(R.id.ball_type_in_runout_layout); // ball type in run out layout
-        LinearLayout stumped_layout = wicketDialogView.findViewById(R.id.stumped_ball_type_layout); //ball type in run out
+        LinearLayout runs_input_layout = wicketDialogView.findViewById(R.id.runsInWicketLayout); //runs input
+        LinearLayout out_batsman_layout = wicketDialogView.findViewById(R.id.outBatsmanLayout); // out batsman
+        LinearLayout out_end_layout = wicketDialogView.findViewById(R.id.outEndLayout); //out end
+        LinearLayout runs_from_bat_or_by_layout = wicketDialogView.findViewById(R.id.runsInRunOutLayout); // from bat/by layout
+        LinearLayout ball_type_in_run_out_layout = wicketDialogView.findViewById(R.id.ballTypeInWicketLayout); // ball type in run out layout
+        LinearLayout stumped_layout = wicketDialogView.findViewById(R.id.ballTypeInStumpingLayout); //ball type in run out
 
-        RadioGroup out_batsman_radio_group = wicketDialogView.findViewById(R.id.out_batsman_rg);
-        RadioGroup out_end_radio_group = wicketDialogView.findViewById(R.id.out_end_rg);
-        RadioGroup ball_type_in_run_out_radio_group = wicketDialogView.findViewById(R.id.ball_type_rg);
-        RadioGroup from_bat_or_by_radio_group = wicketDialogView.findViewById(R.id.runs_source_rg);
-        RadioGroup stumped_ball_type = wicketDialogView.findViewById(R.id.stumped_ball_type_rg);
+        RadioGroup out_batsman_radio_group = wicketDialogView.findViewById(R.id.outBatsmanRadioGroup);
+        RadioGroup out_end_radio_group = wicketDialogView.findViewById(R.id.outEndRadioGroup);
+        RadioGroup ball_type_in_run_out_radio_group = wicketDialogView.findViewById(R.id.ballTypeInWicketRadioGroup);
+        RadioGroup from_bat_or_by_radio_group = wicketDialogView.findViewById(R.id.runsInRunOutRadioGroup);
+        RadioGroup stumped_ball_type = wicketDialogView.findViewById(R.id.ballTypeInStumpingRadioGroup);
 
 
         runs_input_layout.setVisibility(View.GONE);
@@ -339,7 +339,7 @@ public class MatchActivity extends AppCompatActivity {
 
         // Add listener to RadioGroup to detect selection
         dismissalTypeRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId == R.id.run_out_rb) {
+            if (checkedId == R.id.runOutRadioButton) {
                 runs_input_layout.setVisibility(View.VISIBLE);
                 out_batsman_layout.setVisibility(View.VISIBLE);
                 out_end_layout.setVisibility(View.VISIBLE);
@@ -347,13 +347,13 @@ public class MatchActivity extends AppCompatActivity {
                 runs_from_bat_or_by_layout.setVisibility(View.VISIBLE);
                 stumped_layout.setVisibility(View.GONE);
                 ball_type_in_run_out_radio_group.setOnCheckedChangeListener((group1, checkedId1) -> {
-                    if(checkedId1 == R.id.wide_rb){
+                    if(checkedId1 == R.id.wideBallRadioButton){
                         runs_from_bat_or_by_layout.setVisibility(View.GONE);
                     }else{
                         runs_from_bat_or_by_layout.setVisibility(View.VISIBLE);
                     }
                 });
-            }else if(checkedId == R.id.stumped_rb) {
+            }else if(checkedId == R.id.stumpedRadioButton) {
                 runs_input_layout.setVisibility(View.GONE);
                 out_batsman_layout.setVisibility(View.GONE);
                 out_end_layout.setVisibility(View.GONE);
