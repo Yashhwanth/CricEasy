@@ -630,7 +630,7 @@ public class MatchActivity extends AppCompatActivity {
                 String bat_style = bat_button.getTag().toString();
                 String bowl_style = bowl_button.getTag().toString();
                 updatePlayerDataInSp(playerType, player_name, role, bat_style, bowl_style);
-                insertOver();
+                if(playerType.equals("bowler")) insertOver();
                 playerDialog.dismiss();
             }
         });
@@ -788,12 +788,6 @@ public class MatchActivity extends AppCompatActivity {
         long overId = sharedPreferences.getLong("over_id", -1);
         databaseHelper.insertMaidenOver(overId);
     }
-//    private void startSecondInnings(){
-//        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
-//        long matchId = sharedPreferences.getLong("match_id", -1);
-//        long battingTeamId = sharedPreferences.getLong("teamB_id", -1);
-//        databaseHelper.startSecondInnings(matchId, battingTeamId);
-//    }
     private void secondInnings(){
         Log.d(TAG, "secondInnings: entered second innings");
         Intent intent = new Intent(MatchActivity.this, SelectingSrNsBowActivity.class);
