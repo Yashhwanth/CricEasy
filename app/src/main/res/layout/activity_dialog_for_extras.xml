@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/extrasActivityLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -7,7 +8,7 @@
 
     <!-- Text field to show the type of ball -->
     <TextView
-        android:id="@+id/ball_type_label"
+        android:id="@+id/ballTypeHeading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -18,7 +19,7 @@
 
     <!-- Input field for entering the extra runs -->
     <EditText
-        android:id="@+id/extra_runs_input"
+        android:id="@+id/extraRunsEditText"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:hint="Enter extra runs"
@@ -26,43 +27,37 @@
         android:padding="10dp" />
 
     <!-- Buttons for Cancel and Submit -->
-    <LinearLayout
-        android:id="@+id/source_of_runs_LL"
+    <RadioGroup
+        android:id="@+id/runsInNoBallRadioGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <RadioGroup
-            android:id="@+id/noballrg"
-            android:layout_width="wrap_content"
+        <RadioButton
+            android:id="@+id/runsFromBatRadioButton"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:tag="Bat"
+            android:text="from bat" />
 
-            <RadioButton
-                android:id="@+id/radioButton25"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:tag="Bat"
-                android:text="from bat" />
+        <RadioButton
+            android:id="@+id/runsFromByeRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:tag="Lb"
+            android:text="from leg bye" />
 
-            <RadioButton
-                android:id="@+id/radioButton23"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:tag="Lb"
-                android:text="from leg bye" />
+        <RadioButton
+            android:id="@+id/runsFromLegByeRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:tag="By"
+            android:text="from bye" />
 
-            <RadioButton
-                android:id="@+id/radioButton24"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:tag="By"
-                android:text="from bye" />
-
-        </RadioGroup>
-    </LinearLayout>
+    </RadioGroup>
 
     <LinearLayout
+        android:id="@+id/activtyNavigationButtonsLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
@@ -70,7 +65,7 @@
         android:paddingTop="20dp">
 
         <Button
-            android:id="@+id/btn_cancel"
+            android:id="@+id/cancelButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cancel" />

@@ -19,8 +19,8 @@ public class SelectingPlayersActivity extends AppCompatActivity {
 
 
         //UI
-        EditText editText = findViewById(R.id.player_name_edit_text);
-        Button submit_btn = findViewById(R.id.submit_button);
+        EditText editText = findViewById(R.id.playerNameEditText);
+        Button submit_btn = findViewById(R.id.submitButton);
         role_radio_group = findViewById(R.id.radioGroup);
         bat_style_radio_group = findViewById(R.id.batGroup);
         bowl_style_radio_group = findViewById(R.id.bowlStyleRadioGroup);

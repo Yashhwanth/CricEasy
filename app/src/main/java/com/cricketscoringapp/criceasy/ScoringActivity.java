@@ -33,7 +33,7 @@ public class ScoringActivity extends AppCompatActivity {
         dialog.setContentView(R.layout.activity_dialog_for_extras);
         dialog.setCancelable(true);
 
-        Button btnCancel = dialog.findViewById(R.id.btn_cancel);
+        Button btnCancel = dialog.findViewById(R.id.cancelButton);
         Button btnSubmit = dialog.findViewById(R.id.btn_submit);
 
         btnCancel.setOnClickListener(v -> dialog.dismiss());

@@ -166,13 +166,13 @@ public class MatchActivity extends AppCompatActivity {
             showExtrasDialog("Bye", dialog);
         });
         legByeScoringButton.setOnClickListener(view -> {
-            showExtrasDialog("Leg Bye", dialog);
+            showExtrasDialog("LegBye", dialog);
         });
         wideScoringButton.setOnClickListener(view -> {
             showExtrasDialog("Wide", dialog);
         });
         noBallScoringButton.setOnClickListener(view -> {
-            showExtrasDialog("No Ball", dialog);
+            showExtrasDialog("NoBall", dialog);
         });
         wicketScoringButton.setOnClickListener(view ->{
             showWicketDialog(dialog);
@@ -237,16 +237,16 @@ public class MatchActivity extends AppCompatActivity {
     }
     private void showExtrasDialog(String ballType, AlertDialog parentDialog) {
         View extrasDialogView = getLayoutInflater().inflate(R.layout.activity_dialog_for_extras, null);
-        EditText extraRunsInput = extrasDialogView.findViewById(R.id.extra_runs_input);
-        Button btnCancel = extrasDialogView.findViewById(R.id.btn_cancel);
+        EditText extraRunsInput = extrasDialogView.findViewById(R.id.extraRunsEditText);
+        Button btnCancel = extrasDialogView.findViewById(R.id.cancelButton);
         Button btnSubmit = extrasDialogView.findViewById(R.id.btn_submit);
-        RadioGroup radioGroup = extrasDialogView.findViewById(R.id.noballrg);
-        if ("No Ball".equals(ballType)) {
+        RadioGroup radioGroup = extrasDialogView.findViewById(R.id.runsInNoBallRadioGroup);
+        if ("NoBall".equals(ballType)) {
             radioGroup.setVisibility(View.VISIBLE);  // Show radio group for No Ball
         } else {
             radioGroup.setVisibility(View.GONE);  // Hide radio group for other ball types
         }
-        TextView ballTypeLabel = extrasDialogView.findViewById(R.id.ball_type_label);
+        TextView ballTypeLabel = extrasDialogView.findViewById(R.id.ballTypeHeading);
         ballTypeLabel.setText(ballType);
 
         // Create the extras dialog
@@ -282,17 +282,16 @@ public class MatchActivity extends AppCompatActivity {
                 // Check the ball type and call the corresponding method
                 switch (ballType) {
                     case "Bye":
-                    case "Leg Bye":
+                    case "LegBye":
                         handleScoringForByesAndLegByes(extraRuns, ballType);
                         break;
                     case "Wide":
                         handleScoringForWide(extraRuns, ballType);
                         break;
-                    case "No Ball":
+                    case "NoBall":
                         handleScoringForNoBall(extraRuns, ballType, runFromWhat);
                         break;
                 }
-
                 Toast.makeText(this, ballType + " runs: " + extraRuns, Toast.LENGTH_SHORT).show();
                 extrasDialog.dismiss();
                 parentDialog.dismiss(); // Close the scoring popup
@@ -413,7 +412,7 @@ public class MatchActivity extends AppCompatActivity {
                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, null, null, "BOWLED");
                     databaseHelper.insertBallDataForWicket(over_id, "Legal", runs, striker, non_striker_id);
                     databaseHelper.updateTeamStatsForBowCauLbw(team_stats_id);
-                    incrementPlayedBalls();
+                    incrementPlayedBallsInSharedPreferences();
                     updateScoreInSharedPreferences("Normal", runs);
                     break;
                 case "Run-Out":
@@ -452,7 +451,7 @@ public class MatchActivity extends AppCompatActivity {
                         RadioButton runsFromRadioButton = wicketDialogView.findViewById(runsFromId);
                         runsFrom = runsFromRadioButton.getText().toString();
                     }
-                    if(ballTypeInRo.equals("Normal"))    incrementPlayedBalls();
+                    if(ballTypeInRo.equals("Normal"))    incrementPlayedBallsInSharedPreferences();
                     updateScoreInSharedPreferences(ballTypeInRo ,runs);
                     databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballTypeInRo, runsFrom, "RUN-OUT");
                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, ballTypeInRo, runsFrom, "RUN-OUT");
@@ -471,7 +470,7 @@ public class MatchActivity extends AppCompatActivity {
                     }
                     RadioButton ballTypeRadioButton = wicketDialogView.findViewById(ballTypeId);
                     String ballType = ballTypeRadioButton.getText().toString();
-                    if(ballType.equals("Normal"))    incrementPlayedBalls();
+                    if(ballType.equals("Normal"))    incrementPlayedBallsInSharedPreferences();
                     updateScoreInSharedPreferences(ballType, runs);
                     databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballType, null, "STUMPED");
                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, ballType, null, "STUMPED");
@@ -479,7 +478,7 @@ public class MatchActivity extends AppCompatActivity {
                     databaseHelper.updateTeamStatsForStumping(team_stats_id, ballType);
                     break;
             }
-            setNewBatsman(playerType);
+            setNewPlayer(playerType);
             checkAndHandleOverEnd();
             wicketDialog.dismiss();
             parentDialog.dismiss();
@@ -487,86 +486,86 @@ public class MatchActivity extends AppCompatActivity {
     }
     private void handleScoringFor0To6(int runs) {
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
-        String type_of_ball = "Normal";
-        long innings_id = sharedPreferences.getLong("Innings_id",-1);
-        long over_id = sharedPreferences.getLong("over_id", -1);
-        long striker = sharedPreferences.getLong("striker_id", -1);
-        long non_striker = sharedPreferences.getLong("non_striker_id", -1);
-        long bowler = sharedPreferences.getLong("bowler_id",-1);
-        long ball_id = databaseHelper.insertBallDataFor0To6(over_id, type_of_ball, runs, striker, non_striker);
+        String typeOfBallIn0To6Runs = "Normal";
+        long inningsId = sharedPreferences.getLong("Innings_id",-1);
+        long overId = sharedPreferences.getLong("over_id", -1);
+        long strikerId = sharedPreferences.getLong("striker_id", -1);
+        long nonStrikerId = sharedPreferences.getLong("non_striker_id", -1);
+        long bowlerId = sharedPreferences.getLong("bowler_id",-1);
+        long ballId = databaseHelper.insertBallDataFor0To6(overId, typeOfBallIn0To6Runs, runs, strikerId, nonStrikerId);
+        databaseHelper.updateBatsmanStatsFor0To6(inningsId, strikerId, runs);
+        databaseHelper.updateBowlerStatsFor0to6(inningsId, bowlerId, runs);
         databaseHelper.updatePartnershipFor0to6(runs, 1);
-        rotateStrike(runs);
-        databaseHelper.updateBatsmanStatsFor0To6(innings_id, striker, runs);
-        databaseHelper.updateBowlerStatsFor0to6(innings_id, bowler, runs);
         updateTeamStatsFor0to6(runs);
-        incrementPlayedBalls();
-        updateScoreInSharedPreferences(type_of_ball, runs);
+        incrementPlayedBallsInSharedPreferences();
+        updateScoreInSharedPreferences(typeOfBallIn0To6Runs, runs);
+        rotateStrike(runs);
         checkAndHandleOverEnd();
-        Toast.makeText(this, "Runs scored: " + runs + ball_id, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Runs scored: " + runs , Toast.LENGTH_SHORT).show();
     }
      private void handleScoringForByesAndLegByes(int extraRuns, String ballType) {
          SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
-         long innings_id = sharedPreferences.getLong("Innings_id", -1);
-         long over_id = sharedPreferences.getLong("over_id", -1);
-         long batsman_id = sharedPreferences.getLong("striker_id", -1);
-         long non_striker_id = sharedPreferences.getLong("non_striker_id", -1);
-         long bowler_id = sharedPreferences.getLong("bowler_id", -1);
-         long ball_id = databaseHelper.insertBallDataForByLByes(over_id, ballType, extraRuns, batsman_id, non_striker_id);
-         databaseHelper.updateBatsmanForByLByes(innings_id, batsman_id, 1);
-         databaseHelper.updateBowlerForByLBes(innings_id, bowler_id, ballType);
+         long inningsId = sharedPreferences.getLong("Innings_id", -1);
+         long overId = sharedPreferences.getLong("over_id", -1);
+         long strikerId = sharedPreferences.getLong("striker_id", -1);
+         long nonStrikerId = sharedPreferences.getLong("non_striker_id", -1);
+         long bowlerId = sharedPreferences.getLong("bowler_id", -1);
+         long ballId = databaseHelper.insertBallDataForByLByes(overId, ballType, extraRuns, strikerId, nonStrikerId);
+         databaseHelper.updateExtrasTable(ballId, ballType, extraRuns);
+         databaseHelper.updateBatsmanForByLByes(inningsId, strikerId, 1);
+         databaseHelper.updateBowlerForByLBes(inningsId, bowlerId, ballType);
          databaseHelper.updatePartnershipForByLByes(1);
-         databaseHelper.updateExtrasTable(ball_id, ballType, extraRuns);
          updateTeamStatsForByLegBy(extraRuns);
-         rotateStrike(extraRuns);
-         incrementPlayedBalls();
+         incrementPlayedBallsInSharedPreferences();
          updateScoreInSharedPreferences(ballType, extraRuns);
+         rotateStrike(extraRuns);
          checkAndHandleOverEnd();
      }
      private void handleScoringForWide(int extraRuns, String ballType){
          SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
-         long innings_id = sharedPreferences.getLong("Innings_id", -1);
-         long over_id = sharedPreferences.getLong("over_id", -1);
-         long bowler_id = sharedPreferences.getLong("bowler_id", -1);
-         long batsman_id = sharedPreferences.getLong("striker_id", -1);
-         long non_striker_id = sharedPreferences.getLong("non_striker_id", -1);
-         long ball_id = databaseHelper.insertBallDataForWide(over_id, extraRuns, batsman_id, non_striker_id);
-         databaseHelper.updateBowlerForWide(innings_id, bowler_id, extraRuns);
-         databaseHelper.updateExtrasTable(ball_id, ballType, extraRuns);
+         long inningsId = sharedPreferences.getLong("Innings_id", -1);
+         long overId = sharedPreferences.getLong("over_id", -1);
+         long bowlerId = sharedPreferences.getLong("bowler_id", -1);
+         long strikerId = sharedPreferences.getLong("striker_id", -1);
+         long nonStrikerId = sharedPreferences.getLong("non_striker_id", -1);
+         long ballId = databaseHelper.insertBallDataForWide(overId, extraRuns, strikerId, nonStrikerId);
+         databaseHelper.updateExtrasTable(ballId, ballType, extraRuns);
+         databaseHelper.updateBowlerForWide(inningsId, bowlerId, extraRuns);
          updateTeamStatsForWide(extraRuns);
-         rotateStrike(extraRuns);
          updateScoreInSharedPreferences(ballType, extraRuns);
+         rotateStrike(extraRuns);
          checkAndHandleOverEnd();
      }
      private void handleScoringForNoBall(int extraRuns, String ballType, String runFromWhat){
          SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
-         long innings_id = sharedPreferences.getLong("Innings_id", -1);
-         long over_id = sharedPreferences.getLong("over_id", -1);
-         long bowler_id = sharedPreferences.getLong("bowler_id", -1);
-         long striker = sharedPreferences.getLong("striker_id", -1);
-         long non_striker_id = sharedPreferences.getLong("non_striker_id", -1);
+         long inningsId = sharedPreferences.getLong("Innings_id", -1);
+         long overId = sharedPreferences.getLong("over_id", -1);
+         long bowlerId = sharedPreferences.getLong("bowler_id", -1);
+         long strikerId = sharedPreferences.getLong("striker_id", -1);
+         long nonStrikerId = sharedPreferences.getLong("non_striker_id", -1);
          long partnership_id = sharedPreferences.getLong("partnership_id", -1);
          switch (runFromWhat){
              case "Bat":
-                 databaseHelper.updateBatsmanStatsForNb(innings_id, striker, extraRuns, "Bat");
-                 databaseHelper.updateBowlerStatsForNb(innings_id, bowler_id, extraRuns, "Bat");
+                 databaseHelper.updateBatsmanStatsForNb(inningsId, strikerId, extraRuns, "Bat");
+                 databaseHelper.updateBowlerStatsForNb(inningsId, bowlerId, extraRuns, "Bat");
                  databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "Bat");
-                 long ball_id = databaseHelper.insertBallDataForNb(over_id, extraRuns, striker, non_striker_id);
+                 long ball_id = databaseHelper.insertBallDataForNb(overId, extraRuns, strikerId, nonStrikerId);
                  databaseHelper.updateExtrasTable(ball_id, ballType, extraRuns);
                  rotateStrike(extraRuns);
                  break;
              case "Lb":
-                 databaseHelper.updateBatsmanStatsForNb(innings_id, striker, extraRuns, "Bye");
-                 databaseHelper.updateBowlerStatsForNb(innings_id, bowler_id, extraRuns, "Bye");
+                 databaseHelper.updateBatsmanStatsForNb(inningsId, strikerId, extraRuns, "Bye");
+                 databaseHelper.updateBowlerStatsForNb(inningsId, bowlerId, extraRuns, "Bye");
                  databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "Bye");
-                 long balll_id = databaseHelper.insertBallDataForNb(over_id, extraRuns, striker, non_striker_id);
+                 long balll_id = databaseHelper.insertBallDataForNb(overId, extraRuns, strikerId, nonStrikerId);
                  databaseHelper.updateExtrasTable(balll_id, ballType, extraRuns);
                  rotateStrike(extraRuns);
                  break;
              case "By":
-                 databaseHelper.updateBatsmanStatsForNb(innings_id, striker, extraRuns, "Leg Bye");
-                 databaseHelper.updateBowlerStatsForNb(innings_id, bowler_id, extraRuns, "Leg Bye");
+                 databaseHelper.updateBatsmanStatsForNb(inningsId, strikerId, extraRuns, "Leg Bye");
+                 databaseHelper.updateBowlerStatsForNb(inningsId, bowlerId, extraRuns, "Leg Bye");
                  databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "Leg Bye");
-                 long ballll_id = databaseHelper.insertBallDataForNb(over_id, extraRuns, striker, non_striker_id);
+                 long ballll_id = databaseHelper.insertBallDataForNb(overId, extraRuns, strikerId, nonStrikerId);
                  databaseHelper.updateExtrasTable(ballll_id, ballType, extraRuns);
                  rotateStrike(extraRuns);
                  break;
@@ -594,36 +593,35 @@ public class MatchActivity extends AppCompatActivity {
         long teamStatsId = sharedPreferences.getLong("teamStatsId", -1);
         databaseHelper.updateTeamStatsForNoBall(teamStatsId, runs, runsSource);
     }
-    private void setNewBatsman(String player_type) {
+    private void setNewPlayer(String playerType) {
         // Inflate your dialog layout
-        Log.d(TAG, "setNewBatsman: " + player_type);
-        View batsmanDialogView = getLayoutInflater().inflate(R.layout.activity_selecting_players, null);
+        Log.d(TAG, "setNewBatsman: " + playerType);
+        View playerDialogView = getLayoutInflater().inflate(R.layout.activity_selecting_players, null);
         // Create and configure the dialog
-        AlertDialog.Builder batsmanBuilder = new AlertDialog.Builder(this);
-        batsmanBuilder.setView(batsmanDialogView);
-        AlertDialog batsmanDialog = batsmanBuilder.create();
-
+        AlertDialog.Builder playerBuilder = new AlertDialog.Builder(this);
+        playerBuilder.setView(playerDialogView);
+        AlertDialog playerDialog = playerBuilder.create();
         // Show the dialog
-        batsmanDialog.show();
-
+        playerDialog.show();
         // Set dialog width and height to match your desired values
-        if (batsmanDialog.getWindow() != null) {
-            batsmanDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        if (playerDialog.getWindow() != null) {
+            playerDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
-
         // Find buttons and input fields in the dialog
-        EditText editText = batsmanDialogView.findViewById(R.id.player_name_edit_text);
-        Button submit_btn = batsmanDialogView.findViewById(R.id.submit_button);
-        Button back_btn = batsmanDialogView.findViewById(R.id.back_button);
-        RadioGroup role_radio_group = batsmanDialogView.findViewById(R.id.radioGroup);
-        RadioGroup bat_style_radio_group = batsmanDialogView.findViewById(R.id.batGroup);
-        RadioGroup bowl_style_radio_group = batsmanDialogView.findViewById(R.id.bowlStyleRadioGroup);
-
-
+        TextView playerTypeTextView = playerDialogView.findViewById(R.id.playerTypeTextView);
+        String newPlayerType = playerType.equals("bowler") ? "Bowler" : "Batsman";
+        String formattedText = getString(R.string.selectNewPlayerSetText, newPlayerType);
+        playerTypeTextView.setText(formattedText);
+        EditText playerNameEditText = playerDialogView.findViewById(R.id.playerNameEditText);
+        Button submitButton = playerDialogView.findViewById(R.id.submitButton);
+        Button backButton = playerDialogView.findViewById(R.id.back_button);
+        RadioGroup role_radio_group = playerDialogView.findViewById(R.id.radioGroup);
+        RadioGroup bat_style_radio_group = playerDialogView.findViewById(R.id.batGroup);
+        RadioGroup bowl_style_radio_group = playerDialogView.findViewById(R.id.bowlStyleRadioGroup);
 
         // Submit Button Click Handler
-        submit_btn.setOnClickListener(v -> {
-            String player_name = String.valueOf(editText.getText());
+        submitButton.setOnClickListener(v -> {
+            String player_name = String.valueOf(playerNameEditText.getText());
             int role_button_id = role_radio_group.getCheckedRadioButtonId();
             int bat_style_button_id = bat_style_radio_group.getCheckedRadioButtonId();
             int bowl_style_button_id = bowl_style_radio_group.getCheckedRadioButtonId();
@@ -632,23 +630,23 @@ public class MatchActivity extends AppCompatActivity {
                 return;
             }
             else {
-                RadioButton role_button = batsmanDialogView.findViewById(role_button_id);
-                RadioButton bat_button = batsmanDialogView.findViewById(bat_style_button_id);
-                RadioButton bowl_button = batsmanDialogView.findViewById(bowl_style_button_id);
+                RadioButton role_button = playerDialogView.findViewById(role_button_id);
+                RadioButton bat_button = playerDialogView.findViewById(bat_style_button_id);
+                RadioButton bowl_button = playerDialogView.findViewById(bowl_style_button_id);
                 String role = role_button.getTag().toString();
                 String bat_style = bat_button.getTag().toString();
                 String bowl_style = bowl_button.getTag().toString();
-                updatePlayerDataInSp(player_type, player_name, role, bat_style, bowl_style);
-                batsmanDialog.dismiss();
+                updatePlayerDataInSp(playerType, player_name, role, bat_style, bowl_style);
+                playerDialog.dismiss();
             }
         });
         // Back Button Click Handler
-        back_btn.setOnClickListener(v -> {
+        backButton.setOnClickListener(v -> {
             // Just dismiss the dialog without saving
-            batsmanDialog.dismiss();
+            playerDialog.dismiss();
         });
         // Show the dialog
-        batsmanDialog.show();
+        playerDialog.show();
     }
     private void updatePlayerDataInSp(String player_type, String player_name, String role, String bat_style, String bowl_style){
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
@@ -676,7 +674,7 @@ public class MatchActivity extends AppCompatActivity {
         long player_id = databaseHelper.insertPlayer(name, role, batStyle, bowlStyle, player_type);
         databaseHelper.initializeBowlerStats(player_id, innings_id);
     }
-    private void incrementPlayedBalls() {
+    private void incrementPlayedBallsInSharedPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         long playedBalls = sharedPreferences.getLong("playedBalls", 0);
@@ -697,9 +695,9 @@ public class MatchActivity extends AppCompatActivity {
         int currentScore = sharedPreferences.getInt("score", -1);
         if (playedBalls % 6 == 0 && playedBalls != 0 && playedBalls != totalBalls) {
             Log.d(TAG, "checkAndHandleOverEnd:" + playedBalls / 6 + "Over has ended");
-            rotateStrike(1);
             if(currentOverScore == 0) insertMaidenOver();
-            setNewBatsman("bowler");
+            setNewPlayer("bowler");
+            rotateStrike(1);
             insertOver();
         }
         if(playedBalls == totalBalls || currentScore >= target) {
