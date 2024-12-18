@@ -405,9 +405,10 @@ public class MatchActivity extends AppCompatActivity {
                 case "Bowled":
                 case "Caught":
                 case "LBW":
+                    databaseHelper.insertBallDataForWicket(over_id, "Legal", runs, striker, non_striker_id);
                     databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, null, null, "BOWLED");
                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, null, null, "BOWLED");
-                    databaseHelper.insertBallDataForWicket(over_id, "Legal", runs, striker, non_striker_id);
+                    //need a partnership helper
                     databaseHelper.updateTeamStatsForBowCauLbw(team_stats_id);
                     incrementPlayedBallsInSharedPreferences();
                     updateScoreInSharedPreferences("Normal", runs);
@@ -435,9 +436,6 @@ public class MatchActivity extends AppCompatActivity {
                     }
                     RadioButton ballTypeRadioButtonRO = wicketDialogView.findViewById(ballTypeRadioButtonIdRO);
                     String ballTypeInRo = ballTypeRadioButtonRO.getText().toString();
-//                    if(ballTypeInRo.equals("Normal"))      updateScoreInSharedPreferences(runs);
-//                    else if(ballTypeInRo.equals("wide"))    updateScoreInSharedPreferences(runs + 1);
-//                    else if(ballTypeInRo.equals("No-ball"))  updateScoreInSharedPreferences(runs + 1);
                     String runsFrom = "N/A";
                     if (!ballTypeInRo.equals("Wide") && from_bat_or_by_radio_group.getVisibility() == View.VISIBLE) {
                         int runsFromId = from_bat_or_by_radio_group.getCheckedRadioButtonId();
@@ -450,9 +448,9 @@ public class MatchActivity extends AppCompatActivity {
                     }
                     if(ballTypeInRo.equals("Normal"))    incrementPlayedBallsInSharedPreferences();
                     updateScoreInSharedPreferences(ballTypeInRo ,runs);
+                    databaseHelper.insertBallDataForWicket(over_id, ballTypeInRo, runs, striker, non_striker_id);
                     databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballTypeInRo, runsFrom, "RUN-OUT");
                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, ballTypeInRo, runsFrom, "RUN-OUT");
-                    databaseHelper.insertBallDataForWicket(over_id, ballTypeInRo, runs, striker, non_striker_id);
                     databaseHelper.updateTeamStatsForRunOut(team_stats_id, runs, ballTypeInRo, runsFrom);
                     databaseHelper.updatePartnershipForRunOut(partnership_id, runs, ballTypeInRo, runsFrom);
                     outBatsman = outBatsman.equals("non-striker") ? "non_striker" : "striker";
@@ -469,10 +467,11 @@ public class MatchActivity extends AppCompatActivity {
                     String ballType = ballTypeRadioButton.getText().toString();
                     if(ballType.equals("Normal"))    incrementPlayedBallsInSharedPreferences();
                     updateScoreInSharedPreferences(ballType, runs);
+                    databaseHelper.insertBallDataForWicket(over_id, ballType, runs, striker, non_striker_id);
                     databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballType, null, "STUMPED");
                     databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, ballType, null, "STUMPED");
-                    databaseHelper.insertBallDataForWicket(over_id, ballType, runs, striker, non_striker_id);
                     databaseHelper.updateTeamStatsForStumping(team_stats_id, ballType);
+                    //need a partnership helper
                     break;
             }
             setNewPlayer(playerType);
@@ -728,7 +727,7 @@ public class MatchActivity extends AppCompatActivity {
             score += runs;
             currentOverScore += runs;
         }
-        else if(ballType.equals("No-ball") || ballType.equals("Wide") || ballType.equals("No Ball")) {
+        else if(ballType.equals("No-ball") || ballType.equals("Wide") || ballType.equals("NoBall")) {
             score += runs + 1;
             currentOverScore += runs + 1;
         }

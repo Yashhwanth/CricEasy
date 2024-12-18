@@ -1062,13 +1062,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         try {
-            // Calculate the total runs for the no-ball
-            int totalRuns = extraRuns + 1; // 1 run for the no-ball itself + additional runs
-
+            int totalRuns = extraRuns + 1;
             // Create a ContentValues object to hold the values to be inserted
             ContentValues contentValues = new ContentValues();
             contentValues.put(COLUMN_OVER_ID, overId); // Over ID
-            contentValues.put(COLUMN_TYPE_OF_BALL, "No Ball"); // Type of ball set to "No Ball"
+            contentValues.put(COLUMN_TYPE_OF_BALL, "NoBall"); // Type of ball set to "No Ball"
             contentValues.put(COLUMN_RUNS, totalRuns); // Total runs for the no-ball
             contentValues.put(COLUMN_IS_WICKET, 0); // No wicket for no-ball
             contentValues.put(COLUMN_STRIKER, strikerId); // Striker ID
@@ -1092,7 +1090,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             // Calculate the total runs for the ball (add extra runs for wide/no ball)
             int totalRuns = runs;
-            if (typeOfBall.equals("Wide") || typeOfBall.equals("No-ball")) {
+            if (typeOfBall.equals("Wide") || typeOfBall.equals("Noball")) {
                 totalRuns += 1; // Add 1 extra run for wide/no ball
             }
 
@@ -1197,9 +1195,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             // Determine how to update based on the run type
             if (runType.equals("Bat")) {
-                // Runs from the bat during a no-ball
                 query += COLUMN_RUNS + " = " + COLUMN_RUNS + " + ? ";
-            } else if (runType.equals("Bye") || runType.equalsIgnoreCase("legbye")) {
+            } else if (runType.equals("Bye") || runType.equalsIgnoreCase("LegBye")) {
                 // No runs added for byes or leg-byes in partnerships table
                 Log.d("DatabaseHelper", "No runs added for run type: " + runType);
                 return;
@@ -1382,8 +1379,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     }
                     break;
 
-                case "bye":
-                case "legbye":
+                case "Bye":
+                case "LegBye":
                     // Add 1 run for the no-ball (extras) but do not update specific run type columns
                     updateQuery += ", " + COLUMN_SCORE + " = " + COLUMN_SCORE + " + 0";
                     break;
@@ -1702,27 +1699,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 case "RUN-OUT":
                     switch (ballType) {
                         case "Normal":
-                            if (ballType.equals("Normal")) {
-                                if (runsFrom.equals("From Bat")) {
-                                    // Construct query and bind together
-                                    updateQuery += COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 ," +
-                                            COLUMN_RUNS + " = " + COLUMN_RUNS + " + ?";
-                                    updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
-                                    statement = db.compileStatement(updateQuery);
-                                    statement.bindLong(1, runs); // Bind runs
-                                    statement.bindLong(2, bowler_id); // Bind bowler_id
-                                    statement.bindLong(3, innings_id); // Bind innings_id
-                                } else if (runsFrom.equals("From by/lb")) {
-                                    // Construct query and bind together
-                                    updateQuery += COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1";
-                                    updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
-                                    statement = db.compileStatement(updateQuery);
-                                    statement.bindLong(1, bowler_id); // Bind bowler_id
-                                    statement.bindLong(2, innings_id); // Bind innings_id
-                                }
+                            if (runsFrom.equals("From Bat")) {
+                                // Construct query and bind together
+                                updateQuery += COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 ," +
+                                        COLUMN_RUNS + " = " + COLUMN_RUNS + " + ?";
+                                updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+                                statement = db.compileStatement(updateQuery);
+                                statement.bindLong(1, runs); // Bind runs
+                                statement.bindLong(2, bowler_id); // Bind bowler_id
+                                statement.bindLong(3, innings_id); // Bind innings_id
+                            } else if (runsFrom.equals("From by/lb")) {
+                                // Construct query and bind together
+                                updateQuery += COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1";
+                                updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+                                statement = db.compileStatement(updateQuery);
+                                statement.bindLong(1, bowler_id); // Bind bowler_id
+                                statement.bindLong(2, innings_id); // Bind innings_id
                             }
                             break;
-                        case "No-ball":
+                        case "NoBall":
                             if (runsFrom.equals("From Bat")) {
                                 updateQuery += COLUMN_RUNS + " = " + COLUMN_RUNS + " + ?";
                                 updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
