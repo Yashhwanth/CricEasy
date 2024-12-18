@@ -1,8 +1,9 @@
 <resources>
+    Main Activity
     <string name="app_name">CricEasy</string>
     <string name="app_logo">CricEasy</string>
-    <string name="new_match_button">New Match</string>
-    <string name="past_matches">Past Matches</string>
+    <string name="newMatchButton">New Match</string>
+    <string name="pastMatches">Past Matches</string>
     <string name="match_type">Match Type : </string>
     <string name="limited_overs">Limited Overs</string>
     <string name="box_cricket">Box Cricket</string>

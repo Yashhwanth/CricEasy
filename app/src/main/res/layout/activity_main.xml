@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/mainActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/back"
@@ -11,11 +11,10 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/newmatchbtn"
+        android:id="@+id/newMatchButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/new_match_button"
-        android:background="@drawable/round_button"
+        android:text="@string/newMatchButton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.174"
@@ -24,11 +23,10 @@
         app:layout_constraintVertical_bias="0.777" />
 
     <Button
-        android:id="@+id/pastmatchesbtn"
+        android:id="@+id/pastMatchesButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/past_matches"
-        android:background="@drawable/round_button"
+        android:text="@string/pastMatches"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.794"

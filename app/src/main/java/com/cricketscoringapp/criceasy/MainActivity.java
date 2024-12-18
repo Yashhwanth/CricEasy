@@ -1,5 +1,7 @@
 package com.cricketscoringapp.criceasy;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,29 +23,26 @@ import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
 
 public class MainActivity extends AppCompatActivity {
     private DatabaseHelper databaseHelper;
-    private long currentMatchId = -1;
-    private static final String PREFS_NAME = "match_prefs"; // SharedPreferences name
+    private static final String SHARED_PREFERENCES = "match_prefs"; // SharedPreferences name
     private static final String KEY_MATCH_ID = "match_id";  // Key to store match ID
     private static final String KEY_CURRENT_ACTIVITY = "current_activity"; // Key for current activity
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate: Opened Main Activity" );
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-
         // Initialize database helper
         databaseHelper = new DatabaseHelper(this);
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        Log.d(TAG, "onCreate: Clearing all Shared Preferences");
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
+        Log.d(TAG, "onCreate: Cleared all SharedPreferences");
 
-
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.mainActivity), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
@@ -54,18 +53,16 @@ public class MainActivity extends AppCompatActivity {
 //            return; // Skip MainActivity logic if navigating to the last activity
 //        }
 //
+        Log.d(TAG, "onCreate: updating current activity in sp");
         updateCurrentActivityInPreferences();
-
-        // Load saved match ID from SharedPreferences (if any)
-        loadMatchIdFromPreferences();
-
-        //Onclick for button
-        Button newMatchButton = findViewById(R.id.newmatchbtn);
+        Button newMatchButton = findViewById(R.id.newMatchButton);
         newMatchButton.setOnClickListener(view ->{
-            handleNewMatch();
+            Log.d(TAG, "onCreate: new match button clicked");
+            long currentMatchId = handleNewMatch();
             // Save the match ID to SharedPreferences after creating or resuming a match
-            saveMatchIdToPreferences();
+            saveMatchIdToPreferences(currentMatchId);
             // Proceed to the MatchInfoActivity
+            Log.d(TAG, "onCreate: opening matchinfo activity");
             Intent intent = new Intent(MainActivity.this, MatchInfoActivity.class);
             startActivity(intent);
         });
@@ -74,59 +71,57 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Update current activity in SharedPreferences
         updateCurrentActivityInPreferences();
     }
-    private void handleNewMatch() {
+    private long handleNewMatch() {
+        Log.d(TAG, "handleNewMatch: checking a match is present or not");
+        long currentMatchId = -1;
         try (Cursor cursor = databaseHelper.getOngoingMatch()) {
             if (cursor != null && cursor.moveToFirst()) {
+                Log.d(TAG, "handleNewMatch: ongoing match exists");
                 int matchIdIndex = cursor.getColumnIndex(DatabaseHelper.getColumnId());
                 if (matchIdIndex != -1) {
                     currentMatchId = cursor.getLong(matchIdIndex);
                     Toast.makeText(this, "Resuming existing match", Toast.LENGTH_SHORT).show();
                 }
             } else {
+                Log.d(TAG, "handleNewMatch: no ongoing match");
                 // No existing match, create a new one
-                createNewMatch();
+                currentMatchId = createNewMatch();
             }
         }catch (Exception e) {
             e.printStackTrace();
-            // Handle any potential exceptions (optional, for safety)
             Toast.makeText(this, "Error handling match!", Toast.LENGTH_SHORT).show();
-        }
-        // Ensure cursor is closed to avoid memory leaks
+        }return currentMatchId;
     }
-
-    private void createNewMatch() {
-        currentMatchId = databaseHelper.insertNewMatch();
+    private long createNewMatch() {
+        Log.d(TAG, "createNewMatch: creating new match");
+        long currentMatchId = databaseHelper.insertNewMatch();
         if (currentMatchId != -1) {
+            Log.d(TAG, "createNewMatch: created a new match");
             Toast.makeText(this, "New match created", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Failed to create a new match", Toast.LENGTH_SHORT).show();
         }
+        return currentMatchId;
     }
-    //Save the current match ID to SharedPreferences.
-    private void saveMatchIdToPreferences() {
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+    private void saveMatchIdToPreferences(long currentMatchId) {
+        Log.d(TAG, "saveMatchIdToPreferences: saving match id in sp");
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putLong(KEY_MATCH_ID, currentMatchId);
-        Log.d("match id check", "hi" + currentMatchId);
-        editor.apply(); // Save changes asynchronously
-    }
-    //Load the match ID from SharedPreferences.
-    private void loadMatchIdFromPreferences() {
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        currentMatchId = sharedPreferences.getLong(KEY_MATCH_ID, -1);
+        editor.putLong("currentMatchId", currentMatchId);
+        editor.apply();
+        Log.d(TAG, "saveMatchIdToPreferences: saved match id in sp with id" + currentMatchId);
     }
     private void updateCurrentActivityInPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("current_activity", getClass().getSimpleName()); // Store the current activity name
-        editor.apply(); // Save changes asynchronously
+        editor.putString("currentActivity", getClass().getSimpleName());
+        editor.apply(); 
+        Log.d(TAG, "inside updateCurrentActivityInPreferences method: updated current activity in sp");
     }
-
     private boolean navigateToLastActivityIfOngoingMatch() {
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         String lastActivity = sharedPreferences.getString(KEY_CURRENT_ACTIVITY, null);
         long matchId = sharedPreferences.getLong(KEY_MATCH_ID, -1);
 
