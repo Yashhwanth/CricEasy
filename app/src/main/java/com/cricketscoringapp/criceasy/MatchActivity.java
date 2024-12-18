@@ -195,7 +195,6 @@ public class MatchActivity extends AppCompatActivity {
         // Access the SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-
         // Retrieve current striker and non-striker IDs
         long strikerId = sharedPreferences.getLong("striker_id", -1);
         long nonStrikerId = sharedPreferences.getLong("non_striker_id", -1);
@@ -207,7 +206,6 @@ public class MatchActivity extends AppCompatActivity {
             strikerId = nonStrikerId;
             nonStrikerId = temp;
         }
-
         // Update the SharedPreferences with the new IDs
         editor.putLong("striker_id", strikerId);
         editor.putLong("non_striker_id", nonStrikerId);
@@ -239,12 +237,12 @@ public class MatchActivity extends AppCompatActivity {
         View extrasDialogView = getLayoutInflater().inflate(R.layout.activity_dialog_for_extras, null);
         EditText extraRunsInput = extrasDialogView.findViewById(R.id.extraRunsEditText);
         Button btnCancel = extrasDialogView.findViewById(R.id.cancelButton);
-        Button btnSubmit = extrasDialogView.findViewById(R.id.btn_submit);
-        RadioGroup radioGroup = extrasDialogView.findViewById(R.id.runsInNoBallRadioGroup);
+        Button btnSubmit = extrasDialogView.findViewById(R.id.submitButton);
+        RadioGroup runsInNoBallRadioGroup = extrasDialogView.findViewById(R.id.runsInNoBallRadioGroup);
         if ("NoBall".equals(ballType)) {
-            radioGroup.setVisibility(View.VISIBLE);  // Show radio group for No Ball
+            runsInNoBallRadioGroup.setVisibility(View.VISIBLE);  // Show radio group for No Ball
         } else {
-            radioGroup.setVisibility(View.GONE);  // Hide radio group for other ball types
+            runsInNoBallRadioGroup.setVisibility(View.GONE);  // Hide radio group for other ball types
         }
         TextView ballTypeLabel = extrasDialogView.findViewById(R.id.ballTypeHeading);
         ballTypeLabel.setText(ballType);
@@ -267,14 +265,14 @@ public class MatchActivity extends AppCompatActivity {
         // Handle Submit button
         btnSubmit.setOnClickListener(view -> {
             String extraRunsStr = extraRunsInput.getText().toString();
-            int radioBtnId = radioGroup.getCheckedRadioButtonId(); // Get the selected RadioButton ID
+            int runsInNoBallRadioButtonId = runsInNoBallRadioGroup.getCheckedRadioButtonId(); // Get the selected RadioButton ID
             String runFromWhat = null; // Variable to store the tag value
-            if (radioGroup.getVisibility() == View.VISIBLE) {
-                if (radioBtnId == -1) { // No RadioButton is selected
+            if (runsInNoBallRadioGroup.getVisibility() == View.VISIBLE) {
+                if (runsInNoBallRadioButtonId == -1) { // No RadioButton is selected
                     Toast.makeText(this, "Please select the source of runs (From bat or Byes/Leg Byes).", Toast.LENGTH_SHORT).show();
                 } else { // A RadioButton is selected
-                    RadioButton radioBtn = extrasDialogView.findViewById(radioBtnId);
-                    runFromWhat = (String) radioBtn.getTag(); // Get the tag of the selected RadioButton
+                    RadioButton runsInNoBallRadioButton = extrasDialogView.findViewById(runsInNoBallRadioButtonId);
+                    runFromWhat = runsInNoBallRadioButton.getText().toString();
                 }
             }
             if (!extraRunsStr.isEmpty()) {
@@ -302,7 +300,6 @@ public class MatchActivity extends AppCompatActivity {
     }
     private void showWicketDialog(AlertDialog parentDialog){
         View wicketDialogView = getLayoutInflater().inflate(R.layout.activity_typeofwicket, null);
-
         AlertDialog.Builder wicketsBuilder = new AlertDialog.Builder(this);
         wicketsBuilder.setView(wicketDialogView);
         AlertDialog wicketDialog = wicketsBuilder.create();
@@ -544,33 +541,28 @@ public class MatchActivity extends AppCompatActivity {
          long strikerId = sharedPreferences.getLong("striker_id", -1);
          long nonStrikerId = sharedPreferences.getLong("non_striker_id", -1);
          long partnership_id = sharedPreferences.getLong("partnership_id", -1);
+         long ballId = 0;
+         ballId = databaseHelper.insertBallDataForNb(overId, extraRuns, strikerId, nonStrikerId);
+         databaseHelper.updateExtrasTable(ballId, ballType, extraRuns);
          switch (runFromWhat){
              case "Bat":
                  databaseHelper.updateBatsmanStatsForNb(inningsId, strikerId, extraRuns, "Bat");
                  databaseHelper.updateBowlerStatsForNb(inningsId, bowlerId, extraRuns, "Bat");
                  databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "Bat");
-                 long ball_id = databaseHelper.insertBallDataForNb(overId, extraRuns, strikerId, nonStrikerId);
-                 databaseHelper.updateExtrasTable(ball_id, ballType, extraRuns);
-                 rotateStrike(extraRuns);
                  break;
-             case "Lb":
+             case "LegBye":
                  databaseHelper.updateBatsmanStatsForNb(inningsId, strikerId, extraRuns, "Bye");
                  databaseHelper.updateBowlerStatsForNb(inningsId, bowlerId, extraRuns, "Bye");
                  databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "Bye");
-                 long balll_id = databaseHelper.insertBallDataForNb(overId, extraRuns, strikerId, nonStrikerId);
-                 databaseHelper.updateExtrasTable(balll_id, ballType, extraRuns);
-                 rotateStrike(extraRuns);
                  break;
-             case "By":
-                 databaseHelper.updateBatsmanStatsForNb(inningsId, strikerId, extraRuns, "Leg Bye");
-                 databaseHelper.updateBowlerStatsForNb(inningsId, bowlerId, extraRuns, "Leg Bye");
-                 databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "Leg Bye");
-                 long ballll_id = databaseHelper.insertBallDataForNb(overId, extraRuns, strikerId, nonStrikerId);
-                 databaseHelper.updateExtrasTable(ballll_id, ballType, extraRuns);
-                 rotateStrike(extraRuns);
+             case "Bye":
+                 databaseHelper.updateBatsmanStatsForNb(inningsId, strikerId, extraRuns, "LegBye");
+                 databaseHelper.updateBowlerStatsForNb(inningsId, bowlerId, extraRuns, "LegBye");
+                 databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "LegBye");
                  break;
          }updateTeamStatsForNoBall(extraRuns, runFromWhat);
          updateScoreInSharedPreferences(ballType, extraRuns);
+         rotateStrike(extraRuns);
          checkAndHandleOverEnd();
      }
      private void updateTeamStatsFor0to6(int runs){

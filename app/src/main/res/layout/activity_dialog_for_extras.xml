@@ -13,7 +13,6 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:paddingBottom="10dp"
-        android:text="Ball Type"
         android:textSize="18sp"
         android:textStyle="bold" />
 
@@ -22,7 +21,8 @@
         android:id="@+id/extraRunsEditText"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:hint="Enter extra runs"
+        android:autofillHints="null"
+        android:hint="@string/hintForExtraRunsEditText"
         android:inputType="number"
         android:padding="10dp" />
 
@@ -38,26 +38,26 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:tag="Bat"
-            android:text="from bat" />
+            android:text="@string/runsFromBat" />
 
         <RadioButton
             android:id="@+id/runsFromByeRadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:tag="Lb"
-            android:text="from leg bye" />
+            android:tag="Bye"
+            android:text="@string/runsFromBye" />
 
         <RadioButton
             android:id="@+id/runsFromLegByeRadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:tag="By"
-            android:text="from bye" />
+            android:tag="LegBye"
+            android:text="@string/runsFromLegBye" />
 
     </RadioGroup>
 
     <LinearLayout
-        android:id="@+id/activtyNavigationButtonsLayout"
+        android:id="@+id/activityNavigationButtonsLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
@@ -68,13 +68,13 @@
             android:id="@+id/cancelButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cancel" />
+            android:text="@string/cancelButton" />
 
         <Button
-            android:id="@+id/btn_submit"
+            android:id="@+id/submitButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:text="Submit" />
+            android:text="@string/submitButton" />
     </LinearLayout>
 </LinearLayout>

@@ -48,8 +48,8 @@
     <string name="out_end">Out-End</string>
     <string name="striker_end">striker</string>
     <string name="non_striker_end">non-striker</string>
-    <string name="submit">Submit</string>
-    <string name="cancel">Cancel</string>
+    <string name="submitButton">Submit</string>
+    <string name="cancelButton">Cancel</string>
     <string name="stumped_ball_type">Ball type while Stumping</string>
     activity match
     <string name="infoButton">Info</string>
@@ -77,6 +77,12 @@
     <string name="undoScoringButton">Undo</string>
     activity new player
     <string name="selectNewPlayerSetText">Select New %1$s</string>
+    activity for extras
+    <string name="hintForExtraRunsEditText">Enter Extra Runs(0 if no runs are scored)</string>
+    <string name="runsFromBat">Bat</string>
+    <string name="runsFromBye">Bye</string>
+    <string name="runsFromLegBye">LegBye</string>
+
 
 
 
