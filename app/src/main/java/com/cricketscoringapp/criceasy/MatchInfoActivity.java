@@ -91,7 +91,7 @@ public class MatchInfoActivity extends AppCompatActivity {
         }
 
         // Initialize AutoCompleteTextView for place selection
-        placeAutoComplete = findViewById(R.id.placeAutocomplete);
+        placeAutoComplete = findViewById(R.id.placeAutoCompleteEditText);
         placeAutoComplete.setOnClickListener(v -> openAutocompleteActivity());
 
         // Initialize EditText for date and time selection
@@ -99,7 +99,7 @@ public class MatchInfoActivity extends AppCompatActivity {
         dateTimeEditText.setOnClickListener(v -> showDateTimePicker());
 
         // Initialize EditText and RadioGroups for number of overs and match settings
-        noOfOversEditText = findViewById(R.id.noOfOversEditText); // Highlighted line added
+        noOfOversEditText = findViewById(R.id.noOfOversTextView); // Highlighted line added
         oversTypeRadioGroup = findViewById(R.id.oversTypeRadioGroup); // Highlighted line added
         ballTypeRadioGroup = findViewById(R.id.ballTypeRadioGroup); // Highlighted line added
 
@@ -124,9 +124,9 @@ public class MatchInfoActivity extends AppCompatActivity {
     //Method to validate inputs
     private boolean validateInputs() {
         // Get references to the required fields
-        AppCompatAutoCompleteTextView placeAutoComplete = findViewById(R.id.placeAutocomplete);
+        AppCompatAutoCompleteTextView placeAutoComplete = findViewById(R.id.placeAutoCompleteEditText);
         EditText dateTimeEditText = findViewById(R.id.dateTimeEditText);
-        EditText noOfOversEditText = findViewById(R.id.noOfOversEditText);
+        EditText noOfOversEditText = findViewById(R.id.noOfOversTextView);
         RadioGroup oversTypeRadioGroup = findViewById(R.id.oversTypeRadioGroup);
         RadioGroup ballTypeRadioGroup = findViewById(R.id.ballTypeRadioGroup);
 
