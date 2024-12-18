@@ -217,13 +217,13 @@
                 android:id="@+id/noBallRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/no_ball" />
+                android:text="@string/noBallScoringButton" />
 
             <RadioButton
                 android:id="@+id/wideBallRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/wide_ball" />
+                android:text="@string/wideScoringButton" />
         </RadioGroup>
     </LinearLayout>
 
@@ -255,13 +255,13 @@
                 android:id="@+id/fromBatRadioButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/no_ball_bat" />
+                android:text="@string/runsFromBat" />
 
             <RadioButton
                 android:id="@+id/fromByeLegByeRadioButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/no_ball_by_lby" />
+                android:text="@string/runsFromBye" />
         </RadioGroup>
     </LinearLayout>
 

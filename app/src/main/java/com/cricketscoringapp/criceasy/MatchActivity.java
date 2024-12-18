@@ -446,6 +446,8 @@ public class MatchActivity extends AppCompatActivity {
                         RadioButton runsFromRadioButton = wicketDialogView.findViewById(runsFromId);
                         runsFrom = runsFromRadioButton.getText().toString();
                     }
+                    Log.d(TAG, "showWicketDialog: " + runsFrom);
+                    Log.d(TAG, "showWicketDialog: " + ballTypeInRo);
                     if(ballTypeInRo.equals("Normal"))    incrementPlayedBallsInSharedPreferences();
                     updateScoreInSharedPreferences(ballTypeInRo ,runs);
                     databaseHelper.insertBallDataForWicket(over_id, ballTypeInRo, runs, striker, non_striker_id);
@@ -628,6 +630,7 @@ public class MatchActivity extends AppCompatActivity {
                 String bat_style = bat_button.getTag().toString();
                 String bowl_style = bowl_button.getTag().toString();
                 updatePlayerDataInSp(playerType, player_name, role, bat_style, bowl_style);
+                insertOver();
                 playerDialog.dismiss();
             }
         });
@@ -689,7 +692,7 @@ public class MatchActivity extends AppCompatActivity {
             if(currentOverScore == 0) insertMaidenOver();
             setNewPlayer("bowler");
             rotateStrike(1);
-            insertOver();
+            //insertOver();
         }
         if(playedBalls == totalBalls || currentScore >= target) {
             handleInningsEnd(currentInnings);

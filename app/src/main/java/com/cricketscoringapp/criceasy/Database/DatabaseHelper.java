@@ -1200,9 +1200,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 // No runs added for byes or leg-byes in partnerships table
                 Log.d("DatabaseHelper", "No runs added for run type: " + runType);
                 return;
-            } else if(runType.equals("Leg Bye")){
-                //Log.e("DatabaseHelper", "Invalid run type: " + runType);
-                return;
             }
 
             // Add WHERE condition to the query
@@ -1222,35 +1219,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void updatePartnershipForRunOut(long partnershipId, int runsScored, String ballType, String runsFrom) {
         SQLiteDatabase db = this.getWritableDatabase();
         Log.d(TAG, "updatePartnershipForRunOut: Ball Type: " + ballType + ", Runs From: " + runsFrom);
+        String query = null ; // Initialize an empty query string
 
         try {
-            String query = "UPDATE " + TABLE_PARTNERSHIPS + " SET ";
-            boolean addComma = false;
-            // Add runs if they are from the bat
-            if (runsFrom.equals("From Bat")) {
-                query += COLUMN_RUNS + " = " + COLUMN_RUNS + " + ?";
-                addComma = true;
+            // Update runs if runs are from the bat
+            if (runsFrom.equals("Bat") && ballType.equals("Normal")) {
+                query = "UPDATE " + TABLE_PARTNERSHIPS + " SET " +
+                        COLUMN_RUNS + " = " + COLUMN_RUNS + " + " + runsScored + ", " +
+                        COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 " +
+                        "WHERE " + COLUMN_PARTNERSHIP_ID + " = " + partnershipId;
+            } else if (runsFrom.equals("Bat")) {
+                query = "UPDATE " + TABLE_PARTNERSHIPS + " SET " +
+                        COLUMN_RUNS + " = " + COLUMN_RUNS + " + " + runsScored + " " +
+                        "WHERE " + COLUMN_PARTNERSHIP_ID + " = " + partnershipId;
+            } else if (ballType.equals("Normal")) {
+                query = "UPDATE " + TABLE_PARTNERSHIPS + " SET " +
+                        COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 " +
+                        "WHERE " + COLUMN_PARTNERSHIP_ID + " = " + partnershipId;
             }
 
-            // Add balls if the ball type is normal
-            if (ballType.equals("Normal")) {
-                if (addComma) {
-                    query += ", ";
-                }
-                query += COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1";
-            }
-
-            // Add WHERE condition to the query
-            query += " WHERE " + COLUMN_PARTNERSHIP_ID + " = ?";
-
-            // Execute the update query
-            if (runsFrom.equals("From Bat")) {
-                db.execSQL(query, new Object[]{runsScored, partnershipId});
+            // Execute the query if it's not empty
+            if (!query.isEmpty()) {
+                db.execSQL(query);
+                Log.d("DatabaseHelper", "Partnership updated successfully for run out.");
             } else {
-                db.execSQL(query, new Object[]{partnershipId});
+                Log.d("DatabaseHelper", "No update query executed as conditions were not met.");
             }
-
-            Log.d("DatabaseHelper", "Partnership updated successfully for run out.");
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("DatabaseHelper", "Failed to update partnership for run out.");
@@ -1382,7 +1376,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 case "Bye":
                 case "LegBye":
                     // Add 1 run for the no-ball (extras) but do not update specific run type columns
-                    updateQuery += ", " + COLUMN_SCORE + " = " + COLUMN_SCORE + " + 0";
+                    updateQuery += ", " + COLUMN_SCORE + " = " + COLUMN_SCORE + " + ?";
                     break;
 
                 default:
@@ -1438,7 +1432,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 }
             } else if (wicketType.equals("RUN-OUT")) {
                 if (ballType.equals("Normal")) {
-                    if (runsFrom.equals("From Bat")) {
+                    if (runsFrom.equals("Bat")) {
                         updateQuery += COLUMN_SCORE + " = " + COLUMN_SCORE + " + ? ," +
                                 COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 ";
                         updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
@@ -1446,15 +1440,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         statement.bindLong(1, runs); // Bind runs
                         statement.bindLong(2, player_id); // Bind player_id
                         statement.bindLong(3, innings_id); // Bind innings_id
-                    } else if (runsFrom.equals("From by/lb")) {
+                    } else if (runsFrom.equals("Bye") || runsFrom.equals("LegBye")) {
                         updateQuery += COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 ";
                         updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
                         statement = db.compileStatement(updateQuery);
                         statement.bindLong(1, player_id); // Bind player_id
                         statement.bindLong(2, innings_id); // Bind innings_id
                     }
-                } else if (ballType.equals("No-ball")) {
-                    if (runsFrom.equals("From Bat")) {
+                } else if (ballType.equals("NoBall")) {
+                    if (runsFrom.equals("Bat")) {
                         updateQuery += COLUMN_SCORE + " = " + COLUMN_SCORE + " + ? ";
                         updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
                         statement = db.compileStatement(updateQuery);
@@ -1546,7 +1540,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // Depending on the ball type, increment the respective column
             if ("Bye".equalsIgnoreCase(ballType)) {
                 updateQuery += COLUMN_BY + " = " + COLUMN_BY + " + 1 ";
-            } else if ("Leg Bye".equalsIgnoreCase(ballType)) {
+            } else if ("LegBye".equalsIgnoreCase(ballType)) {
                 updateQuery += COLUMN_LB + " = " + COLUMN_LB + " + 1 ";
             } else {
                 // If ballType is neither "Bye" nor "Leg Bye", return early.
@@ -1637,7 +1631,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     break;
 
                 case "Bye":
-                case "Leg Bye":
+                case "LegBye":
                     // No need to update specific run type columns for byes or leg byes
                     // Increment runs by 1 for the no-ball
                     break;
@@ -1699,7 +1693,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 case "RUN-OUT":
                     switch (ballType) {
                         case "Normal":
-                            if (runsFrom.equals("From Bat")) {
+                            if (runsFrom.equals("Bat")) {
                                 // Construct query and bind together
                                 updateQuery += COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 ," +
                                         COLUMN_RUNS + " = " + COLUMN_RUNS + " + ?";
@@ -1708,7 +1702,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                 statement.bindLong(1, runs); // Bind runs
                                 statement.bindLong(2, bowler_id); // Bind bowler_id
                                 statement.bindLong(3, innings_id); // Bind innings_id
-                            } else if (runsFrom.equals("From by/lb")) {
+                            } else if (runsFrom.equals("Bye") || runsFrom.equals("LegBye")) {
                                 // Construct query and bind together
                                 updateQuery += COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1";
                                 updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
@@ -1718,7 +1712,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                             }
                             break;
                         case "NoBall":
-                            if (runsFrom.equals("From Bat")) {
+                            if (runsFrom.equals("Bat")) {
                                 updateQuery += COLUMN_RUNS + " = " + COLUMN_RUNS + " + ?";
                                 updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
                                 statement = db.compileStatement(updateQuery);
@@ -1766,7 +1760,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(COLUMN_EXTRA_TYPE, ball_type);
 
             // Handle Bye and Leg Bye
-            if (ball_type.equals("Bye") || ball_type.equals("Leg Bye")) {
+            if (ball_type.equals("Bye") || ball_type.equals("LegBye")) {
                 values.put(COLUMN_EXTRA_RUNS, runs);
 
                 // Insert the extra data into the EXTRAS table
@@ -1793,7 +1787,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             }
             // Handle No Ball
-            else if (ball_type.equals("No Ball")) {
+            else if (ball_type.equals("NoBall")) {
                 values.put(COLUMN_EXTRA_RUNS, runs + 1); // Add 1 run for the no-ball itself
 
                 long result = db.insertWithOnConflict(TABLE_EXTRAS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
@@ -2007,7 +2001,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if ("Bat".equalsIgnoreCase(runsSource)) {
                 // Add only the no-ball extra
                 currentExtras += 1;
-            } else if ("Lb".equalsIgnoreCase(runsSource) || "By".equalsIgnoreCase(runsSource)) {
+            } else if ("LegBye".equalsIgnoreCase(runsSource) || "Bye".equalsIgnoreCase(runsSource)) {
                 // Add the total runs (runs + 1 for no-ball)
                 currentExtras += totalNoBallRuns;
             } else {
@@ -2079,7 +2073,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     public void updateTeamStatsForRunOut(long teamStatsId, int runs, String ballType, String runsFrom) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String query = null;
+        String query;
         SQLiteStatement statement;
 
         if ("Wide".equalsIgnoreCase(ballType)) {
@@ -2096,8 +2090,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             statement.bindLong(3, teamStatsId);
             statement.executeUpdateDelete();
             statement.close();
-        } else if ("No-ball".equalsIgnoreCase(ballType)) {
-            if ("From Bat".equalsIgnoreCase(runsFrom)) {
+        } else if ("NoBall".equalsIgnoreCase(ballType)) {
+            if ("Bat".equalsIgnoreCase(runsFrom)) {
                 // No-ball from bat: Add runs + 1 for no-ball to total runs, increment wicket
                 query = "UPDATE " + TABLE_TEAM_STATISTICS +
                         " SET " +
@@ -2109,7 +2103,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 statement.bindLong(2, teamStatsId);
                 statement.executeUpdateDelete();
                 statement.close();
-            } else if ("From by/lb".equalsIgnoreCase(runsFrom)) {
+            } else if ("Bye".equalsIgnoreCase(runsFrom) || "LegBye".equalsIgnoreCase(runsFrom)) {
                 // No-ball from byes/leg-byes: Add runs + 1 for no-ball to both extras and total runs, increment wicket
                 query = "UPDATE " + TABLE_TEAM_STATISTICS +
                         " SET " +
@@ -2125,7 +2119,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 statement.close();
             }
         } else if ("Normal".equalsIgnoreCase(ballType)) {
-            if ("From Bat".equalsIgnoreCase(runsFrom)) {
+            if ("Bat".equalsIgnoreCase(runsFrom)) {
                 // Normal from bat: Add runs to total runs, increment ball and wicket
                 query = "UPDATE " + TABLE_TEAM_STATISTICS +
                         " SET " +
@@ -2138,7 +2132,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 statement.bindLong(2, teamStatsId);
                 statement.executeUpdateDelete();
                 statement.close();
-            } else if ("From by/lb".equalsIgnoreCase(runsFrom)) {
+            } else if ("Bye".equalsIgnoreCase(runsFrom) || "LegBye".equalsIgnoreCase(runsFrom)) {
                 // Normal from byes/leg-byes: Add runs to both extras and total runs, increment ball and wicket
                 query = "UPDATE " + TABLE_TEAM_STATISTICS +
                         " SET " +

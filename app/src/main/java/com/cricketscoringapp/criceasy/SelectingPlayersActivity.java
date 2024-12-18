@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,6 +17,8 @@ public class SelectingPlayersActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_selecting_players); // Make sure this layout file exists
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        String playerType = sharedPreferences.getString("player_type", null);
 
 
         //UI
@@ -24,6 +27,9 @@ public class SelectingPlayersActivity extends AppCompatActivity {
         role_radio_group = findViewById(R.id.radioGroup);
         bat_style_radio_group = findViewById(R.id.batGroup);
         bowl_style_radio_group = findViewById(R.id.bowlStyleRadioGroup);
+        TextView playerTypeTextView = findViewById(R.id.playerTypeTextView);
+        String formattedText = getString(R.string.selectNewPlayerSetText, playerType);
+        playerTypeTextView.setText(formattedText);
 
 
         submit_btn.setOnClickListener(view ->{
