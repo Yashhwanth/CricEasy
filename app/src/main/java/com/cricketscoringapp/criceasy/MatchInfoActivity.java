@@ -99,7 +99,7 @@ public class MatchInfoActivity extends AppCompatActivity {
         dateTimeEditText.setOnClickListener(v -> showDateTimePicker());
 
         // Initialize EditText and RadioGroups for number of overs and match settings
-        noOfOversEditText = findViewById(R.id.noOfOversTextView); // Highlighted line added
+        noOfOversEditText = findViewById(R.id.noOfOversEditText); // Highlighted line added
         oversTypeRadioGroup = findViewById(R.id.oversTypeRadioGroup); // Highlighted line added
         ballTypeRadioGroup = findViewById(R.id.ballTypeRadioGroup); // Highlighted line added
 
@@ -126,7 +126,7 @@ public class MatchInfoActivity extends AppCompatActivity {
         // Get references to the required fields
         AppCompatAutoCompleteTextView placeAutoComplete = findViewById(R.id.placeAutoCompleteEditText);
         EditText dateTimeEditText = findViewById(R.id.dateTimeEditText);
-        EditText noOfOversEditText = findViewById(R.id.noOfOversTextView);
+        EditText noOfOversEditText = findViewById(R.id.noOfOversEditText);
         RadioGroup oversTypeRadioGroup = findViewById(R.id.oversTypeRadioGroup);
         RadioGroup ballTypeRadioGroup = findViewById(R.id.ballTypeRadioGroup);
 

@@ -79,7 +79,7 @@ public class MatchActivity extends AppCompatActivity {
         summaryFragmentButton.setOnClickListener(view -> showFragment(new liveFragment()));
         scorecardFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
         commentaryFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
-        teamsFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
+        teamsFragmentButton.setOnClickListener(view -> showFragment(new TeamsFragment()));
         floatingButton.setOnClickListener(view ->{
             openScoringPopup();
         });
@@ -608,31 +608,13 @@ public class MatchActivity extends AppCompatActivity {
         EditText playerNameEditText = playerDialogView.findViewById(R.id.playerNameEditText);
         Button submitButton = playerDialogView.findViewById(R.id.submitButton);
         Button backButton = playerDialogView.findViewById(R.id.back_button);
-        RadioGroup role_radio_group = playerDialogView.findViewById(R.id.radioGroup);
-        RadioGroup bat_style_radio_group = playerDialogView.findViewById(R.id.batGroup);
-        RadioGroup bowl_style_radio_group = playerDialogView.findViewById(R.id.bowlStyleRadioGroup);
 
         // Submit Button Click Handler
         submitButton.setOnClickListener(v -> {
             String player_name = String.valueOf(playerNameEditText.getText());
-            int role_button_id = role_radio_group.getCheckedRadioButtonId();
-            int bat_style_button_id = bat_style_radio_group.getCheckedRadioButtonId();
-            int bowl_style_button_id = bowl_style_radio_group.getCheckedRadioButtonId();
-            if(role_button_id == -1 || bat_style_button_id == -1 || bowl_style_button_id == -1 || player_name.isEmpty()){
-                Toast.makeText(this, "Please make all selections", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            else {
-                RadioButton role_button = playerDialogView.findViewById(role_button_id);
-                RadioButton bat_button = playerDialogView.findViewById(bat_style_button_id);
-                RadioButton bowl_button = playerDialogView.findViewById(bowl_style_button_id);
-                String role = role_button.getTag().toString();
-                String bat_style = bat_button.getTag().toString();
-                String bowl_style = bowl_button.getTag().toString();
-                updatePlayerDataInSp(playerType, player_name, role, bat_style, bowl_style);
-                if(playerType.equals("bowler")) insertOver();
-                playerDialog.dismiss();
-            }
+            updatePlayerDataInSp(playerType, player_name);
+            if(playerType.equals("bowler")) insertOver();
+            playerDialog.dismiss();
         });
         // Back Button Click Handler
         backButton.setOnClickListener(v -> {
@@ -642,30 +624,30 @@ public class MatchActivity extends AppCompatActivity {
         // Show the dialog
         playerDialog.show();
     }
-    private void updatePlayerDataInSp(String player_type, String player_name, String role, String bat_style, String bowl_style){
+    private void updatePlayerDataInSp(String player_type, String player_name){
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         long innings_id  = sharedPreferences.getLong("Innings_id", -1);
         editor.putString(player_type + " name",player_name);
-        editor.putString(player_type + " ROLE",role);
-        editor.putString(player_type + " BS",bat_style);
-        editor.putString(player_type + " BOS",bowl_style);
         editor.putInt("currentOverScore", 0);
         editor.apply();
-        if(player_type.equals("bowler")) updateNewBowlerToDB(player_name, role, bat_style, bowl_style, player_type, innings_id);
-        else updateNewBatsmanToDB(player_name, role, bat_style, bowl_style, player_type, innings_id);
+        if(player_type.equals("bowler")) updateNewBowlerToDB(player_name, player_type, innings_id);
+        else updateNewBatsmanToDB(player_name, player_type, innings_id);
     }
-    private void updateNewBatsmanToDB(String name, String role, String batStyle, String bowlStyle, String player_type, long innings_id) {
-        long player_id = databaseHelper.insertPlayer(name, role, batStyle, bowlStyle, player_type);
+    private void updateNewBatsmanToDB(String name, String player_type, long innings_id) {
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        long teamId = sharedPreferences.getLong("teamA_id", -1);
+        long player_id = databaseHelper.insertPlayer(name, player_type, teamId);
         String batter = player_type.equals("striker") ? "non_striker_id" : "striker_id";
         databaseHelper.initializeBatsmanStats(player_id, innings_id);
         long player2_id = sharedPreferences.getLong(batter, -1);
         Log.d(TAG, "striker" + player_id + "non striker" + player2_id);
         databaseHelper.insertPartnership(innings_id,player_id, player2_id, 0, 0);
     }
-    private void updateNewBowlerToDB(String name, String role, String batStyle, String bowlStyle, String player_type, long innings_id) {
-        long player_id = databaseHelper.insertPlayer(name, role, batStyle, bowlStyle, player_type);
+    private void updateNewBowlerToDB(String name, String player_type, long innings_id) {
+        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        long teamId = sharedPreferences.getLong("teamB_id", -1);
+        long player_id = databaseHelper.insertPlayer(name, player_type, teamId);
         databaseHelper.initializeBowlerStats(player_id, innings_id);
     }
     private void incrementPlayedBallsInSharedPreferences() {

@@ -117,33 +117,24 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
 
         // Validate Striker
         String strikerName = sharedPreferences.getString("striker name", null);
-        String strikerRole = sharedPreferences.getString("striker ROLE", null);
-        String strikerBatStyle = sharedPreferences.getString("striker BS", null);
-        String strikerBowlStyle = sharedPreferences.getString("striker BOS", null);
 
-        if (strikerName == null || strikerRole == null || strikerBatStyle == null || strikerBowlStyle == null) {
+        if (strikerName == null) {
             Toast.makeText(this, "Please select and complete Striker details!", Toast.LENGTH_SHORT).show();
             return false;
         }
 
         // Validate Non-Striker
         String nonStrikerName = sharedPreferences.getString("non_striker name", null);
-        String nonStrikerRole = sharedPreferences.getString("non_striker ROLE", null);
-        String nonStrikerBatStyle = sharedPreferences.getString("non_striker BS", null);
-        String nonStrikerBowlStyle = sharedPreferences.getString("non_striker BOS", null);
 
-        if (nonStrikerName == null || nonStrikerRole == null || nonStrikerBatStyle == null || nonStrikerBowlStyle == null) {
+        if (nonStrikerName == null) {
             Toast.makeText(this, "Please select and complete Non-Striker details!", Toast.LENGTH_SHORT).show();
             return false;
         }
 
         // Validate Bowler
         String bowlerName = sharedPreferences.getString("bowler name", null);
-        String bowlerRole = sharedPreferences.getString("bowler ROLE", null);
-        String bowlerBatStyle = sharedPreferences.getString("bowler BS", null);
-        String bowlerBowlStyle = sharedPreferences.getString("bowler BOS", null);
 
-        if (bowlerName == null || bowlerRole == null || bowlerBatStyle == null || bowlerBowlStyle == null) {
+        if (bowlerName == null) {
             Toast.makeText(this, "Please select and complete Bowler details!", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -153,30 +144,18 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
 
     private void insertSNsBowl() {
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
-
+        long team1Id = sharedPreferences.getLong("teamA_id", -1);
+        long team2Id = sharedPreferences.getLong("teamB_id", -1);
         // Insert Striker
         String strikerName = sharedPreferences.getString("striker name", "");
-        String strikerRole = sharedPreferences.getString("striker ROLE", "");
-        String strikerBatStyle = sharedPreferences.getString("striker BS", "");
-        String strikerBowlStyle = sharedPreferences.getString("striker BOS", "");
-
-
         // Insert Non-Striker
         String nonStrikerName = sharedPreferences.getString("non_striker name", "");
-        String nonStrikerRole = sharedPreferences.getString("non_striker ROLE", "");
-        String nonStrikerBatStyle = sharedPreferences.getString("non_striker BS", "");
-        String nonStrikerBowlStyle = sharedPreferences.getString("non_striker BOS", "");
-
-
         // Insert Bowler
         String bowlerName = sharedPreferences.getString("bowler name", "");
-        String bowlerRole = sharedPreferences.getString("bowler ROLE", "");
-        String bowlerBatStyle = sharedPreferences.getString("bowler BS", "");
-        String bowlerBowlStyle = sharedPreferences.getString("bowler BOS", "");
 
-        databaseHelper.insertPlayer(strikerName, strikerRole, strikerBatStyle, strikerBowlStyle, "striker");
-        databaseHelper.insertPlayer(nonStrikerName, nonStrikerRole, nonStrikerBatStyle, nonStrikerBowlStyle, "non_striker");
-        databaseHelper.insertPlayer(bowlerName, bowlerRole, bowlerBatStyle, bowlerBowlStyle, "bowler");
+        databaseHelper.insertPlayer(strikerName, "striker", team1Id);
+        databaseHelper.insertPlayer(nonStrikerName, "non_striker", team1Id);
+        databaseHelper.insertPlayer(bowlerName, "bowler", team2Id);
 
     }
 

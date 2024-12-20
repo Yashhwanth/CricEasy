@@ -100,7 +100,7 @@ public class TeamCreationActivity extends AppCompatActivity {
     public void validateTeamsAndSavetoDB(){
         String team1Name = sharedPreferences.getString("A", null);
         String team2Name = sharedPreferences.getString("B", null);
-        long match_id = sharedPreferences.getLong("match_id",-1);
+        long match_id = sharedPreferences.getLong("currentMatchId",-1);
         if(team1Name != null && team2Name != null){
             databaseHelper.addTeamNames(match_id,team1Name,team2Name);
         }

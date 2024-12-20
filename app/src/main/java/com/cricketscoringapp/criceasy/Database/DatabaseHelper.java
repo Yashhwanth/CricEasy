@@ -16,7 +16,7 @@ import static android.content.ContentValues.TAG;
 import androidx.annotation.Nullable;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 11; // Update version
+    private static final int DATABASE_VERSION = 12; // Update version
     private static final String DATABASE_NAME = "CricketDB";
     private final Context context;
     private SharedPreferences sharedPreferences;
@@ -69,15 +69,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Matches-Teams Table
     public static final String TABLE_MATCHES_TEAMS = "Matches_Teams";
     public static final String COLUMN_MATCHES_TEAMS_ID = "Match_Team_id";
+    public static final String COLUMN_TEAM1_ID = "team1_id";
+    public static final String COLUMN_TEAM2_ID = "team2_id";
 
-    // Create statement for the Matches-Teams junction table
+
     public static final String CREATE_MATCHES_TEAMS_TABLE =
             "CREATE TABLE " + TABLE_MATCHES_TEAMS + " (" +
                     COLUMN_MATCHES_TEAMS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_MATCH_ID + " INTEGER, " +
-                    COLUMN_TEAM_ID + " INTEGER, " +
+                    COLUMN_TEAM1_ID + " INTEGER, " +
+                    COLUMN_TEAM2_ID + " INTEGER, " +
                     "FOREIGN KEY(" + COLUMN_MATCH_ID + ") REFERENCES Matches(" + COLUMN_MATCH_ID + "), " +
-                    "FOREIGN KEY(" + COLUMN_TEAM_ID + ") REFERENCES Teams(" + COLUMN_TEAM_ID + ")" +
+                    "FOREIGN KEY(" + COLUMN_TEAM1_ID + ") REFERENCES Teams(" + COLUMN_TEAM_ID + "), " +
+                    "FOREIGN KEY(" + COLUMN_TEAM2_ID + ") REFERENCES Teams(" + COLUMN_TEAM_ID + ")" +
                     ");";
 
 
@@ -94,7 +98,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Toss table and column names
     public static final String TABLE_TOSS = "Toss";
-
     public static final String COLUMN_TOSS_CALL_BY = "toss_call_by";
     public static final String COLUMN_TOSS_WON_BY = "toss_won_by";
     public static final String COLUMN_TOSS_WON_TEAM_CHOOSE_TO = "toss_won_team_choose_to";
@@ -113,17 +116,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_PLAYERS = "Players";
     // Column names
     public static final String COLUMN_PLAYER_ID = "player_id";
-    public static final String COLUMN_PLAYER_BATTING_STYLE = "batting_style";
-    public static final String COLUMN_PLAYER_BOWLING_STYLE = "bowling_style";
     public static final String COLUMN_NAME = "name";
-    public static final String COLUMN_ROLE = "role";
     public static final String CREATE_PLAYERS_TABLE = "CREATE TABLE " + TABLE_PLAYERS + " (" +
             COLUMN_PLAYER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            COLUMN_NAME + " TEXT NOT NULL, " +
-            COLUMN_ROLE + " TEXT ," +
-            COLUMN_PLAYER_BATTING_STYLE + " TEXT ," +
-            COLUMN_PLAYER_BOWLING_STYLE + " TEXT " +
-            ");";
+            COLUMN_NAME + " TEXT NOT NULL " + ");";
 
 
     //
@@ -293,7 +289,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Bowler table name
     private static final String TABLE_BOWLER = "Bowlers";
-
     // Bowler table columns
     private static final String COLUMN_MAIDENS = "maidens";
     private static final String COLUMN_ECONOMY = "economy";
@@ -400,7 +395,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Check if there is an ongoing match
     public Cursor getOngoingMatch() {
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery(" SELECT " + COLUMN_MATCH_ID + " FROM " + TABLE_MATCHES + " WHERE " + COLUMN_IS_MATCH_COMPLETED + "=0", null);
+        Cursor cursor = db.rawQuery(" SELECT " + COLUMN_MATCH_ID + " FROM " + TABLE_MATCHES + " WHERE " + COLUMN_IS_MATCH_COMPLETED + "=0", null);
+        Log.d(TAG, "getOngoingMatch: " + cursor);
+        return cursor;
     }
 
     // Insert a new match if no ongoing match exists
@@ -495,26 +492,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //                           ***TEAM CREATION PAGE ****
     public void addTeamNames(long match_id, String teamAName, String teamBName) {
+        Log.d(TAG, "addTeamNames: " + match_id);
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction(); // Start a transaction for atomicity
         try {
             // Check if Team A exists, insert if not, and get its ID
-            long teamAId = getOrInsertTeam(db, teamAName);
+            long team1Id = getOrInsertTeam(db, teamAName);
 
             // Check if Team B exists, insert if not, and get its ID
-            long teamBId = getOrInsertTeam(db, teamBName);
+            long team2Id = getOrInsertTeam(db, teamBName);
 
             // Ensure Matches_Teams table is clean for the given match_id
             resetMatchTeams(db, match_id);
 
             // Insert into Matches_Teams table
-            insertMatchTeamPair(db, match_id, teamAId);
-            insertMatchTeamPair(db, match_id, teamBId);
+            insertMatchTeamPair(db, match_id, team1Id, team2Id);
+            //insertMatchTeamPair(db, match_id, teamBId, "B");
 
             SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putLong("teamA_id", teamAId);
-            editor.putLong("teamB_id", teamBId);
+            editor.putLong("teamA_id", team1Id);
+            editor.putLong("teamB_id", team2Id);
             editor.apply(); // Save team IDs for use in TossActivity
 
 
@@ -566,14 +564,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // Helper method to insert match and team ID pair into Matches_Teams table
-    private void insertMatchTeamPair(SQLiteDatabase db, long matchId, long teamId) {
+    private void insertMatchTeamPair(SQLiteDatabase db, long matchId, long team1Id, long team2Id) {
         // Insert the pair into Matches_Teams
         ContentValues values = new ContentValues();
         values.put(COLUMN_MATCH_ID, matchId);
-        values.put(COLUMN_TEAM_ID, teamId);
+        values.put(COLUMN_TEAM1_ID, team1Id);
+        values.put(COLUMN_TEAM2_ID, team2Id);
         long result = db.insert(TABLE_MATCHES_TEAMS, null, values);
         if (result == -1) {
-            throw new IllegalStateException("Failed to insert match-team pair for match_id=" + matchId + " and team_id=" + teamId);
+            throw new IllegalStateException("Failed to insert match-team pair for match_id=" + matchId + " and team_id=" + team1Id);
         }
     }
 
@@ -733,16 +732,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.insert(TABLE_BOWLER, null, values);
     }
-    public long insertPlayer(String playerName, String playerRole, String battingStyle, String bowlingStyle, String playerType) {
+    public long insertPlayer(String playerName, String playerType, long teamId) {
         // Get writable database instance
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Create a ContentValues object to store the player data
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_NAME, playerName);
-        contentValues.put(COLUMN_ROLE, playerRole);
-        contentValues.put(COLUMN_PLAYER_BATTING_STYLE, battingStyle);
-        contentValues.put(COLUMN_PLAYER_BOWLING_STYLE, bowlingStyle);
 
         // Insert the data into the players table
         long result = db.insert(TABLE_PLAYERS, null, contentValues);
@@ -754,10 +750,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // Player inserted successfully
             Log.d("DatabaseHelper", "Player inserted successfully");
 
+            // Insert the player-team relationship into the Players_Teams table
+            ContentValues playerTeamValues = new ContentValues();
+            playerTeamValues.put(COLUMN_TEAM_ID, teamId); // The team ID should be passed or retrieved based on the match context
+            playerTeamValues.put(COLUMN_PLAYER_ID, result); // The player ID from the Players table
+
+            long teamResult = db.insert(TABLE_PLAYERS_TEAMS, null, playerTeamValues);
+
+            if (teamResult == -1) {
+                Log.e("DatabaseHelper", "Error inserting player-team into database");
+            } else {
+                Log.d("DatabaseHelper", "Player-team relation inserted successfully");
+            }
+
+            // Update the specific role in SharedPreferences
             SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
-
-            // Update the specific role
             switch (playerType) {
                 case "striker":
                     editor.putLong("striker_id", result);
@@ -771,6 +779,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
             editor.apply();
         }
+
         // Close the database connection
         db.close();
         return result;
