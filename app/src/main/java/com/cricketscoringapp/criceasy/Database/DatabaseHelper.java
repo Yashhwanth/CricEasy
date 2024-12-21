@@ -537,20 +537,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     //                         *******TOSS PAGE METHODS********
-    public void saveOrUpdateTossDetails(Context context, Long tossId, String teamCalling, String tossWinner, String tossDecision) {
+    public long saveOrUpdateTossDetails(long currentMatchId, Long tossId, String teamCalling, String tossWinner, String tossDecision) {
         SQLiteDatabase db = this.getWritableDatabase();
         Log.d("DatabaseHelper", "Toss received with ID: " + tossId);
-
-        // Retrieve the ongoing match ID from SharedPreferences
-        SharedPreferences prefs = context.getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
-        long matchId = prefs.getLong("match_id", -1); // Default to -1 if not found
-        Log.d("match_id check", "saveOrUpdateTossDetails: " + matchId);
-
-        if (matchId == -1) {
-            Log.e("DatabaseHelper", "Match ID not found in SharedPreferences.");
-            return; // Exit early if match ID is not available
-        }
-
         // Start a database transaction
         db.beginTransaction();
         try {
@@ -561,27 +550,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // Validate that both teams exist
             if (callingTeamId == -1 || winningTeamId == -1) {
                 Log.e("DatabaseHelper", "Invalid team ID(s): callingTeamId=" + callingTeamId + ", winningTeamId=" + winningTeamId);
-                return; // Exit early if validation fails
+                return -1; // Exit early if validation fails
             }
-
-            // Create ContentValues for the toss details
             ContentValues tossValues = new ContentValues();
             tossValues.put(COLUMN_TOSS_CALL_BY, callingTeamId);
             tossValues.put(COLUMN_TOSS_WON_BY, winningTeamId);
             tossValues.put(COLUMN_TOSS_WON_TEAM_CHOOSE_TO, tossDecision);
 
             // Check if tossId is valid for updating or needs insertion
-            if (tossId == null || tossId <= 0) { // Includes -1 check explicitly
+            if (tossId == -1) { // Includes -1 check explicitly
                 tossId = db.insert(TABLE_TOSS, null, tossValues);
                 if (tossId == -1) {
                     throw new Exception("Failed to insert toss details.");
                 } else {
                     Log.d("DatabaseHelper", "Toss details inserted successfully with ID: " + tossId);
-
-                    // Save tossId in SharedPreferences for future reference (used when updating toss)
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putLong("toss_id", tossId);
-                    editor.apply();
                 }
             } else {
                 // Otherwise, update the existing toss record
@@ -592,39 +574,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     Log.d("DatabaseHelper", "Toss details updated successfully with ID: " + tossId);
                 }
             }
-
-            // Update the toss ID in the MATCHES table for the current match
-            ContentValues matchValues = new ContentValues();
-            matchValues.put(COLUMN_TOSS, tossId);
-            int rowsUpdatedInMatch = db.update(TABLE_MATCHES, matchValues, "match_id = ?", new String[]{String.valueOf(matchId)});
-            if (rowsUpdatedInMatch <= 0) {
-                throw new Exception("Failed to update match details with toss ID.");
-            } else {
-                Log.d("DatabaseHelper", "Match updated with toss ID: " + tossId);
-            }
-
+            tossId = updateTossInMatch(currentMatchId, tossId);
             // Mark transaction as successful
             db.setTransactionSuccessful();
         } catch (Exception e) {
             Log.e("DatabaseHelper", "Transaction failed: " + e.getMessage());
         } finally {
-            // End the transaction
             db.endTransaction();
-        }
+        }return tossId;
     }
     private int getTeamIdFromName(SQLiteDatabase db, String teamName) {
-        Cursor cursor = null;
-        try {
-            cursor = db.query(
-                    "Teams",  // Table name
-                    new String[]{COLUMN_TEAM_ID},  // Columns to retrieve
-                    COLUMN_TEAM_NAME + " = ?",  // WHERE clause
-                    new String[]{teamName},  // Selection args
-                    null,  // GROUP BY
-                    null,  // HAVING
-                    null   // ORDER BY
-            );
-
+        try (Cursor cursor = db.query(
+                TABLE_TEAMS,  // Table name
+                new String[]{COLUMN_TEAM_ID},  // Columns to retrieve
+                COLUMN_TEAM_NAME + " = ?",  // WHERE clause
+                new String[]{teamName},  // Selection args
+                null,  // GROUP BY
+                null,  // HAVING
+                null   // ORDER BY
+        )) {
             if (cursor != null && cursor.moveToFirst()) {
                 int teamIdColumnIndex = cursor.getColumnIndex(COLUMN_TEAM_ID);
                 if (teamIdColumnIndex != -1) {
@@ -637,13 +605,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         } catch (Exception e) {
             Log.e("DatabaseHelper", "Error retrieving team ID for name: " + teamName + ", Error: " + e.getMessage());
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
         }
         return -1; // If no team found or error occurred, return -1
     }
+    public long updateTossInMatch(long currentMatchId, long tossId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        long updatedTossId = -1;
+
+        try {
+            ContentValues matchValues = new ContentValues();
+            matchValues.put(COLUMN_TOSS, tossId); // Update toss ID in the match
+            // Update the MATCHES table with the new toss ID
+            int rowsUpdatedInMatch = db.update(TABLE_MATCHES, matchValues, "match_id = ?", new String[]{String.valueOf(currentMatchId)});
+            if (rowsUpdatedInMatch > 0) {
+                Log.d("DatabaseHelper", "Match updated successfully with toss ID: " + tossId);
+                updatedTossId = tossId;
+            } else {
+                Log.e("DatabaseHelper", "Failed to update match with toss ID: " + tossId);
+            }
+        } catch (Exception e) {
+            Log.e("DatabaseHelper", "Error updating toss in match: " + e.getMessage());
+        }
+        return updatedTossId;
+    }
+
 
 
     //                                           ****S,Ns,Bow PAGE METHODS *****

@@ -64,7 +64,7 @@ public class MatchInfoActivity extends AppCompatActivity {
         final long matchId = sharedPreferences.getLong(MATCH_ID, -1L); // -1 is the default value if match_id is not found
 
 
-        Button backButton = findViewById(R.id.backButton);
+        Button backButton = findViewById(R.id.needHelpButton);
         Button nextButton = findViewById(R.id.nextButton);
         backButton.setOnClickListener(v -> {
             Intent intent = new Intent(MatchInfoActivity.this, MainActivity.class);

@@ -29,15 +29,15 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        databaseHelper = new DatabaseHelper(this);
         Log.d(TAG, "onCreate: Opened Main Activity" );
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate: Clearing all Shared Preferences");
+        databaseHelper = new DatabaseHelper(this);
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
+        //editor.clear();
         editor.apply();
         Log.d(TAG, "onCreate: Cleared all SharedPreferences");
 
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             long currentMatchId = handleNewMatch();
             saveMatchIdToPreferences(currentMatchId);
             Log.d(TAG, "onCreate: opening matchInfo activity");
-            Intent intent = new Intent(MainActivity.this, MatchInfoActivity.class);
+            Intent intent = new Intent(MainActivity.this, SelectingSrNsBowActivity.class);
             startActivity(intent);
         });
     }
@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
                 currentMatchId = createNewMatch();
             }
         }catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "handleNewMatch: error handling match");
             Toast.makeText(this, "Error handling match!", Toast.LENGTH_SHORT).show();
         }return currentMatchId;
     }

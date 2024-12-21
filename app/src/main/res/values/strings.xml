@@ -32,6 +32,18 @@
     <string name="teamNameTextView">Team Name</string>
     <string name="teamNameAutofillHint">Enter Team Name</string>
     <string name="okayButton">OK</string>
+    Toss Activity
+    <string name = "tossHeadingTextView">Toss</string>
+    <string name = "tossCallingTeamTextView">Toss Call By :</string>
+    <string name = "tossWinningTeamTextView">Toss Won By :</string>
+    <string name = "tossWonTeamChooseToTextView">Toss Won Team Choose To :</string>
+    <string name = "batRadioButton">Bat</string>
+    <string name = "bowlRadioButton">Bowl</string>
+    <string name = "tossAnimationTextView">Tap the Coin to Flip</string>
+    <string name = "tossCoinContentDescription">Toss Coin</string>
+    <string name = "needHelpButton">Need Help ?</string>
+    <string name = "letsPlayButton">Let\'s Play</string>
+
 
     <string name="Teams">Teams</string>
     <string name="matchtypeKey">Match Type : </string>

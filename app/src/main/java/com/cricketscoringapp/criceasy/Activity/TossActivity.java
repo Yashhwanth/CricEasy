@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.View;
+import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -15,6 +15,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
@@ -23,10 +24,12 @@ import com.cricketscoringapp.criceasy.R;
 import java.util.Random;
 
 public class TossActivity extends AppCompatActivity {
-    private RadioGroup teamCallingTossGroup, tossWinnerGroup, tossDecisionGroup;
-    private RadioButton teamACallingButton, teamBCallingButton;
-    private RadioButton teamAWinnerButton, teamBWinnerButton;
-    private RadioButton decisionBatButton, decisionBowlButton;
+    private final String SHARED_PREFERENCES = "match_prefs";
+    private final String TEAM_A_NAME = "teamAName";
+    private final String TEAM_B_NAME = "teamBName";
+    private final String TOSS_ID_KEY = "tossId";
+    private SharedPreferences sharedPreferences;
+    private RadioGroup tossCallingTeamRadioGroup, tossWinningTeamRadioGroup, tossWonTeamChooseToRadioGroup;
     private ImageView coinImage;
     private Random random;
     private boolean isFlipping = false;
@@ -34,47 +37,41 @@ public class TossActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_toss); // Make sure this layout file exists
         updateCurrentActivityInPreferences();
 
-        Button playButton = findViewById(R.id.btn_play);
-
+        Button playButton = findViewById(R.id.letsPlayButton);
+        Button needHelpButton = findViewById(R.id.needHelpButton);
         // Initialize RadioGroups
-        teamCallingTossGroup = findViewById(R.id.teamCallingTossGroup);
-        tossWinnerGroup = findViewById(R.id.tossWinnerGroup);
-        tossDecisionGroup = findViewById(R.id.tossDecisionGroup);
+        tossCallingTeamRadioGroup = findViewById(R.id.teamCallingTossRadioGroup);
+        tossWinningTeamRadioGroup = findViewById(R.id.tossWinnerGroup);
+        tossWonTeamChooseToRadioGroup = findViewById(R.id.tossDecisionGroup);
 
         // Initialize RadioButtons
-        teamACallingButton = findViewById(R.id.radioButton11);
-        teamBCallingButton = findViewById(R.id.radioButton12);
-        teamAWinnerButton = findViewById(R.id.radioButton2);
-        teamBWinnerButton = findViewById(R.id.radioButton3);
-        decisionBatButton = findViewById(R.id.radioButton4);
-        decisionBowlButton = findViewById(R.id.radioButton5);
+        RadioButton tossCallByTeamARadioButton = findViewById(R.id.tossCallTeamARadioButton);
+        RadioButton tossCallByTeamBRadioButton = findViewById(R.id.tossCallTeamBRadioButton);
+        RadioButton tossWinByTeamARadioButton = findViewById(R.id.tossWinTeamARadioButton);
+        RadioButton tossWinBYTeamBRadioButton = findViewById(R.id.tossWinTeamBRadioButton);
 
-        // Retrieve team names from SharedPreferences
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
-        String teamAName = sharedPreferences.getString("A", "Team A");
-        String teamBName = sharedPreferences.getString("B", "Team B");
-
-
-
-        // Set text for RadioButtons dynamically
-        teamACallingButton.setText(teamAName);
-        teamBCallingButton.setText(teamBName);
-        teamAWinnerButton.setText(teamAName);
-        teamBWinnerButton.setText(teamBName);
 
         coinImage = findViewById(R.id.img_coin);
         random = new Random();
 
+        // Retrieve team names from SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        String TEAM_DEFAULT_NAME = "";
+        String teamAName = sharedPreferences.getString(TEAM_A_NAME, TEAM_DEFAULT_NAME);
+        String teamBName = sharedPreferences.getString(TEAM_B_NAME, TEAM_DEFAULT_NAME);
 
-        playButton.setOnClickListener(view ->{
-            letsplay();
-        });
+        // Set text for RadioButtons dynamically
+        tossCallByTeamARadioButton.setText(teamAName);
+        tossCallByTeamBRadioButton.setText(teamBName);
+        tossWinByTeamARadioButton.setText(teamAName);
+        tossWinBYTeamBRadioButton.setText(teamBName);
 
-
-        // Set the click listener to trigger the coin flip
+        playButton.setOnClickListener(view -> letsPlay());
+        needHelpButton.setOnClickListener(view -> back());
         coinImage.setOnClickListener(view -> {
             if (!isFlipping) {
                 flipCoin();
@@ -85,131 +82,123 @@ public class TossActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        // Update current activity in SharedPreferences
         updateCurrentActivityInPreferences();
     }
-    public void letsplay() {
+    public void letsPlay() {
+        // Retrieve the toss ID from SharedPreferences
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
+        String CURRENT_MATCH_ID = "currentMatchId";
+        long currentMatchId = sharedPreferences.getLong(CURRENT_MATCH_ID, -1L);
+        long tossId = sharedPreferences.getLong(TOSS_ID_KEY, -1); // Default to -1 if no toss_id is found
 
         // Get selected RadioButton IDs
-        int selectedTeamCallingId = teamCallingTossGroup.getCheckedRadioButtonId();
-        int selectedTossWinnerId = tossWinnerGroup.getCheckedRadioButtonId();
-        int selectedDecisionId = tossDecisionGroup.getCheckedRadioButtonId();
+        int tossCallingTeamRadioButtonId = tossCallingTeamRadioGroup.getCheckedRadioButtonId();
+        int tossWinningTeamRadioButtonId = tossWinningTeamRadioGroup.getCheckedRadioButtonId();
+        int tossWonTeamChooseToRadioButton = tossWonTeamChooseToRadioGroup.getCheckedRadioButtonId();
 
         // Validate that all options are selected
-        if (selectedTeamCallingId == -1 || selectedTossWinnerId == -1 || selectedDecisionId == -1) {
+        if (tossCallingTeamRadioButtonId == -1 || tossWinningTeamRadioButtonId == -1 || tossWonTeamChooseToRadioButton == -1) {
             Toast.makeText(this, "Please make all selections before proceeding.", Toast.LENGTH_SHORT).show();
             return;
         }
 
         // Get the selected RadioButtons
-        RadioButton selectedTeamCalling = findViewById(selectedTeamCallingId);
-        RadioButton selectedTossWinner = findViewById(selectedTossWinnerId);
-        RadioButton selectedDecision = findViewById(selectedDecisionId);
+        RadioButton selectedTeamCalling = findViewById(tossCallingTeamRadioButtonId);
+        RadioButton selectedTossWinner = findViewById(tossWinningTeamRadioButtonId);
+        RadioButton selectedDecision = findViewById(tossWonTeamChooseToRadioButton);
 
         // Retrieve selected values based on button text
         String teamCalling = selectedTeamCalling.getText().toString();
         String tossWinner = selectedTossWinner.getText().toString();
         String tossDecision = selectedDecision.getText().toString();
 
+        // Perform database operations in a focused try-catch block
+        try (DatabaseHelper databaseHelper = new DatabaseHelper(this)) {
+            // Call the saveOrUpdateTossDetails method
+            tossId = databaseHelper.saveOrUpdateTossDetails(currentMatchId, tossId, teamCalling, tossWinner, tossDecision);
+            updateTossIdInSharedPreferences(tossId);
 
-        // Retrieve the toss ID from SharedPreferences
-        SharedPreferences prefs = getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
-        long tossId = prefs.getLong("toss_id", -1); // Default to -1 if no toss_id is found
+            // Determine the batting team based on the toss details
+            int battingTeam = determineBattingTeam(tossWinner, tossDecision);
+            updateBattingAndBowlingTeamsInSharedPreferences(battingTeam);
+        } catch (Exception e) {
+            Log.e("letsPlay", "Error occurred during database operations: " + e.getMessage());
+            Toast.makeText(this, "An error occurred. Please try again.", Toast.LENGTH_SHORT).show();
+            return; // Exit the method if there's an error
+        }
 
-        // Create an instance of the DatabaseHelper
-        DatabaseHelper databaseHelper = new DatabaseHelper(this);
-
-        // Call the saveOrUpdateTossDetails method
-        databaseHelper.saveOrUpdateTossDetails(this, tossId, teamCalling, tossWinner, tossDecision);
-
-
-
-        // Now determine the batting team based on the toss details
-        int battingTeam = determineBattingTeam(tossWinner, tossDecision);
-
-        // Retrieve team IDs from SharedPreferences
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
-        long teamAId = sharedPreferences.getLong("teamA_id", -1);
-        long teamBId = sharedPreferences.getLong("teamB_id", -1);
-
-        // Update team1_id and team2_id based on the determined batting team
-        long battingTeamId = (battingTeam == 1) ? teamAId : teamBId;
-        long bowlingTeamId = (battingTeam == 1) ? teamBId : teamAId;
-
-        // Save the batting and bowling team IDs (update team1_id and team2_id accordingly)
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putLong("teamA_id", battingTeamId); // Batting team is always team1
-        editor.putLong("teamB_id", bowlingTeamId); // Bowling team is always team2
-        editor.apply();
-
-
-        // Navigate back to MatchInfoActivity
+        // Navigate to the next activity
         Intent intent = new Intent(this, SelectingSrNsBowActivity.class);
         startActivity(intent);
-        //finish(); // Close the current activity
     }
 
-    public void back(View view) {
-        // Navigate back to MatchInfoActivity
-//        Intent intent = new Intent(this, TeamCreationActivity.class);
-//        startActivity(intent);
-        //finish(); // Close the current activity
+    public void back() {
+        Intent intent = new Intent(this, TeamCreationActivity.class);
+        startActivity(intent);
     }
-
-
     private void flipCoin() {
         isFlipping = true;
-
         // Start the coin flip animation
         Animation flipAnimation = AnimationUtils.loadAnimation(this, R.anim.coin_flip_anim);
         coinImage.startAnimation(flipAnimation);
-
         // Delay to simulate the flipping time
         Handler handler = new Handler();
         handler.postDelayed(() -> {
             // Randomly determine the result (Heads or Tails)
             boolean isHeads = random.nextBoolean();
-
             // Update the ImageView based on the result
             if (isHeads) {
                 coinImage.setImageResource(R.drawable.heads);
             } else {
                 coinImage.setImageResource(R.drawable.tails);
             }
-
             isFlipping = false; // Reset flipping state
         }, 800); // Animation duration in milliseconds
     }
     // Method to update SharedPreferences with the current activity
     private void updateCurrentActivityInPreferences() {
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("current_activity", getClass().getSimpleName()); // Store the current activity name
-        editor.apply(); // Save changes asynchronously
+        String CURRENT_ACTIVITY = "currentActivity";
+        editor.putString(CURRENT_ACTIVITY, getClass().getSimpleName());
+        editor.apply();
     }
-
     private int determineBattingTeam(String tossWinner, String tossDecision) {
         // Retrieve team names from SharedPreferences
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
-        String teamAName = sharedPreferences.getString("A", null);
-        String teamBName = sharedPreferences.getString("B", null);
-
-        // Determine the batting team based on the toss winner and decision
-        if (tossWinner.equals(teamAName)) {
-            if (tossDecision.equals("Bat")) {
-                return 1; // Team A is the batting team
-            } else {
-                return 2; // Team B is the batting team
-            }
-        } else if (tossWinner.equals(teamBName)) {
-            if (tossDecision.equals("Bat")) {
-                return 2; // Team B is the batting team
-            } else {
-                return 1; // Team A is the batting team
-            }
+        String teamAName = sharedPreferences.getString(TEAM_A_NAME, null);
+        String teamBName = sharedPreferences.getString(TEAM_B_NAME, null);
+        // Handle null values for team names
+        if (teamAName == null || teamBName == null) {
+            Log.e("determineBattingTeam", "One or both team names are null.");
+            return -1;
         }
-        return -1; // In case of an error or invalid data
+        // Determine the batting team based on the toss winner and decision
+        if (tossWinner.equals(teamAName) || tossWinner.equals(teamBName)) {
+            boolean isTeamBatting = tossDecision.equals("Bat");
+            return tossWinner.equals(teamAName) ? (isTeamBatting ? 1 : 2) : (isTeamBatting ? 2 : 1);
+        }
+        Log.e("determineBattingTeam", "Toss winner does not match any team.");
+        return -1; // Invalid toss winner
+    }
+    public void updateBattingAndBowlingTeamsInSharedPreferences(int battingTeam) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        // Determine the batting and bowling teams based on toss decision
+        String TEAM_A_ID = "teamAId";
+        long teamAId = sharedPreferences.getLong(TEAM_A_ID, -1);
+        String TEAM_B_ID = "teamBId";
+        long teamBId = sharedPreferences.getLong(TEAM_B_ID, -1);
+        long battingTeamId = (battingTeam == 1) ? teamAId : teamBId;
+        long bowlingTeamId = (battingTeam == 1) ? teamBId : teamAId;
+        String BATTING_TEAM_ID = "battingTeamId";
+        editor.putLong(BATTING_TEAM_ID, battingTeamId); // Batting team is always team1
+        String BOWLING_TEAM_ID = "bowlingTeamId";
+        editor.putLong(BOWLING_TEAM_ID, bowlingTeamId); // Bowling team is always team2
+        editor.apply();
+    }
+    private void updateTossIdInSharedPreferences(long tossId){
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putLong(TOSS_ID_KEY, tossId);
+        editor.apply();
     }
 
 }
