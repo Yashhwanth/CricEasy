@@ -2,7 +2,6 @@ package com.cricketscoringapp.criceasy;
 
 import static android.content.ContentValues.TAG;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -24,17 +23,16 @@ import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
 public class MainActivity extends AppCompatActivity {
     private DatabaseHelper databaseHelper;
     private static final String SHARED_PREFERENCES = "match_prefs"; // SharedPreferences name
-    private static final String KEY_MATCH_ID = "match_id";  // Key to store match ID
-    private static final String KEY_CURRENT_ACTIVITY = "current_activity"; // Key for current activity
+    private static final String MATCH_ID = "currentMatchId";  // Key to store match ID
+    private static final String CURRENT_ACTIVITY = "currentActivity"; // Key for current activity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        databaseHelper = new DatabaseHelper(this);
         Log.d(TAG, "onCreate: Opened Main Activity" );
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        // Initialize database helper
-        databaseHelper = new DatabaseHelper(this);
         Log.d(TAG, "onCreate: Clearing all Shared Preferences");
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -59,10 +57,8 @@ public class MainActivity extends AppCompatActivity {
         newMatchButton.setOnClickListener(view ->{
             Log.d(TAG, "onCreate: new match button clicked");
             long currentMatchId = handleNewMatch();
-            // Save the match ID to SharedPreferences after creating or resuming a match
             saveMatchIdToPreferences(currentMatchId);
-            // Proceed to the MatchInfoActivity
-            Log.d(TAG, "onCreate: opening matchinfo activity");
+            Log.d(TAG, "onCreate: opening matchInfo activity");
             Intent intent = new Intent(MainActivity.this, MatchInfoActivity.class);
             startActivity(intent);
         });
@@ -107,23 +103,23 @@ public class MainActivity extends AppCompatActivity {
     }
     private void saveMatchIdToPreferences(long currentMatchId) {
         Log.d(TAG, "saveMatchIdToPreferences: saving match id in sp");
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putLong("currentMatchId", currentMatchId);
+        editor.putLong(MATCH_ID, currentMatchId);
         editor.apply();
         Log.d(TAG, "saveMatchIdToPreferences: saved match id in sp with id" + currentMatchId);
     }
     private void updateCurrentActivityInPreferences() {
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("currentActivity", getClass().getSimpleName());
+        editor.putString(CURRENT_ACTIVITY, getClass().getSimpleName());
         editor.apply(); 
         Log.d(TAG, "inside updateCurrentActivityInPreferences method: updated current activity in sp");
     }
     private boolean navigateToLastActivityIfOngoingMatch() {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
-        String lastActivity = sharedPreferences.getString(KEY_CURRENT_ACTIVITY, null);
-        long matchId = sharedPreferences.getLong(KEY_MATCH_ID, -1);
+        String lastActivity = sharedPreferences.getString(CURRENT_ACTIVITY, null);
+        long matchId = sharedPreferences.getLong(MATCH_ID, -1);
 
         // Check if there's an ongoing match and a last activity
         if (lastActivity != null && matchId != -1) {
