@@ -16,7 +16,7 @@ import static android.content.ContentValues.TAG;
 import androidx.annotation.Nullable;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 12; // Update version
+    private static final int DATABASE_VERSION = 13; // Update version
     private static final String DATABASE_NAME = "CricketDB";
     private final Context context;
     private SharedPreferences sharedPreferences;
@@ -365,27 +365,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_BATSMAN_TABLE);
         db.execSQL(CREATE_BOWLER_TABLE);
         db.execSQL(CREATE_TEAM_STATISTICS_TABLE);
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS Matches");
-        db.execSQL("DROP TABLE IF EXISTS Teams");
-        db.execSQL("DROP TABLE IF EXISTS Places");
-        db.execSQL("DROP TABLE IF EXISTS Toss");
-        db.execSQL("DROP TABLE IF EXISTS Matches_Teams");
-        db.execSQL("DROP TABLE IF EXISTS Players_Teams");
-        db.execSQL("DROP TABLE IF EXISTS Players");
-        db.execSQL("DROP TABLE IF EXISTS Partnerships");
-        db.execSQL("DROP TABLE IF EXISTS Innings");
-        db.execSQL("DROP TABLE IF EXISTS Overs");
-        db.execSQL("DROP TABLE IF EXISTS Balls");
-        db.execSQL("DROP TABLE IF EXISTS Wickets");
-        db.execSQL("DROP TABLE IF EXISTS Extras");
-        db.execSQL("DROP TABLE IF EXISTS Batsmans");
-        db.execSQL("DROP TABLE IF EXISTS Bowlers");
-        db.execSQL("DROP TABLE IF EXISTS TeamStatistics");
-        onCreate(db);
+        db.execSQL("DELETE FROM Matches");
+//        db.execSQL("DROP TABLE IF EXISTS Matches");
+//        db.execSQL("DROP TABLE IF EXISTS Teams");
+//        db.execSQL("DROP TABLE IF EXISTS Places");
+//        db.execSQL("DROP TABLE IF EXISTS Toss");
+//        db.execSQL("DROP TABLE IF EXISTS Matches_Teams");
+//        db.execSQL("DROP TABLE IF EXISTS Players_Teams");
+//        db.execSQL("DROP TABLE IF EXISTS Players");
+//        db.execSQL("DROP TABLE IF EXISTS Partnerships");
+//        db.execSQL("DROP TABLE IF EXISTS Innings");
+//        db.execSQL("DROP TABLE IF EXISTS Overs");
+//        db.execSQL("DROP TABLE IF EXISTS Balls");
+//        db.execSQL("DROP TABLE IF EXISTS Wickets");
+//        db.execSQL("DROP TABLE IF EXISTS Extras");
+//        db.execSQL("DROP TABLE IF EXISTS Batsmans");
+//        db.execSQL("DROP TABLE IF EXISTS Bowlers");
+//        db.execSQL("DROP TABLE IF EXISTS TeamStatistics");
+//        onCreate(db);
     }
 
 
@@ -419,41 +421,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                          int isCompleted) {
 
         SQLiteDatabase db = this.getWritableDatabase();
+        long placeId = getOrInsertPlaceId(place);
         ContentValues values = new ContentValues();
-
-        // Insert match_id (this is always passed)
-        values.put("match_id", matchId);
-
-        if (matchType != null && !matchType.isEmpty()) {
-            values.put("match_type", matchType);
-        }
-        if (overs != null && !overs.isEmpty()) {
-            values.put("overs", overs);
-        }
-        if (ballType != null && !ballType.isEmpty()) {
-            values.put("ball_type", ballType);
-        }
-        if (place != null && !place.isEmpty()) {
-            // Get or insert the place and retrieve the placeId
-            long placeId = getOrInsertPlaceId(place);
-            values.put("location", placeId); // Insert the placeId into Matches table
-        }
-        if (time != null && !time.isEmpty()) {
-            values.put("date_time", time);
-        }
-
-        // Insert the "is_completed" value, using the default value (0) if not provided
-        values.put("is_match_completed", isCompleted);
-
+        values.put(COLUMN_MATCH_ID, matchId);
+        values.put(COLUMN_MATCH_TYPE, matchType);
+        values.put(COLUMN_OVERS, overs);
+        values.put(COLUMN_BALL_TYPE, ballType);
+        values.put(COLUMN_LOCATION, placeId);
+        values.put(COLUMN_DATE_TIME, time);
+        values.put(COLUMN_IS_MATCH_COMPLETED, isCompleted);
         // Check if the row exists
-        int rowsUpdated = db.update("Matches", values, "match_id=?", new String[]{String.valueOf(matchId)});
+        int rowsUpdated = db.update(TABLE_MATCHES, values, "match_id=?", new String[]{String.valueOf(matchId)});
 
-        // If no rows were updated, insert a new row
-        if (rowsUpdated == 0) {
-            values.put("match_id", matchId);
-            long result = db.insert("Matches", null, values);
-            return result != -1;
-        }
+//        // If no rows were updated, insert a new row
+//        if (rowsUpdated == 0) {
+//            values.put("match_id", matchId);
+//            long result = db.insert("Matches", null, values);
+//            return result != -1;
+//        }
         return true;
     }
 
