@@ -370,30 +370,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DELETE FROM Matches");
-//        db.execSQL("DROP TABLE IF EXISTS Matches");
-//        db.execSQL("DROP TABLE IF EXISTS Teams");
-//        db.execSQL("DROP TABLE IF EXISTS Places");
-//        db.execSQL("DROP TABLE IF EXISTS Toss");
-//        db.execSQL("DROP TABLE IF EXISTS Matches_Teams");
-//        db.execSQL("DROP TABLE IF EXISTS Players_Teams");
-//        db.execSQL("DROP TABLE IF EXISTS Players");
-//        db.execSQL("DROP TABLE IF EXISTS Partnerships");
-//        db.execSQL("DROP TABLE IF EXISTS Innings");
-//        db.execSQL("DROP TABLE IF EXISTS Overs");
-//        db.execSQL("DROP TABLE IF EXISTS Balls");
-//        db.execSQL("DROP TABLE IF EXISTS Wickets");
-//        db.execSQL("DROP TABLE IF EXISTS Extras");
-//        db.execSQL("DROP TABLE IF EXISTS Batsmans");
-//        db.execSQL("DROP TABLE IF EXISTS Bowlers");
-//        db.execSQL("DROP TABLE IF EXISTS TeamStatistics");
-//        onCreate(db);
+        db.execSQL("DROP TABLE IF EXISTS Matches");
+        db.execSQL("DROP TABLE IF EXISTS Teams");
+        db.execSQL("DROP TABLE IF EXISTS Places");
+        db.execSQL("DROP TABLE IF EXISTS Toss");
+        db.execSQL("DROP TABLE IF EXISTS Matches_Teams");
+        db.execSQL("DROP TABLE IF EXISTS Players_Teams");
+        db.execSQL("DROP TABLE IF EXISTS Players");
+        db.execSQL("DROP TABLE IF EXISTS Partnerships");
+        db.execSQL("DROP TABLE IF EXISTS Innings");
+        db.execSQL("DROP TABLE IF EXISTS Overs");
+        db.execSQL("DROP TABLE IF EXISTS Balls");
+        db.execSQL("DROP TABLE IF EXISTS Wickets");
+        db.execSQL("DROP TABLE IF EXISTS Extras");
+        db.execSQL("DROP TABLE IF EXISTS Batsmans");
+        db.execSQL("DROP TABLE IF EXISTS Bowlers");
+        db.execSQL("DROP TABLE IF EXISTS TeamStatistics");
+        onCreate(db);
     }
 
 
 
 
-// ---------------------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------Main Activity------------------------------------------------------
     // Check if there is an ongoing match
     public Cursor getOngoingMatch() {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -416,6 +415,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return COLUMN_MATCH_ID;
     }
 
+// -----------------------------------------------MatchInfo Activity------------------------------------------------------
     public boolean insertMatchBasicInfo1(long matchId, String matchType,
                                          String overs, String ballType, String place, String time,
                                          int isCompleted) {
@@ -431,51 +431,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_DATE_TIME, time);
         values.put(COLUMN_IS_MATCH_COMPLETED, isCompleted);
         // Check if the row exists
-        int rowsUpdated = db.update(TABLE_MATCHES, values, "match_id=?", new String[]{String.valueOf(matchId)});
-
-//        // If no rows were updated, insert a new row
-//        if (rowsUpdated == 0) {
-//            values.put("match_id", matchId);
-//            long result = db.insert("Matches", null, values);
-//            return result != -1;
-//        }
-        return true;
+        int rowsUpdated = db.update(TABLE_MATCHES, values, COLUMN_MATCH_ID + "=?", new String[]{String.valueOf(matchId)});
+        return rowsUpdated != 0;
     }
 
 
     public long getOrInsertPlaceId(String place) {
         SQLiteDatabase db = this.getWritableDatabase();
-
-        // Query to check if the place already exists in the Places table
         Cursor cursor = db.query(TABLE_PLACES, new String[]{COLUMN_PLACE_ID}, COLUMN_PLACE_NAME + " = ?", new String[]{place}, null, null, null);
-
-        // If the cursor is not null and it contains data
         if (cursor != null) {
-            // Get the column index
             int placeIdColumnIndex = cursor.getColumnIndex(COLUMN_PLACE_ID);
-
-            // If the column index is valid (greater than or equal to 0)
             if (placeIdColumnIndex >= 0 && cursor.moveToFirst()) {
                 long placeId = cursor.getLong(placeIdColumnIndex);
                 cursor.close();  // Don't forget to close the cursor
                 return placeId;
             }
-            cursor.close();  // Close the cursor if no valid data was found
+            cursor.close();
         }
-
         // If the place is not found, insert a new place and return the new place_id
         ContentValues values = new ContentValues();
         values.put(COLUMN_PLACE_NAME, place);
-
         // Insert the new place and get the place_id
-        long placeId = db.insert(TABLE_PLACES, null, values);
-
         // Return the place_id (newly inserted)
-        return placeId;
+        return db.insert(TABLE_PLACES, null, values);
     }
 
 
-    //                           ***TEAM CREATION PAGE ****
+    //----------------------------------***TEAM CREATION PAGE ****---------------------------------
     public void addTeamNames(long match_id, String teamAName, String teamBName) {
         Log.d(TAG, "addTeamNames: " + match_id);
         SQLiteDatabase db = this.getWritableDatabase();
