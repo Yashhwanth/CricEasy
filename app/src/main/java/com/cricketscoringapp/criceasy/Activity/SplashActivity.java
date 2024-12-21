@@ -1,10 +1,12 @@
 // SplashActivity.java
-package com.cricketscoringapp.criceasy;
+package com.cricketscoringapp.criceasy.Activity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.cricketscoringapp.criceasy.R;
 
 public class SplashActivity extends AppCompatActivity {
     @Override

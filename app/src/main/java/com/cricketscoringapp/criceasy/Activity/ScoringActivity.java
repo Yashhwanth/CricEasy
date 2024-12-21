@@ -1,4 +1,4 @@
-package com.cricketscoringapp.criceasy;
+package com.cricketscoringapp.criceasy.Activity;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.cricketscoringapp.criceasy.R;
 
 public class ScoringActivity extends AppCompatActivity {
     @Override

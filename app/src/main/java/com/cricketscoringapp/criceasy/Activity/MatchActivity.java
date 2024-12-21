@@ -1,4 +1,4 @@
-package com.cricketscoringapp.criceasy;
+package com.cricketscoringapp.criceasy.Activity;
 
 import static android.content.ContentValues.TAG;
 
@@ -28,6 +28,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
+import com.cricketscoringapp.criceasy.R;
+import com.cricketscoringapp.criceasy.fragment.InfoFragment;
+import com.cricketscoringapp.criceasy.fragment.TeamsFragment;
+import com.cricketscoringapp.criceasy.fragment.liveFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 

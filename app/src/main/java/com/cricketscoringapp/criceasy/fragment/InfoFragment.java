@@ -1,4 +1,4 @@
-package com.cricketscoringapp.criceasy;
+package com.cricketscoringapp.criceasy.fragment;
 
 
 import android.content.Context;
@@ -8,13 +8,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
+import com.cricketscoringapp.criceasy.R;
 
 import java.util.Map;
 

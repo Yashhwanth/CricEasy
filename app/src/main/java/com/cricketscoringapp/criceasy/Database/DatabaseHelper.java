@@ -8,18 +8,16 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
+import android.util.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
 import static android.content.ContentValues.TAG;
 
-import androidx.annotation.Nullable;
-
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 13; // Update version
     private static final String DATABASE_NAME = "CricketDB";
     private final Context context;
-    private SharedPreferences sharedPreferences;
 
 
     // Table schema
@@ -432,6 +430,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_IS_MATCH_COMPLETED, isCompleted);
         // Check if the row exists
         int rowsUpdated = db.update(TABLE_MATCHES, values, COLUMN_MATCH_ID + "=?", new String[]{String.valueOf(matchId)});
+        db.close();
         return rowsUpdated != 0;
     }
 
@@ -458,38 +457,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     //----------------------------------***TEAM CREATION PAGE ****---------------------------------
-    public void addTeamNames(long match_id, String teamAName, String teamBName) {
-        Log.d(TAG, "addTeamNames: " + match_id);
+    public Pair<Long, Long> addTeamNames(long matchId, String teamAName, String teamBName) {
+        Log.d(TAG, "addTeamNames: " + matchId);
         SQLiteDatabase db = this.getWritableDatabase();
+        long teamAId = -1;
+        long teamBId = -1;
         db.beginTransaction(); // Start a transaction for atomicity
         try {
             // Check if Team A exists, insert if not, and get its ID
-            long team1Id = getOrInsertTeam(db, teamAName);
-
+            teamAId = getOrInsertTeam(db, teamAName);
             // Check if Team B exists, insert if not, and get its ID
-            long team2Id = getOrInsertTeam(db, teamBName);
+            teamBId = getOrInsertTeam(db, teamBName);
 
             // Ensure Matches_Teams table is clean for the given match_id
-            resetMatchTeams(db, match_id);
-
+            resetMatchTeams(db, matchId);
             // Insert into Matches_Teams table
-            insertMatchTeamPair(db, match_id, team1Id, team2Id);
-            //insertMatchTeamPair(db, match_id, teamBId, "B");
-
-            SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putLong("teamA_id", team1Id);
-            editor.putLong("teamB_id", team2Id);
-            editor.apply(); // Save team IDs for use in TossActivity
-
+            insertMatchTeamPair(db, matchId, teamAId, teamBId);
 
             db.setTransactionSuccessful(); // Mark transaction as successful
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "Error in addTeamNames: ", e); // Log the exception with the TAG
         } finally {
             db.endTransaction(); // End the transaction
             db.close(); // Close the database
         }
+        return new Pair<>(teamAId, teamBId);
     }
 
     // Helper method to check if a team exists or insert it and return the team ID

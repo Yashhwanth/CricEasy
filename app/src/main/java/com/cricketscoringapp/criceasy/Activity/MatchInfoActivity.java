@@ -1,4 +1,4 @@
-package com.cricketscoringapp.criceasy;
+package com.cricketscoringapp.criceasy.Activity;
 
 import static android.content.ContentValues.TAG;
 
@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
 
 import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
+import com.cricketscoringapp.criceasy.R;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;

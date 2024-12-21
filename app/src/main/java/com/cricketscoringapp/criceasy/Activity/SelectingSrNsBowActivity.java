@@ -1,6 +1,4 @@
-package com.cricketscoringapp.criceasy;
-
-import static android.content.ContentValues.TAG;
+package com.cricketscoringapp.criceasy.Activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +13,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
+import com.cricketscoringapp.criceasy.R;
 
 public class SelectingSrNsBowActivity extends AppCompatActivity {
     private DatabaseHelper databaseHelper;

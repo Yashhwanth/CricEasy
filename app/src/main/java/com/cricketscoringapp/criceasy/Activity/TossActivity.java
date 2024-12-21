@@ -1,4 +1,4 @@
-package com.cricketscoringapp.criceasy;
+package com.cricketscoringapp.criceasy.Activity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -18,6 +18,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
+import com.cricketscoringapp.criceasy.R;
 
 import java.util.Random;
 

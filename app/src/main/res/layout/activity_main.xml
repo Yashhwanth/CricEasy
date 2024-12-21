@@ -8,7 +8,7 @@
     android:background="@drawable/back"
     android:padding="16dp"
     android:scaleType="centerCrop"
-    tools:context=".MainActivity">
+    tools:context=".Activity.MainActivity">
 
     <Button
         android:id="@+id/newMatchButton"

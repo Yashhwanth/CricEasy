@@ -20,10 +20,19 @@
     <string name="dateEditText">Select Date &amp; Time</string>
     <string name="backButton">Back</string>
     <string name="nextButton">Next</string>
-
-    <string name="select_team_a">Select Team A</string>
-    <string name="select_team_b">Select Team B</string>
+    Team Creation Activity
+    <string name="team1Image">Team 1 Image</string>
+    <string name="team2Image">Team 2 Image</string>
+    <string name="team1ContentDescription">Click to select Team 1</string>
+    <string name="team2ContentDescription">Click to select Team 2</string>
+    <string name="selectTeamAButton">Select Team A</string>
+    <string name="selectTeamBButton">Select Team B</string>
     <string name="versus">VS</string>
+    Team Selection Activity
+    <string name="teamNameTextView">Team Name</string>
+    <string name="teamNameAutofillHint">Enter Team Name</string>
+    <string name="okayButton">OK</string>
+
     <string name="Teams">Teams</string>
     <string name="matchtypeKey">Match Type : </string>
     <string name="oversKey">Overs : </string>

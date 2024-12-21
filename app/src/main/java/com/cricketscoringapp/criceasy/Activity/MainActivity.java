@@ -1,4 +1,4 @@
-package com.cricketscoringapp.criceasy;
+package com.cricketscoringapp.criceasy.Activity;
 
 import static android.content.ContentValues.TAG;
 
@@ -19,6 +19,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 
 import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
+import com.cricketscoringapp.criceasy.R;
 
 public class MainActivity extends AppCompatActivity {
     private DatabaseHelper databaseHelper;

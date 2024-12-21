@@ -1,4 +1,4 @@
-package com.cricketscoringapp.criceasy;
+package com.cricketscoringapp.criceasy.Activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,13 +9,13 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
+import com.cricketscoringapp.criceasy.R;
 
 public class TeamSelectionActivity extends AppCompatActivity {
-    private long matchId;
     private EditText teamAEditText;
-    private DatabaseHelper databaseHelper;
     private String teamType; // To differentiate between Team A and Team B
+
+
     private SharedPreferences sharedPreferences;
 
     @Override
@@ -23,32 +23,23 @@ public class TeamSelectionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_team_selection); // Make sure this layout file exists4
 
-        // Initialize SharedPreferences
-        sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        String SHARED_PREFERENCES = "match_prefs";
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        String TEAM_TYPE_KEY = "teamType";
+        teamType = sharedPreferences.getString(TEAM_TYPE_KEY, "");
 
-        // Initialize DatabaseHelper
-        databaseHelper = new DatabaseHelper(this); // Highlighted line added
-
-        // Retrieve team type from SharedPreferences
-        teamType = sharedPreferences.getString("TEAM_TYPE", "");
-
-        //UI Components
-        Button SubmitButton = findViewById(R.id.button);
-        teamAEditText = findViewById(R.id.editTextText);
-
-
-        //UI Onclicks
+        Button SubmitButton = findViewById(R.id.okButton);
+        teamAEditText = findViewById(R.id.teamNameEditText);
         SubmitButton.setOnClickListener(v -> {
-            saveTeamName();
-            goback();
+            saveTeamNameInSharedPreferences();
+            goToTeamsCreationPage();
         });
     }
 
-    public void goback() {
-        // Navigate back to MatchInfoActivity
+    public void goToTeamsCreationPage() {
         Intent intent = new Intent(this, TeamCreationActivity.class);
         startActivity(intent);
-        finish(); // Close the current activity
+        finish();
     }
 
     // Method to show a Toast message
@@ -56,23 +47,21 @@ public class TeamSelectionActivity extends AppCompatActivity {
         Toast.makeText(TeamSelectionActivity.this, message, Toast.LENGTH_SHORT).show();
     }
 
-    private void saveTeamName() {
+    private void saveTeamNameInSharedPreferences() {
         String teamName = teamAEditText.getText().toString().trim();
-
         if (teamName.isEmpty()) {
             showToast("Please enter a team name.");
             return;
         }
-
-        // Save team name based on teamType
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        if ("A".equals(teamType)) {
-            editor.putString("A", teamName);
-        } else if ("B".equals(teamType)) {
-            editor.putString("B", teamName);
+        String TEAM_B = "teamBName";
+        String TEAM_A = "teamAName";
+        if (TEAM_A.equals(teamType)) {
+            editor.putString(TEAM_A, teamName);
+        } else if (TEAM_B.equals(teamType)) {
+            editor.putString(TEAM_B, teamName);
         }
         editor.apply();
-
         showToast("Team name saved successfully!");
     }
 }

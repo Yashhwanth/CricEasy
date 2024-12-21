@@ -1,10 +1,12 @@
-package com.cricketscoringapp.criceasy;
+package com.cricketscoringapp.criceasy.Activity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.cricketscoringapp.criceasy.R;
 
 public class TypeofWicketActivity extends AppCompatActivity {
     @Override

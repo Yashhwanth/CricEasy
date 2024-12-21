@@ -2,13 +2,14 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/teamCreationLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
 
     <!-- Select Team A Button -->
     <LinearLayout
-        android:id="@+id/linearLayoutA"
+        android:id="@+id/team1ButtonLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -20,19 +21,19 @@
         tools:layout_editor_absoluteX="16dp">
 
         <ImageView
-            android:id="@+id/imgAddTeamA"
+            android:id="@+id/team1PlusImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:contentDescription="@string/select_team_a"
+            android:contentDescription="@string/team1Image"
             android:src="@drawable/ic_add_circle" />
 
         <Button
-            android:id="@+id/btnSelectTeamA"
+            android:id="@+id/team1Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/select_team_a" />
+            android:text="@string/selectTeamAButton" />
     </LinearLayout>
 
     <!-- VS Separator -->
@@ -40,83 +41,7 @@
     <!-- Select Team B Button -->
 
     <TextView
-        android:id="@+id/txtVs"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp"
-        android:text="@string/versus"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="@+id/bottomButtons"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/linearLayoutA"
-        app:layout_constraintVertical_bias="0.25" />
-
-    <LinearLayout
-        android:id="@+id/linearLayoutB"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="@+id/bottomButtons"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.63">
-
-        <ImageView
-            android:id="@+id/imgAddTeamB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:contentDescription="@string/select_team_b"
-            android:src="@drawable/ic_add_circle" />
-
-        <Button
-            android:id="@+id/btnSelectTeamB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/select_team_b" />
-    </LinearLayout>
-
-    <!-- Back and Next Buttons at the Bottom -->
-    <LinearLayout
-        android:id="@+id/bottomButtons"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:divider="@android:drawable/divider_horizontal_bright"
-        android:showDividers="middle"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-
-        app:layout_constraintStart_toStartOf="parent"
-
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintVertical_bias="0.995">
-
-        <Button
-            android:id="@+id/btnBack"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/square_button"
-            android:text="@string/backButton"
-            android:onClick="goBack"/>
-
-        <Button
-            android:id="@+id/btnNext"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/square_button"
-            android:text="@string/nextButton"
-            android:onClick="goToNext"/>
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/textView22"
+        android:id="@+id/team1TextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#673AB7"
@@ -128,14 +53,90 @@
         app:layout_constraintVertical_bias="0.367" />
 
     <TextView
-        android:id="@+id/textView23"
+        android:id="@+id/versusTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:text="@string/versus"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/navigationButtonsLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/team1ButtonLayout"
+        app:layout_constraintVertical_bias="0.25" />
+
+    <LinearLayout
+        android:id="@+id/team2ButtonLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@+id/navigationButtonsLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.63">
+
+        <ImageView
+            android:id="@+id/team2PlusButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:contentDescription="@string/team2Image"
+            android:src="@drawable/ic_add_circle" />
+
+        <Button
+            android:id="@+id/team2Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/selectTeamBButton" />
+    </LinearLayout>
+
+    <!-- Back and Next Buttons at the Bottom -->
+    <TextView
+        android:id="@+id/team2TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#673AB7"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.506"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.766" />
+
+    <LinearLayout
+        android:id="@+id/navigationButtonsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="@android:drawable/divider_horizontal_bright"
+        android:orientation="horizontal"
+        android:showDividers="middle"
+        style="?android:attr/buttonBarStyle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_bias="0.995">
+
+        <Button
+            android:id="@+id/backButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            style="@style/CommonButtonStyle"
+
+            android:text="@string/backButton" />
+
+        <Button
+            android:id="@+id/nextButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            style="@style/CommonButtonStyle"
+
+            android:text="@string/nextButton" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
