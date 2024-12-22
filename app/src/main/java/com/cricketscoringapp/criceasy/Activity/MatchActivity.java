@@ -641,17 +641,17 @@ public class MatchActivity extends AppCompatActivity {
     private void updateNewBatsmanToDB(String name, String player_type, long innings_id) {
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
         long teamId = sharedPreferences.getLong("teamA_id", -1);
-        long player_id = databaseHelper.insertPlayer(name, player_type, teamId);
+        long player_id = databaseHelper.insertPlayer(name, teamId);
         String batter = player_type.equals("striker") ? "non_striker_id" : "striker_id";
         databaseHelper.initializeBatsmanStats(player_id, innings_id);
         long player2_id = sharedPreferences.getLong(batter, -1);
         Log.d(TAG, "striker" + player_id + "non striker" + player2_id);
-        databaseHelper.insertPartnership(innings_id,player_id, player2_id, 0, 0);
+        databaseHelper.insertPartnership(innings_id,player_id, player2_id);
     }
     private void updateNewBowlerToDB(String name, String player_type, long innings_id) {
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
         long teamId = sharedPreferences.getLong("teamB_id", -1);
-        long player_id = databaseHelper.insertPlayer(name, player_type, teamId);
+        long player_id = databaseHelper.insertPlayer(name, teamId);
         databaseHelper.initializeBowlerStats(player_id, innings_id);
     }
     private void incrementPlayedBallsInSharedPreferences() {

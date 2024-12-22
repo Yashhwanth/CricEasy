@@ -215,7 +215,7 @@
         android:id="@+id/needHelpButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:onClick="back"
+        android:onClick="previousActivity"
         android:text="@string/needHelpButton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

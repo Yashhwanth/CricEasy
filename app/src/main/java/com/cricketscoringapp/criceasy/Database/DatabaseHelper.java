@@ -536,7 +536,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    //                         *******TOSS PAGE METHODS********
+    //-------------------------------------------*******TOSS PAGE METHODS********-------------------------------------------
     public long saveOrUpdateTossDetails(long currentMatchId, Long tossId, String teamCalling, String tossWinner, String tossDecision) {
         SQLiteDatabase db = this.getWritableDatabase();
         Log.d("DatabaseHelper", "Toss received with ID: " + tossId);
@@ -629,9 +629,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return updatedTossId;
     }
 
-
-
-    //                                           ****S,Ns,Bow PAGE METHODS *****
+    //-------------------------------------------*******S,Ns,Bow PAGE METHODS *****----------------------------------------------
     public void initializeBatsmanStats(long playerId, long inningsId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -647,7 +645,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_FOURS, 0);
         values.put(COLUMN_FIVES, 0);
         values.put(COLUMN_SIXES, 0);
-
         db.insert(TABLE_BATSMAN, null, values);
     }
     public void initializeBowlerStats(long playerId, long inningsId) {
@@ -673,106 +670,58 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_WB, 0);
         values.put(COLUMN_NB, 0);
         values.put(COLUMN_DB, 0);
-
         db.insert(TABLE_BOWLER, null, values);
     }
-    public long insertPlayer(String playerName, String playerType, long teamId) {
-        // Get writable database instance
+    public long insertPlayer(String playerName, long teamId) {
         SQLiteDatabase db = this.getWritableDatabase();
-
-        // Create a ContentValues object to store the player data
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_NAME, playerName);
-
-        // Insert the data into the players table
-        long result = db.insert(TABLE_PLAYERS, null, contentValues);
-
-        // Check if the insertion was successful
-        if (result == -1) {
+        long playerId = db.insert(TABLE_PLAYERS, null, contentValues);
+        if (playerId == -1) {
             Log.e("DatabaseHelper", "Error inserting player into database");
         } else {
-            // Player inserted successfully
+            insertPlayerTeamRelation(db, playerId, teamId);
             Log.d("DatabaseHelper", "Player inserted successfully");
-
-            // Insert the player-team relationship into the Players_Teams table
-            ContentValues playerTeamValues = new ContentValues();
-            playerTeamValues.put(COLUMN_TEAM_ID, teamId); // The team ID should be passed or retrieved based on the match context
-            playerTeamValues.put(COLUMN_PLAYER_ID, result); // The player ID from the Players table
-
-            long teamResult = db.insert(TABLE_PLAYERS_TEAMS, null, playerTeamValues);
-
-            if (teamResult == -1) {
-                Log.e("DatabaseHelper", "Error inserting player-team into database");
-            } else {
-                Log.d("DatabaseHelper", "Player-team relation inserted successfully");
-            }
-
-            // Update the specific role in SharedPreferences
-            SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            switch (playerType) {
-                case "striker":
-                    editor.putLong("striker_id", result);
-                    break;
-                case "non_striker":
-                    editor.putLong("non_striker_id", result);
-                    break;
-                case "bowler":
-                    editor.putLong("bowler_id", result);
-                    break;
-            }
-            editor.apply();
         }
-
-        // Close the database connection
         db.close();
-        return result;
+        return playerId;
     }
-    public void startFirstInnings(long matchId, long battingTeamId) {
-
-        // Check if the necessary data is available
-        if (matchId == -1 || battingTeamId == -1) {
-            // Handle error: return or show a message that necessary data is missing
-            Log.e("DatabaseHelper", "Missing data for match or team in SharedPreferences");
-            return;
+    private void insertPlayerTeamRelation(SQLiteDatabase db, long playerId, long teamId) {
+        ContentValues playerTeamValues = new ContentValues();
+        playerTeamValues.put(COLUMN_TEAM_ID, teamId);
+        playerTeamValues.put(COLUMN_PLAYER_ID, playerId);
+        // Insert the relationship into the Players_Teams table
+        long teamResult = db.insert(TABLE_PLAYERS_TEAMS, null, playerTeamValues);
+        if (teamResult == -1) {
+            Log.e("DatabaseHelper", "Error inserting player-team into database");
+        } else {
+            Log.d("DatabaseHelper", "Player-team relation inserted successfully");
         }
-
-        // Create a writable database
+    }
+    public long startFirstInnings(long matchId, long battingTeamId, String currentInningsNumber) {
+        Log.d(TAG, "startFirstInnings: current innings number is" + currentInningsNumber);
+        if (matchId == -1 || battingTeamId == -1) {
+            Log.e("DatabaseHelper", "Missing data for match or team in SharedPreferences");
+            return -1;
+        }
         SQLiteDatabase db = this.getWritableDatabase();
-
+        long inningsId = 0;
         try {
-            // Insert a new row to start the first innings
             ContentValues values = new ContentValues();
-            values.put(COLUMN_INNINGS_NUMBER, 1); // First innings
-            values.put(COLUMN_MATCH_ID, matchId); // Match ID
-            values.put(COLUMN_TEAM_BATTING, battingTeamId); // Batting team ID
-            values.put(COLUMN_IS_COMPLETED, 0); // Incomplete innings
-
-            // Insert into the INNINGS table
-            long inningsId = db.insert(TABLE_INNINGS, null, values);
-
+            values.put(COLUMN_INNINGS_NUMBER, currentInningsNumber == null ? 1 : 2);
+            values.put(COLUMN_MATCH_ID, matchId);
+            values.put(COLUMN_TEAM_BATTING, battingTeamId);
+            values.put(COLUMN_IS_COMPLETED, 0);
+            inningsId = db.insert(TABLE_INNINGS, null, values);
             if (inningsId == -1) {
-                // Handle failure to insert
                 Log.e("DatabaseHelper", "Failed to start first innings.");
-            } else {
-                // Successfully inserted, store inningsId in SharedPreferences
-                SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putLong("playedBalls", 0);
-                editor.putLong("Innings_id", inningsId); // Save inningsId in SharedPreferences
-                editor.putString("currentInnings", "first");
-                editor.putLong("target", 10000);
-                editor.putInt("score",0);
-                editor.apply(); // Commit changes
-                Log.d("DatabaseHelper", "First innings started with inningsId: " + inningsId);
             }
         } catch (Exception e) {
-            // Handle any exceptions
-            e.printStackTrace();
+            Log.e("DatabaseHelper", "Error inserting player-team into database");
         } finally {
-            // Close the database
             db.close();
         }
+        return inningsId;
     }
     public void startSecondInnings(long matchId, long battingTeamId) {
 
@@ -819,20 +768,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
-
-    public void insertOver(long inningsId, int over, long playerId, int isMaiden) {
+    public long insertOver(long inningsId, int over, long bowlerId, int isMaiden) {
         SQLiteDatabase db = this.getWritableDatabase();
+        long over_id = 0;
         try {
             ContentValues values = new ContentValues();
             values.put(COLUMN_INNINGS_ID, inningsId);
             values.put(COLUMN_OVER, over);
-            values.put(COLUMN_PLAYER_ID, playerId);
+            values.put(COLUMN_PLAYER_ID, bowlerId);
             values.put(COLUMN_IS_MAIDEN, isMaiden);
-
-            // Insert into the overs table
-            long over_id = db.insert(TABLE_OVERS, null, values);
+            over_id = db.insert(TABLE_OVERS, null, values);
             if (over_id == -1) {
-                // Handle failure to insert
                 Log.e("DatabaseHelper", "Failed to start over");
             } else {
                 SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
@@ -841,12 +787,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 editor.apply();
             }
         } catch (Exception e) {
-            // Handle any exceptions
-            e.printStackTrace();
+            Log.e(TAG, "insertOver: , failed to insert over");
         } finally {
-            // Close the database
             db.close();
         }
+        return over_id;
     }
     public void insertMaidenOver(long overId){
         SQLiteDatabase db = this.getWritableDatabase();
@@ -861,57 +806,46 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
-    public void insertPartnership(long innings_id, long bat1_id, long bat2_id, int runs,int balls){
+    public long insertPartnership(long inningsId, long batsman1Id, long batsman2Id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        try{
+        long partnership_id = 0;
+        try {
             ContentValues values = new ContentValues();
-            values.put(COLUMN_INNINGS_ID,innings_id);
-            values.put(COLUMN_BATSMAN1_ID,bat1_id);
-            values.put(COLUMN_BATSMAN2_ID,bat2_id);
-            values.put(COLUMN_RUNS,runs);
-            values.put(COLUMN_BALLS,balls);
-
-            long partnership_id = db.insert(TABLE_PARTNERSHIPS, null, values);
+            values.put(COLUMN_INNINGS_ID, inningsId);
+            values.put(COLUMN_BATSMAN1_ID, batsman1Id);
+            values.put(COLUMN_BATSMAN2_ID, batsman2Id);
+            values.put(COLUMN_RUNS, 0);
+            values.put(COLUMN_BALLS, 0);
+            partnership_id = db.insert(TABLE_PARTNERSHIPS, null, values);
             if (partnership_id == -1) {
-                // Handle failure to insert
                 Log.e("DatabaseHelper", "Failed to start over");
-            } else {
-                SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putLong("partnership_id", partnership_id);
-                editor.apply();
             }
         } catch (Exception e) {
-            e.printStackTrace();
-        }finally {
+            Log.e("DatabaseHelper", "Failed to start over");
+        } finally {
             db.close();
         }
+        return partnership_id;
     }
     public long initializeTeamStats(long inningsId) {
         SQLiteDatabase db = this.getWritableDatabase();
-        long teamStatsId = -1; // Default value if insertion fails
+        long teamStatsId = -1;
         try {
             ContentValues contentValues = new ContentValues();
-            contentValues.put("innings_id", inningsId);
-            // Insert and get the row ID
+            contentValues.put(COLUMN_INNINGS_ID, inningsId);
             teamStatsId = db.insert(TABLE_TEAM_STATISTICS, null, contentValues);
-
             if (teamStatsId != -1) {
                 Log.d("DatabaseHelper", "Team stats initialized for innings ID: " + inningsId);
             } else {
                 Log.e("DatabaseHelper", "Failed to initialize team stats.");
             }
         } catch (Exception e) {
-            e.printStackTrace();
             Log.e("DatabaseHelper", "Error during team stats initialization.");
         } finally {
             db.close();
         }
         return teamStatsId;
     }
-
-
-
 
 
     public Map<String, String> getMatchDetails(long matchId) {

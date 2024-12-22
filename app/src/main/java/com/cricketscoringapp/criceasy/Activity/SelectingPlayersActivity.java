@@ -17,12 +17,13 @@ public class SelectingPlayersActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private final String SHARED_PREFERENCES = "match_prefs";
     private final String PLAYER_TYPE_KEY = "playerType";
-    private final String CURRENT_ACTIVITY = "currentActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_selecting_players); // Make sure this layout file exists
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        String CURRENT_ACTIVITY = "currentActivity";
         String currentActivity = sharedPreferences.getString(CURRENT_ACTIVITY, null);
         String playerType = sharedPreferences.getString(PLAYER_TYPE_KEY, null);
 
@@ -45,7 +46,7 @@ public class SelectingPlayersActivity extends AppCompatActivity {
         cancelButton.setOnClickListener(view -> back());
     }
     public boolean validateInput(String playerName){
-        if(playerName.isEmpty()){
+        if(playerName.trim().isEmpty()){
             showToast("Please Enter the Player Name");
             return false;
         }
@@ -62,7 +63,7 @@ public class SelectingPlayersActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES,MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         String playerType = sharedPreferences.getString(PLAYER_TYPE_KEY,null);
-        editor.putString(playerType + " name",playerName);
+        editor.putString(playerType, playerName);
         editor.apply();
         showToast(playerType + " Updated");
     }
