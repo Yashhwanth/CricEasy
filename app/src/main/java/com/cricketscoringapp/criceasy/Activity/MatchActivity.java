@@ -611,7 +611,7 @@ public class MatchActivity extends AppCompatActivity {
         playerTypeTextView.setText(formattedText);
         EditText playerNameEditText = playerDialogView.findViewById(R.id.playerNameEditText);
         Button submitButton = playerDialogView.findViewById(R.id.submitButton);
-        Button backButton = playerDialogView.findViewById(R.id.back_button);
+        Button backButton = playerDialogView.findViewById(R.id.cancelButton);
 
         // Submit Button Click Handler
         submitButton.setOnClickListener(v -> {

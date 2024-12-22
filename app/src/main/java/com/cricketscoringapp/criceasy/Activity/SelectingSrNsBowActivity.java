@@ -17,7 +17,17 @@ import com.cricketscoringapp.criceasy.R;
 
 public class SelectingSrNsBowActivity extends AppCompatActivity {
     private DatabaseHelper databaseHelper;
-
+    private SharedPreferences sharedPreferences;
+    private final String SHARED_PREFERENCES = "match_prefs";
+    private static final String CURRENT_ACTIVITY = "currentActivity";
+    private final String CURRENT_INNINGS_KEY  = "currentInningsId";
+    private final String CURRENT_INNINGS_DEFAULT_VALUE  = "";
+    private final String PLAYER_TYPE_KEY = "playerType";
+    public final String PLAYER_STRIKER_VALUE = "striker";
+    private final String PLAYER_NON_STRIKER_VALUE = "nonStriker";
+    public final String PLAYER_BOWLER_VALUE = "bowler";
+    public final String TEAM_A_ID = "teamAId";
+    public final String TEAM_B_ID = "teamBId";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,36 +37,36 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
 
         databaseHelper = new DatabaseHelper(this);
 
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
-        String currentInnings = sharedPreferences.getString("currentInnings", "");
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES,MODE_PRIVATE);
+        String currentInnings = sharedPreferences.getString(CURRENT_INNINGS_KEY, CURRENT_INNINGS_DEFAULT_VALUE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
 
         //UI
-        ImageView striker_button = findViewById(R.id.imageView);
-        ImageView non_striker_button = findViewById(R.id.imageView2);
-        ImageView bowler_button = findViewById(R.id.imageView3);
-        Button start_scoring_button = findViewById(R.id.button2);
+        ImageView strikerButton = findViewById(R.id.srImageView);
+        ImageView nonStrikerButton = findViewById(R.id.nSrImageView);
+        ImageView bowlerButton = findViewById(R.id.bowImageView);
+        Button startScoringButton = findViewById(R.id.startScoringButton);
 
-        striker_button.setOnClickListener(view ->{
-            editor.putString("player_type","striker");
+        strikerButton.setOnClickListener(view ->{
+            editor.putString(PLAYER_TYPE_KEY,PLAYER_STRIKER_VALUE);
             editor.apply();
             select_player();
         });
 
-        non_striker_button.setOnClickListener(view ->{
-            editor.putString("player_type","non_striker");
+        nonStrikerButton.setOnClickListener(view ->{
+            editor.putString(PLAYER_TYPE_KEY,PLAYER_NON_STRIKER_VALUE);
             editor.apply();
             select_player();
         });
 
-        bowler_button.setOnClickListener(view ->{
-            editor.putString("player_type","bowler");
+        bowlerButton.setOnClickListener(view ->{
+            editor.putString(PLAYER_TYPE_KEY,PLAYER_BOWLER_VALUE);
             editor.apply();
             select_player();
         });
 
-        start_scoring_button.setOnClickListener(view ->{
+        startScoringButton.setOnClickListener(view ->{
             if (validateInputs()) {
                 insertSNsBowl();
                 innings_table();
@@ -105,14 +115,14 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
         //finish(); // Close the current activity
     }
     private void updateCurrentActivityInPreferences() {
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("current_activity", getClass().getSimpleName()); // Store the current activity name
+        editor.putString(CURRENT_ACTIVITY, getClass().getSimpleName()); // Store the current activity name
         editor.apply(); // Save changes asynchronously
     }
 
     private boolean validateInputs() {
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
 
         // Validate Striker
         String strikerName = sharedPreferences.getString("striker name", null);

@@ -6,34 +6,38 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:layout_marginBottom="20dp">
+    android:layout_marginTop="20dp">
 
     <TextView
         android:id="@+id/playerTypeTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="TextView" />
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/playerTypeTextView" />
 
     <TextView
-        android:id="@+id/playerNametextView"
+        android:id="@+id/playerNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Enter name of player"
+        android:text="@string/selectPlayerName"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.116"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.103"
-        android:layout_margin="10dp"/>
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"/>
 
     <EditText
         android:id="@+id/playerNameEditText"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
+        android:autofillHints="name"
         android:ems="10"
-        android:hint="Enter player name"
+        android:hint="@string/selectPlayerEditText"
+        android:textColorHint="#707070"
         android:inputType="text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -41,38 +45,46 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.158"
-        android:layout_margin="10dp"/>
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"/>
 
     <LinearLayout
+        android:id="@+id/navigationButtonLayout"
+        style="?android:attr/buttonBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/submitButton"
+            android:id="@+id/cancelButton"
+            style="@style/CommonButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Button"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.728"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.85"
-            android:layout_margin="10dp"/>
-
-        <Button
-            android:id="@+id/back_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Button"
+            android:layout_margin="10dp"
+            android:text="@string/cancelButton"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.315"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.85"
-            android:layout_margin="10dp"/>
+            app:layout_constraintVertical_bias="0.85" />
+
+        <Button
+            android:id="@+id/submitButton"
+            style="@style/CommonButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/submitButton"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.728"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.85" />
+
     </LinearLayout>
 
 </LinearLayout>

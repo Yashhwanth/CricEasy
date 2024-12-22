@@ -43,6 +43,22 @@
     <string name = "tossCoinContentDescription">Toss Coin</string>
     <string name = "needHelpButton">Need Help ?</string>
     <string name = "letsPlayButton">Let\'s Play</string>
+    Selecting S,Ns and Bow Activity
+    <string name = "selectSNsAndBowTextView">Select S,Ns and Bowler</string>
+    <string name = "battingTextView">Batting</string>
+    <string name = "selectStrikerContentDescription">Select Striker Image</string>
+    <string name = "selectStrikerTextView">Select Striker</string>
+    <string name = "bowlingTextView">Bowling</string>
+    <string name = "selectNonStrikerContentDescription">Select Non Striker Image</string>
+    <string name = "selectNonStrikerTextView">Select Non Striker</string>
+    <string name = "selectBowlerContentDescription">Select Bowler Image</string>
+    <string name = "selectBowlerTextView">Select Bowler</string>
+    <string name = "startScoringButton">StartScoring</string>
+    Selecting Player Activity
+    <string name = "playerTypeTextView">Select New Player</string>
+    <string name = "selectPlayerName">Select Player Name</string>
+    <string name = "selectPlayerEditText">Enter Player Name</string>
+    <string name="selectNewPlayerSetText">Select New %1$s</string>
 
 
     <string name="Teams">Teams</string>
@@ -100,8 +116,7 @@
     <string name="wicketScoringButton">Wicket</string>
     <string name="deadScoringButton">Dead</string>
     <string name="undoScoringButton">Undo</string>
-    activity new player
-    <string name="selectNewPlayerSetText">Select New %1$s</string>
+
     activity for extras
     <string name="hintForExtraRunsEditText">Enter Extra Runs(0 if no runs are scored)</string>
     <string name="runsFromBat">Bat</string>
