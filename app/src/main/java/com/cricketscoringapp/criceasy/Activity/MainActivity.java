@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         databaseHelper = new DatabaseHelper(this);
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
+        //editor.clear();
         editor.apply();
         Log.d(TAG, "onCreate: Cleared all SharedPreferences");
 
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             long currentMatchId = handleNewMatch();
             saveMatchIdToPreferences(currentMatchId);
             Log.d(TAG, "onCreate: opening matchInfo activity");
-            Intent intent = new Intent(MainActivity.this, MatchInfoActivity.class);
+            Intent intent = new Intent(MainActivity.this, MatchActivity.class);
             startActivity(intent);
         });
     }

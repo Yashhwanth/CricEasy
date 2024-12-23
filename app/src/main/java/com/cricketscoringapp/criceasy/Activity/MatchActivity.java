@@ -41,6 +41,7 @@ public class MatchActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private final String SHARED_PREFERENCES = "match_prefs";
     private final String INNINGS_ID = "currentInningsId";
+    private final String CURRENT_ACTIVITY = "currentActivity";
     private final String OVER_ID = "overId";
     private final String STRIKER_ID = "strikerId";
     private final String NON_STRIKER_ID = "nonStrikerId";
@@ -58,6 +59,9 @@ public class MatchActivity extends AppCompatActivity {
     private final String NORMAL_BALL = "Normal";
     private final String WIDE_BALL = "Wide";
     private final String NO_BALL = "NoBall";
+    private final String BYE_BALL = "Bye";
+    private final String LEG_BYE_BALL = "LegBye";
+    private final String FROM_BAT = "Bat";
     private final String CURRENT_INNINGS_NUMBER = "currentInningsNumber";
     private final String BATTING_TEAM_ID = "battingTeamId";
     private final String BOWLING_TEAM_ID = "bowlingTeamId";
@@ -170,64 +174,23 @@ public class MatchActivity extends AppCompatActivity {
         sixScoringButton.setOnClickListener(scoringListenerFor0To8);
         sevenScoringButton.setOnClickListener(scoringListenerFor0To8);
         eightScoringButton.setOnClickListener(scoringListenerFor0To8);
-//        // Set up OnClickListeners for the dialog buttons
-//        zeroScoringButton.setOnClickListener(view -> {
-//            int runs = Integer.parseInt(zeroScoringButton.getText().toString());
-//            handleScoringFor0To6(runs);
-//            dialog.dismiss();
+        byeScoringButton.setOnClickListener(extraBallListener);
+        legByeScoringButton.setOnClickListener(extraBallListener);
+        wideScoringButton.setOnClickListener(extraBallListener);
+        noBallScoringButton.setOnClickListener(extraBallListener);
+
+//        byeScoringButton.setOnClickListener(view -> {
+//            showExtrasDialog("Bye", dialog);
 //        });
-//        oneScoringButton.setOnClickListener(view -> {
-//            int runs = Integer.parseInt(oneScoringButton.getText().toString());
-//            handleScoringFor0To6(runs);
-//            dialog.dismiss();
+//        legByeScoringButton.setOnClickListener(view -> {
+//            showExtrasDialog("LegBye", dialog);
 //        });
-//        twoScoringButton.setOnClickListener(view -> {
-//            int runs = Integer.parseInt(twoScoringButton.getText().toString());
-//            handleScoringFor0To6(runs);
-//            dialog.dismiss();
+//        wideScoringButton.setOnClickListener(view -> {
+//            showExtrasDialog("Wide", dialog);
 //        });
-//        threeScoringButton.setOnClickListener(view -> {
-//            int runs = Integer.parseInt(threeScoringButton.getText().toString());
-//            handleScoringFor0To6(runs);
-//            dialog.dismiss();
-//        });
-//        fourScoringButton.setOnClickListener(view -> {
-//            int runs = Integer.parseInt(fourScoringButton.getText().toString());
-//            handleScoringFor0To6(runs);
-//            dialog.dismiss();
-//        });
-//        fiveScoringButton.setOnClickListener(view -> {
-//            int runs = Integer.parseInt(fiveScoringButton.getText().toString());
-//            handleScoringFor0To6(runs);
-//            dialog.dismiss();
-//        });
-//        sixScoringButton.setOnClickListener(view -> {
-//            int runs = Integer.parseInt(sixScoringButton.getText().toString());
-//            handleScoringFor0To6(runs);
-//            dialog.dismiss();
-//        });
-//        sevenScoringButton.setOnClickListener(view -> {
-//            int runs = Integer.parseInt(sevenScoringButton.getText().toString());
-//            handleScoringFor0To6(runs);
-//            dialog.dismiss();
-//        });
-//        eightScoringButton.setOnClickListener(view -> {
-//            int runs = Integer.parseInt(eightScoringButton.getText().toString());
-//            handleScoringFor0To6(runs);
-//            dialog.dismiss();
-        //});
-        byeScoringButton.setOnClickListener(view -> {
-            showExtrasDialog("Bye", dialog);
-        });
-        legByeScoringButton.setOnClickListener(view -> {
-            showExtrasDialog("LegBye", dialog);
-        });
-        wideScoringButton.setOnClickListener(view -> {
-            showExtrasDialog("Wide", dialog);
-        });
-        noBallScoringButton.setOnClickListener(view -> {
-            showExtrasDialog("NoBall", dialog);
-        });
+//        noBallScoringButton.setOnClickListener(view -> {
+//            showExtrasDialog("NoBall", dialog);
+//        })
         wicketScoringButton.setOnClickListener(view ->{
             showWicketDialog(dialog);
         });
@@ -240,9 +203,9 @@ public class MatchActivity extends AppCompatActivity {
         transaction.commit();
     }
     private void updateCurrentActivityInPreferences() {
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("current_activity", getClass().getSimpleName()); // Store the current activity name
+        editor.putString(CURRENT_ACTIVITY, getClass().getSimpleName()); // Store the current activity name
         editor.apply(); // Save changes asynchronously
     }
     private void rotateStrike(int runs) {
@@ -286,8 +249,8 @@ public class MatchActivity extends AppCompatActivity {
         EditText extraRunsInput = extrasDialogView.findViewById(R.id.extraRunsEditText);
         Button btnCancel = extrasDialogView.findViewById(R.id.cancelButton);
         Button btnSubmit = extrasDialogView.findViewById(R.id.submitButton);
-        RadioGroup runsInNoBallRadioGroup = extrasDialogView.findViewById(R.id.runsInNoBallRadioGroup);
-        if ("NoBall".equals(ballType)) {
+        RadioGroup runsInNoBallRadioGroup = extrasDialogView.findViewById(R.id.runsSourceInNoBallRadioGroup);
+        if (NO_BALL.equals(ballType)) {
             runsInNoBallRadioGroup.setVisibility(View.VISIBLE);  // Show radio group for No Ball
         } else {
             runsInNoBallRadioGroup.setVisibility(View.GONE);  // Hide radio group for other ball types
@@ -304,38 +267,36 @@ public class MatchActivity extends AppCompatActivity {
         if (extrasDialog.getWindow() != null) {
             extrasDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
-
         // Handle Cancel button
         btnCancel.setOnClickListener(view -> {
             extrasDialog.dismiss();
         });
-
         // Handle Submit button
         btnSubmit.setOnClickListener(view -> {
             String extraRunsStr = extraRunsInput.getText().toString();
-            int runsInNoBallRadioButtonId = runsInNoBallRadioGroup.getCheckedRadioButtonId(); // Get the selected RadioButton ID
-            String runFromWhat = null; // Variable to store the tag value
+            int runsSourceInNoBallRadioButtonId = runsInNoBallRadioGroup.getCheckedRadioButtonId(); // Get the selected RadioButton ID
+            String runsSourceInNoBall = null; // Variable to store the tag value
             if (runsInNoBallRadioGroup.getVisibility() == View.VISIBLE) {
-                if (runsInNoBallRadioButtonId == -1) { // No RadioButton is selected
+                if (runsSourceInNoBallRadioButtonId == -1) { // No RadioButton is selected
                     Toast.makeText(this, "Please select the source of runs (From bat or Byes/Leg Byes).", Toast.LENGTH_SHORT).show();
                 } else { // A RadioButton is selected
-                    RadioButton runsInNoBallRadioButton = extrasDialogView.findViewById(runsInNoBallRadioButtonId);
-                    runFromWhat = runsInNoBallRadioButton.getText().toString();
+                    RadioButton runsInNoBallRadioButton = extrasDialogView.findViewById(runsSourceInNoBallRadioButtonId);
+                    runsSourceInNoBall = runsInNoBallRadioButton.getText().toString();
                 }
             }
             if (!extraRunsStr.isEmpty()) {
                 int extraRuns = Integer.parseInt(extraRunsStr);
                 // Check the ball type and call the corresponding method
                 switch (ballType) {
-                    case "Bye":
-                    case "LegBye":
+                    case BYE_BALL:
+                    case LEG_BYE_BALL:
                         handleScoringForByesAndLegByes(extraRuns, ballType);
                         break;
-                    case "Wide":
+                    case WIDE_BALL:
                         handleScoringForWide(extraRuns, ballType);
                         break;
-                    case "NoBall":
-                        handleScoringForNoBall(extraRuns, ballType, runFromWhat);
+                    case NO_BALL:
+                        handleScoringForNoBall(extraRuns, ballType, runsSourceInNoBall);
                         break;
                 }
                 Toast.makeText(this, ballType + " runs: " + extraRuns, Toast.LENGTH_SHORT).show();
@@ -552,17 +513,18 @@ public class MatchActivity extends AppCompatActivity {
         Toast.makeText(this, "Runs scored: " + runs , Toast.LENGTH_SHORT).show();
     }
      private void handleScoringForByesAndLegByes(int extraRuns, String ballType) {
-         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
-         long inningsId = sharedPreferences.getLong("Innings_id", -1);
-         long overId = sharedPreferences.getLong("over_id", -1);
-         long strikerId = sharedPreferences.getLong("striker_id", -1);
-         long nonStrikerId = sharedPreferences.getLong("non_striker_id", -1);
-         long bowlerId = sharedPreferences.getLong("bowler_id", -1);
+         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+         long inningsId = sharedPreferences.getLong(INNINGS_ID, -1);
+         long overId = sharedPreferences.getLong(OVER_ID, -1);
+         long strikerId = sharedPreferences.getLong(STRIKER_ID, -1);
+         long nonStrikerId = sharedPreferences.getLong(NON_STRIKER_ID, -1);
+         long bowlerId = sharedPreferences.getLong(BOWLER_ID, -1);
+         long partnershipId = sharedPreferences.getLong(PARTNERSHIP_ID, -1);
          long ballId = databaseHelper.insertBallDataForByLByes(overId, ballType, extraRuns, strikerId, nonStrikerId);
          databaseHelper.updateExtrasTable(ballId, ballType, extraRuns);
-         databaseHelper.updateBatsmanForByLByes(inningsId, strikerId, 1);
+         databaseHelper.updateBatsmanForByLByes(inningsId, strikerId);
          databaseHelper.updateBowlerForByLBes(inningsId, bowlerId, ballType);
-         databaseHelper.updatePartnershipForByLByes(1);
+         databaseHelper.updatePartnershipForByLByes(partnershipId);
          updateTeamStatsForByLegBy(extraRuns);
          incrementPlayedBallsInSharedPreferences();
          updateScoreInSharedPreferences(ballType, extraRuns);
@@ -570,12 +532,12 @@ public class MatchActivity extends AppCompatActivity {
          checkAndHandleOverEnd();
      }
      private void handleScoringForWide(int extraRuns, String ballType){
-         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
-         long inningsId = sharedPreferences.getLong("Innings_id", -1);
-         long overId = sharedPreferences.getLong("over_id", -1);
-         long bowlerId = sharedPreferences.getLong("bowler_id", -1);
-         long strikerId = sharedPreferences.getLong("striker_id", -1);
-         long nonStrikerId = sharedPreferences.getLong("non_striker_id", -1);
+         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+         long inningsId = sharedPreferences.getLong(INNINGS_ID, -1);
+         long overId = sharedPreferences.getLong(OVER_ID, -1);
+         long bowlerId = sharedPreferences.getLong(BOWLER_ID, -1);
+         long strikerId = sharedPreferences.getLong(STRIKER_ID, -1);
+         long nonStrikerId = sharedPreferences.getLong(NON_STRIKER_ID, -1);
          long ballId = databaseHelper.insertBallDataForWide(overId, extraRuns, strikerId, nonStrikerId);
          databaseHelper.updateExtrasTable(ballId, ballType, extraRuns);
          databaseHelper.updateBowlerForWide(inningsId, bowlerId, extraRuns);
@@ -584,34 +546,35 @@ public class MatchActivity extends AppCompatActivity {
          rotateStrike(extraRuns);
          checkAndHandleOverEnd();
      }
-     private void handleScoringForNoBall(int extraRuns, String ballType, String runFromWhat){
-         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
-         long inningsId = sharedPreferences.getLong("Innings_id", -1);
-         long overId = sharedPreferences.getLong("over_id", -1);
-         long bowlerId = sharedPreferences.getLong("bowler_id", -1);
-         long strikerId = sharedPreferences.getLong("striker_id", -1);
-         long nonStrikerId = sharedPreferences.getLong("non_striker_id", -1);
-         long partnership_id = sharedPreferences.getLong("partnership_id", -1);
+     private void handleScoringForNoBall(int extraRuns, String ballType, String runsSourceInNoBall){
+         Log.d(TAG, "handleScoringForNoBall: " + runsSourceInNoBall);
+         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+         long inningsId = sharedPreferences.getLong(INNINGS_ID, -1);
+         long overId = sharedPreferences.getLong(OVER_ID, -1);
+         long bowlerId = sharedPreferences.getLong(BOWLER_ID, -1);
+         long strikerId = sharedPreferences.getLong(STRIKER_ID, -1);
+         long nonStrikerId = sharedPreferences.getLong(NON_STRIKER_ID, -1);
+         long partnership_id = sharedPreferences.getLong(PARTNERSHIP_ID, -1);
          long ballId = 0;
          ballId = databaseHelper.insertBallDataForNb(overId, extraRuns, strikerId, nonStrikerId);
          databaseHelper.updateExtrasTable(ballId, ballType, extraRuns);
-         switch (runFromWhat){
-             case "Bat":
+         switch (runsSourceInNoBall){
+             case FROM_BAT:
                  databaseHelper.updateBatsmanStatsForNb(inningsId, strikerId, extraRuns, "Bat");
                  databaseHelper.updateBowlerStatsForNb(inningsId, bowlerId, extraRuns, "Bat");
                  databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "Bat");
                  break;
-             case "LegBye":
+             case BYE_BALL:
                  databaseHelper.updateBatsmanStatsForNb(inningsId, strikerId, extraRuns, "Bye");
                  databaseHelper.updateBowlerStatsForNb(inningsId, bowlerId, extraRuns, "Bye");
                  databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "Bye");
                  break;
-             case "Bye":
+             case LEG_BYE_BALL:
                  databaseHelper.updateBatsmanStatsForNb(inningsId, strikerId, extraRuns, "LegBye");
                  databaseHelper.updateBowlerStatsForNb(inningsId, bowlerId, extraRuns, "LegBye");
                  databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "LegBye");
                  break;
-         }updateTeamStatsForNoBall(extraRuns, runFromWhat);
+         }updateTeamStatsForNoBall(extraRuns, runsSourceInNoBall);
          updateScoreInSharedPreferences(ballType, extraRuns);
          rotateStrike(extraRuns);
          checkAndHandleOverEnd();
@@ -622,8 +585,8 @@ public class MatchActivity extends AppCompatActivity {
         databaseHelper.updateTeamStatsFor0to6(teamStatsId, runs);
      }
      private void updateTeamStatsForByLegBy(int runs){
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
-        long teamStatsId = sharedPreferences.getLong("teamStatsId", -1);
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        long teamStatsId = sharedPreferences.getLong(TEAM_STATS_ID, -1);
         databaseHelper.updateTeamStatsForByesAndLegByes(teamStatsId, runs);
      }
     private void updateTeamStatsForWide(int runs){
