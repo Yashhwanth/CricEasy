@@ -59,12 +59,11 @@
     <string name = "selectPlayerName">Select Player Name</string>
     <string name = "selectPlayerEditText">Enter Player Name</string>
     <string name="selectNewPlayerSetText">Select New %1$s</string>
-
-
-    <string name="Teams">Teams</string>
-    <string name="matchtypeKey">Match Type : </string>
+    MpInfo Layout
+    <string name="teamsHeading">Teams</string>
+    <string name="matchTypeKey">Match Type : </string>
     <string name="oversKey">Overs : </string>
-    <string name="balltypeKey">Ball Type : </string>
+    <string name="ballTypeKey">Ball Type : </string>
     <string name="venueKey">Venue : </string>
     <string name="dateKey">Time : </string>
     <string name="wicket_type">Type of Dismissal</string>

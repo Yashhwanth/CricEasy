@@ -1,7 +1,6 @@
 package com.cricketscoringapp.criceasy.Activity;
 
 import static android.content.ContentValues.TAG;
-
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -40,6 +39,30 @@ public class MatchActivity extends AppCompatActivity {
     private FloatingActionButton floatingButton;
     private DatabaseHelper databaseHelper;
     private SharedPreferences sharedPreferences;
+    private final String SHARED_PREFERENCES = "match_prefs";
+    private final String INNINGS_ID = "currentInningsId";
+    private final String OVER_ID = "overId";
+    private final String STRIKER_ID = "strikerId";
+    private final String NON_STRIKER_ID = "nonStrikerId";
+    private final String BOWLER_ID = "bowlerId";
+    private final String STRIKER = "striker";
+    private final String NON_STRIKER = "nonStriker";
+    private final String BOWLER = "bowler";
+    private final String PARTNERSHIP_ID = "partnershipId";
+    private final String TEAM_STATS_ID = "teamStatsId";
+    private final String TOTAL_BALLS = "totalBalls";
+    private final String PLAYED_BALLS = "playedBalls";
+    private final String SCORE = "score";
+    private final String CURRENT_OVER_SCORE = "currentOverScore";
+    private final String TARGET = "target";
+    private final String NORMAL_BALL = "Normal";
+    private final String WIDE_BALL = "Wide";
+    private final String NO_BALL = "NoBall";
+    private final String CURRENT_INNINGS_NUMBER = "currentInningsNumber";
+    private final String BATTING_TEAM_ID = "battingTeamId";
+    private final String BOWLING_TEAM_ID = "bowlingTeamId";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +91,6 @@ public class MatchActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Update current activity in SharedPreferences
         updateCurrentActivityInPreferences();
     }
 
@@ -116,7 +138,6 @@ public class MatchActivity extends AppCompatActivity {
         // Set the custom size for the dialog (width and height)
         dialog.show();
         if (dialog.getWindow() != null) {
-            // Set dialog size
             dialog.getWindow().setLayout(
                     ViewGroup.LayoutParams.MATCH_PARENT,  // Set width to match parent
                     ViewGroup.LayoutParams.WRAP_CONTENT   // Set height to wrap content
@@ -129,43 +150,72 @@ public class MatchActivity extends AppCompatActivity {
             params.gravity = Gravity.CENTER; // Center the dialog on the screen
             window.setAttributes(params);
         }
-        // Set up OnClickListeners for the dialog buttons
-        zeroScoringButton.setOnClickListener(view -> {
-            handleScoringFor0To6(0);
+        View.OnClickListener scoringListenerFor0To8 = view -> {
+            int runs = Integer.parseInt(((Button) view).getText().toString().trim());
+            Log.d(TAG, "openScoringPopup: runs from popup are" + runs);
+            handleScoringFor0To6(runs);
             dialog.dismiss();
-        });
-        oneScoringButton.setOnClickListener(view -> {
-            handleScoringFor0To6(1);
+        };
+        View.OnClickListener extraBallListener = view -> {
+            String extraType = ((Button) view).getText().toString().trim();
+            showExtrasDialog(extraType, dialog);
             dialog.dismiss();
-        });
-        twoScoringButton.setOnClickListener(view -> {
-            handleScoringFor0To6(2);
-            dialog.dismiss();
-        });
-        threeScoringButton.setOnClickListener(view -> {
-            handleScoringFor0To6(3);
-            dialog.dismiss();
-        });
-        fourScoringButton.setOnClickListener(view -> {
-            handleScoringFor0To6(4);
-            dialog.dismiss();
-        });
-        fiveScoringButton.setOnClickListener(view -> {
-            handleScoringFor0To6(5);
-            dialog.dismiss();
-        });
-        sixScoringButton.setOnClickListener(view -> {
-            handleScoringFor0To6(6);
-            dialog.dismiss();
-        });
-        sevenScoringButton.setOnClickListener(view -> {
-            handleScoringFor0To6(7);
-            dialog.dismiss();
-        });
-        eightScoringButton.setOnClickListener(view -> {
-            handleScoringFor0To6(8);
-            dialog.dismiss();
-        });
+        };
+        zeroScoringButton.setOnClickListener(scoringListenerFor0To8);
+        oneScoringButton.setOnClickListener(scoringListenerFor0To8);
+        twoScoringButton.setOnClickListener(scoringListenerFor0To8);
+        threeScoringButton.setOnClickListener(scoringListenerFor0To8);
+        fourScoringButton.setOnClickListener(scoringListenerFor0To8);
+        fiveScoringButton.setOnClickListener(scoringListenerFor0To8);
+        sixScoringButton.setOnClickListener(scoringListenerFor0To8);
+        sevenScoringButton.setOnClickListener(scoringListenerFor0To8);
+        eightScoringButton.setOnClickListener(scoringListenerFor0To8);
+//        // Set up OnClickListeners for the dialog buttons
+//        zeroScoringButton.setOnClickListener(view -> {
+//            int runs = Integer.parseInt(zeroScoringButton.getText().toString());
+//            handleScoringFor0To6(runs);
+//            dialog.dismiss();
+//        });
+//        oneScoringButton.setOnClickListener(view -> {
+//            int runs = Integer.parseInt(oneScoringButton.getText().toString());
+//            handleScoringFor0To6(runs);
+//            dialog.dismiss();
+//        });
+//        twoScoringButton.setOnClickListener(view -> {
+//            int runs = Integer.parseInt(twoScoringButton.getText().toString());
+//            handleScoringFor0To6(runs);
+//            dialog.dismiss();
+//        });
+//        threeScoringButton.setOnClickListener(view -> {
+//            int runs = Integer.parseInt(threeScoringButton.getText().toString());
+//            handleScoringFor0To6(runs);
+//            dialog.dismiss();
+//        });
+//        fourScoringButton.setOnClickListener(view -> {
+//            int runs = Integer.parseInt(fourScoringButton.getText().toString());
+//            handleScoringFor0To6(runs);
+//            dialog.dismiss();
+//        });
+//        fiveScoringButton.setOnClickListener(view -> {
+//            int runs = Integer.parseInt(fiveScoringButton.getText().toString());
+//            handleScoringFor0To6(runs);
+//            dialog.dismiss();
+//        });
+//        sixScoringButton.setOnClickListener(view -> {
+//            int runs = Integer.parseInt(sixScoringButton.getText().toString());
+//            handleScoringFor0To6(runs);
+//            dialog.dismiss();
+//        });
+//        sevenScoringButton.setOnClickListener(view -> {
+//            int runs = Integer.parseInt(sevenScoringButton.getText().toString());
+//            handleScoringFor0To6(runs);
+//            dialog.dismiss();
+//        });
+//        eightScoringButton.setOnClickListener(view -> {
+//            int runs = Integer.parseInt(eightScoringButton.getText().toString());
+//            handleScoringFor0To6(runs);
+//            dialog.dismiss();
+        //});
         byeScoringButton.setOnClickListener(view -> {
             showExtrasDialog("Bye", dialog);
         });
@@ -196,23 +246,17 @@ public class MatchActivity extends AppCompatActivity {
         editor.apply(); // Save changes asynchronously
     }
     private void rotateStrike(int runs) {
-        // Access the SharedPreferences
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        // Retrieve current striker and non-striker IDs
-        long strikerId = sharedPreferences.getLong("striker_id", -1);
-        long nonStrikerId = sharedPreferences.getLong("non_striker_id", -1);
-
-        // Check if runs are odd
+        long strikerId = sharedPreferences.getLong(STRIKER_ID, -1);
+        long nonStrikerId = sharedPreferences.getLong(NON_STRIKER_ID, -1);
         if (runs % 2 != 0) {
-            // Swap striker and non-striker
             long temp = strikerId;
             strikerId = nonStrikerId;
             nonStrikerId = temp;
         }
-        // Update the SharedPreferences with the new IDs
-        editor.putLong("striker_id", strikerId);
-        editor.putLong("non_striker_id", nonStrikerId);
+        editor.putLong(STRIKER_ID, strikerId);
+        editor.putLong(NON_STRIKER_ID, nonStrikerId);
         editor.apply();
     }
     private String rotateStrikeWhileRunOut(String outBatsman, String outEnd){
@@ -487,17 +531,19 @@ public class MatchActivity extends AppCompatActivity {
         });
     }
     private void handleScoringFor0To6(int runs) {
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+        Log.d(TAG, "handleScoringFor0To6: runs input ==" + runs);
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         String typeOfBallIn0To6Runs = "Normal";
-        long inningsId = sharedPreferences.getLong("Innings_id",-1);
-        long overId = sharedPreferences.getLong("over_id", -1);
-        long strikerId = sharedPreferences.getLong("striker_id", -1);
-        long nonStrikerId = sharedPreferences.getLong("non_striker_id", -1);
-        long bowlerId = sharedPreferences.getLong("bowler_id",-1);
-        long ballId = databaseHelper.insertBallDataFor0To6(overId, typeOfBallIn0To6Runs, runs, strikerId, nonStrikerId);
+        long inningsId = sharedPreferences.getLong(INNINGS_ID,-1);
+        long overId = sharedPreferences.getLong(OVER_ID, -1);
+        long strikerId = sharedPreferences.getLong(STRIKER_ID, -1);
+        long nonStrikerId = sharedPreferences.getLong(NON_STRIKER_ID, -1);
+        long partnershipId = sharedPreferences.getLong(PARTNERSHIP_ID, -1);
+        long bowlerId = sharedPreferences.getLong(BOWLER_ID,-1);
+        long ballId = databaseHelper.insertBallDataFor0To6(overId, runs, strikerId, nonStrikerId);
         databaseHelper.updateBatsmanStatsFor0To6(inningsId, strikerId, runs);
         databaseHelper.updateBowlerStatsFor0to6(inningsId, bowlerId, runs);
-        databaseHelper.updatePartnershipFor0to6(runs, 1);
+        databaseHelper.updatePartnershipFor0to6(runs, partnershipId);
         updateTeamStatsFor0to6(runs);
         incrementPlayedBallsInSharedPreferences();
         updateScoreInSharedPreferences(typeOfBallIn0To6Runs, runs);
@@ -571,8 +617,8 @@ public class MatchActivity extends AppCompatActivity {
          checkAndHandleOverEnd();
      }
      private void updateTeamStatsFor0to6(int runs){
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
-        long teamStatsId = sharedPreferences.getLong("teamStatsId", -1);
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        long teamStatsId = sharedPreferences.getLong(TEAM_STATS_ID, -1);
         databaseHelper.updateTeamStatsFor0to6(teamStatsId, runs);
      }
      private void updateTeamStatsForByLegBy(int runs){
@@ -591,14 +637,11 @@ public class MatchActivity extends AppCompatActivity {
         databaseHelper.updateTeamStatsForNoBall(teamStatsId, runs, runsSource);
     }
     private void setNewPlayer(String playerType) {
-        // Inflate your dialog layout
         Log.d(TAG, "setNewBatsman: " + playerType);
         View playerDialogView = getLayoutInflater().inflate(R.layout.activity_selecting_players, null);
-        // Create and configure the dialog
         AlertDialog.Builder playerBuilder = new AlertDialog.Builder(this);
         playerBuilder.setView(playerDialogView);
         AlertDialog playerDialog = playerBuilder.create();
-        // Show the dialog
         playerDialog.show();
         // Set dialog width and height to match your desired values
         if (playerDialog.getWindow() != null) {
@@ -612,73 +655,66 @@ public class MatchActivity extends AppCompatActivity {
         EditText playerNameEditText = playerDialogView.findViewById(R.id.playerNameEditText);
         Button submitButton = playerDialogView.findViewById(R.id.submitButton);
         Button backButton = playerDialogView.findViewById(R.id.cancelButton);
-
-        // Submit Button Click Handler
+        backButton.setVisibility(View.GONE);
         submitButton.setOnClickListener(v -> {
-            String player_name = String.valueOf(playerNameEditText.getText());
-            updatePlayerDataInSp(playerType, player_name);
-            if(playerType.equals("bowler")) insertOver();
+            String playerName = String.valueOf(playerNameEditText.getText());
+            updatePlayerDataInSp(playerType, playerName);
+            if(playerType.equals(BOWLER)){
+                updateNewBowlerToDB(playerName);
+                insertOver();
+            }else updateNewBatsmanToDB(playerName, playerType);
             playerDialog.dismiss();
         });
-        // Back Button Click Handler
-        backButton.setOnClickListener(v -> {
-            // Just dismiss the dialog without saving
-            playerDialog.dismiss();
-        });
-        // Show the dialog
         playerDialog.show();
     }
-    private void updatePlayerDataInSp(String player_type, String player_name){
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+    private void updatePlayerDataInSp(String playerType, String playerName){
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        long innings_id  = sharedPreferences.getLong("Innings_id", -1);
-        editor.putString(player_type + " name",player_name);
-        editor.putInt("currentOverScore", 0);
+        editor.putString(playerType, playerName);
+        editor.putInt(CURRENT_OVER_SCORE, 0);
         editor.apply();
-        if(player_type.equals("bowler")) updateNewBowlerToDB(player_name, player_type, innings_id);
-        else updateNewBatsmanToDB(player_name, player_type, innings_id);
     }
-    private void updateNewBatsmanToDB(String name, String player_type, long innings_id) {
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
-        long teamId = sharedPreferences.getLong("teamA_id", -1);
-        long player_id = databaseHelper.insertPlayer(name, teamId);
-        String batter = player_type.equals("striker") ? "non_striker_id" : "striker_id";
-        databaseHelper.initializeBatsmanStats(player_id, innings_id);
-        long player2_id = sharedPreferences.getLong(batter, -1);
-        Log.d(TAG, "striker" + player_id + "non striker" + player2_id);
-        databaseHelper.insertPartnership(innings_id,player_id, player2_id);
+    private void updateNewBatsmanToDB(String name, String player_type) {
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        long inningsId = sharedPreferences.getLong(INNINGS_ID, -1);
+        long teamId = sharedPreferences.getLong(BATTING_TEAM_ID, -1);
+        long newBatsmanId = databaseHelper.insertPlayer(name, teamId);
+        databaseHelper.initializeBatsmanStats(newBatsmanId, inningsId);
+        String oldBatsmanType = player_type.equals(STRIKER) ? NON_STRIKER_ID : STRIKER_ID;
+        long oldBatsmanId = sharedPreferences.getLong(oldBatsmanType, -1);
+        Log.d(TAG, "striker" + newBatsmanId + "non striker" + oldBatsmanId);
+        databaseHelper.insertPartnership(inningsId, newBatsmanId, oldBatsmanId);
     }
-    private void updateNewBowlerToDB(String name, String player_type, long innings_id) {
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
-        long teamId = sharedPreferences.getLong("teamB_id", -1);
-        long player_id = databaseHelper.insertPlayer(name, teamId);
-        databaseHelper.initializeBowlerStats(player_id, innings_id);
+    private void updateNewBowlerToDB(String name) {
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        long teamId = sharedPreferences.getLong(BOWLING_TEAM_ID, -1);
+        long inningsId = sharedPreferences.getLong(INNINGS_ID, -1);
+        long playerId = databaseHelper.insertPlayer(name, teamId);
+        databaseHelper.initializeBowlerStats(playerId, inningsId);
     }
     private void incrementPlayedBallsInSharedPreferences() {
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        long playedBalls = sharedPreferences.getLong("playedBalls", 0);
+        long playedBalls = sharedPreferences.getLong(PLAYED_BALLS, 0);
         playedBalls++;
-        editor.putLong("playedBalls", playedBalls);
+        editor.putLong(PLAYED_BALLS, playedBalls);
         editor.apply();
         Log.d(TAG, "incrementPlayedBalls:  balls incremented by 1 and current balls are " + playedBalls);
-        //checkAndHandleOverEnd(playedBalls);
     }
     public void checkAndHandleOverEnd() {
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
-        long playedBalls = sharedPreferences.getLong("playedBalls", -1);
-        long totalBalls = sharedPreferences.getLong("totalBalls", 0);
-        long target = sharedPreferences.getLong("target", -1);
-        int currentOverScore = sharedPreferences.getInt("currentOverScore", -1);
-        String currentInnings = sharedPreferences.getString("currentInnings","");
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        long playedBalls = sharedPreferences.getLong(PLAYED_BALLS, -1);
+        long totalBalls = sharedPreferences.getLong(TOTAL_BALLS, 0);
+        long target = sharedPreferences.getLong(TARGET, -1);
+        int currentOverScore = sharedPreferences.getInt(CURRENT_OVER_SCORE, -1);
+        String currentInnings = sharedPreferences.getString(CURRENT_INNINGS_NUMBER,"");
         Log.d(TAG, "checkAndHandleOverEnd: current ongoing innings " + currentInnings);
-        int currentScore = sharedPreferences.getInt("score", -1);
+        int currentScore = sharedPreferences.getInt(SCORE, -1);
         if (playedBalls % 6 == 0 && playedBalls != 0 && playedBalls != totalBalls) {
             Log.d(TAG, "checkAndHandleOverEnd:" + playedBalls / 6 + "Over has ended");
             if(currentOverScore == 0) insertMaidenOver();
             setNewPlayer("bowler");
             rotateStrike(1);
-            //insertOver();
         }
         if(playedBalls == totalBalls || currentScore >= target) {
             handleInningsEnd(currentInnings);
@@ -708,11 +744,11 @@ public class MatchActivity extends AppCompatActivity {
         }
     }
     public void updateScoreInSharedPreferences(String ballType, int runs){
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES,MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        int score = sharedPreferences.getInt("score", -1);
-        int currentOverScore = sharedPreferences.getInt("currentOverScore", -1);
-        if(ballType.equals("Normal")){
+        int score = sharedPreferences.getInt(SCORE, -1);
+        int currentOverScore = sharedPreferences.getInt(CURRENT_OVER_SCORE, -1);
+        if(ballType.equals(NORMAL_BALL)){
             score += runs;
             currentOverScore += runs;
         }
@@ -725,11 +761,10 @@ public class MatchActivity extends AppCompatActivity {
             currentOverScore += runs;
         }
         Log.d(TAG, "updateScoreInSharedPreferences: " + score);
-        editor.putInt("score", score);
-        editor.putInt("currentOverScore", currentOverScore);
+        editor.putInt(SCORE, score);
+        editor.putInt(CURRENT_OVER_SCORE, currentOverScore);
         editor.apply();
     }
-
     private void showInningsEndDialog(String title, String message, int durationInSeconds) {
         boolean isDialogClosed = false;
         SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
@@ -763,15 +798,15 @@ public class MatchActivity extends AppCompatActivity {
     }
     private void insertOver(){
         Log.d(TAG, "insertOver: inside the insert over");
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
-        long inningsId = sharedPreferences.getLong("Innings_id", -1);
-        long bowlerId = sharedPreferences.getLong("bowler_id", -1);
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        long inningsId = sharedPreferences.getLong(INNINGS_ID, -1);
+        long bowlerId = sharedPreferences.getLong(BOWLER_ID, -1);
         databaseHelper.insertOver(inningsId, 2, bowlerId, 0);
     }
 
     private void insertMaidenOver(){
-        SharedPreferences sharedPreferences =getSharedPreferences("match_prefs", MODE_PRIVATE);
-        long overId = sharedPreferences.getLong("over_id", -1);
+        sharedPreferences =getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        long overId = sharedPreferences.getLong(OVER_ID, -1);
         databaseHelper.insertMaidenOver(overId);
     }
     private void secondInnings(){

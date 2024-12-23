@@ -20,7 +20,6 @@
         <activity
             android:name=".Activity.SplashActivity"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -58,38 +57,13 @@
             android:launchMode="singleTask"
             android:exported="true"  />
 
-        <activity android:name=".Activity.ScoringActivity"
-            android:launchMode="singleTask"
-            android:exported="true"  />
-
         <activity android:name=".Activity.MatchActivity"
-            android:launchMode="singleTask"
-            android:exported="true"  />
-
-
-        <activity android:name=".Activity.MpScorecardActivity"
-            android:launchMode="singleTask"
-            android:exported="true"  />
-
-<!--        <activity android:name=".MpSummaryActivity"-->
-<!--            android:launchMode="singleTask"-->
-<!--            android:exported="true"  />-->
-
-        <activity android:name=".Activity.MpCommentaryActivity"
-            android:launchMode="singleTask"
-            android:exported="true"  />
-
-        <activity android:name=".Activity.MpTeamsActivity"
             android:launchMode="singleTask"
             android:exported="true"  />
 
         <activity android:name=".Activity.TypeofWicketActivity"
             android:launchMode="singleTask"
             android:exported="true"  />
-
-
-
-
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

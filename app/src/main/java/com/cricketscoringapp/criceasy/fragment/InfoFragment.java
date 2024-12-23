@@ -29,13 +29,13 @@ public class InfoFragment extends Fragment {
         View view = inflater.inflate(R.layout.activity_mp_info, container, false);
 
         // Initialize UI elements
-        team1TextView = view.findViewById(R.id.team1);
-        team2TextView = view.findViewById(R.id.team2);
-        matchTypeTextView = view.findViewById(R.id.matchtypeValue);
-        oversTextView = view.findViewById(R.id.oversValue);
-        ballTypeTextView = view.findViewById(R.id.balltypeValue);
-        venueTextView = view.findViewById(R.id.venueValue);
-        dateTextView = view.findViewById(R.id.dateValue);
+        team1TextView = view.findViewById(R.id.teamAEditText);
+        team2TextView = view.findViewById(R.id.teamBTextView);
+        matchTypeTextView = view.findViewById(R.id.matchTypeValueTextView);
+        oversTextView = view.findViewById(R.id.oversValueTextView);
+        ballTypeTextView = view.findViewById(R.id.ballTypeValueTextView);
+        venueTextView = view.findViewById(R.id.venueValueTextView);
+        dateTextView = view.findViewById(R.id.dateValueTextView);
 
         // Initialize DatabaseHelper
         databaseHelper = new DatabaseHelper(requireContext());

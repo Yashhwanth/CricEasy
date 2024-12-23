@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 import static android.content.ContentValues.TAG;
 
+import com.google.android.datatransport.cct.internal.LogEvent;
+
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 13; // Update version
     private static final String DATABASE_NAME = "CricketDB";
@@ -768,6 +770,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
+
+
     public long insertOver(long inningsId, int over, long bowlerId, int isMaiden) {
         SQLiteDatabase db = this.getWritableDatabase();
         long over_id = 0;
@@ -794,16 +798,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return over_id;
     }
     public void insertMaidenOver(long overId){
-        SQLiteDatabase db = this.getWritableDatabase();
-        try{
+        try (SQLiteDatabase db = this.getWritableDatabase()) {
             ContentValues values = new ContentValues();
             values.put(COLUMN_IS_MAIDEN, 1);
             db.update(TABLE_OVERS, values, COLUMN_OVER_ID + " = ?", new String[]{String.valueOf(overId)});
         } catch (Exception e) {
-            e.printStackTrace();
-        }
-        finally {
-            db.close();
+            Log.e(TAG, "insertMaidenOver: failed to update maiden over");
         }
     }
     public long insertPartnership(long inningsId, long batsman1Id, long batsman2Id) {
@@ -846,8 +846,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return teamStatsId;
     }
-
-
     public Map<String, String> getMatchDetails(long matchId) {
         SQLiteDatabase db = this.getReadableDatabase();
         Map<String, String> matchDetails = new HashMap<>();
@@ -879,26 +877,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //---------------------------------------------ball table------------------------------
-    public long insertBallDataFor0To6(long overId, String typeOfBall, int runs, long strikerId, long nonStrikerId) {
+    public long insertBallDataFor0To6(long overId, int runs, long strikerId, long nonStrikerId) {
+        String typeofBall = "Normal";
         SQLiteDatabase db = this.getWritableDatabase();
-
-        // Create a ContentValues object to hold the values to be inserted
         ContentValues contentValues = new ContentValues();
-
-        // Add the values to the ContentValues object
-        contentValues.put(COLUMN_OVER_ID, overId); // Get overId from SharedPreferences
-        contentValues.put(COLUMN_TYPE_OF_BALL, typeOfBall); // Set type of ball (all legal for now)
-        contentValues.put(COLUMN_RUNS, runs); // Runs scored on the ball
+        contentValues.put(COLUMN_OVER_ID, overId);
+        contentValues.put(COLUMN_TYPE_OF_BALL, typeofBall);
+        contentValues.put(COLUMN_RUNS, runs);
         contentValues.put(COLUMN_IS_WICKET, 0);
-        contentValues.put(COLUMN_STRIKER, strikerId); // Get striker ID from SharedPreferences
-        contentValues.put(COLUMN_NON_STRIKER, nonStrikerId); // Get non-striker ID from SharedPreferences
-
-        // Insert the data into the balls table
+        contentValues.put(COLUMN_STRIKER, strikerId);
+        contentValues.put(COLUMN_NON_STRIKER, nonStrikerId);
         long ballId = db.insert(TABLE_BALLS, null, contentValues);
-
-        db.close(); // Close the database connection
-
-        // Return the ID of the inserted ball (auto-generated)
+        db.close();
         return ballId;
     }
     public long insertBallDataForByLByes(long overId, String typeOfBall, int runs, long strikerId, long nonStrikerId) {
@@ -1006,33 +996,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     //---------------------------------updating partnerships---------------------------------
-    public void updatePartnershipFor0to6(int runsScored, int ballsFaced) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        SharedPreferences sharedPreferences = context.getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
-
-        // Retrieve the partnership ID from shared preferences
-        long partnershipId = sharedPreferences.getLong("partnership_id", -1);
-
-        if (partnershipId == -1) {
-            Log.e("DatabaseHelper", "Partnership ID not found in SharedPreferences.");
-            return;
-        }
-
-        try {
-            // Prepare SQL update query
+    public void updatePartnershipFor0to6(int runsScored, long partnershipId) {
+        try (SQLiteDatabase db = this.getWritableDatabase()) {
+            if (partnershipId == -1) {
+                Log.e("DatabaseHelper", "Partnership ID not found in SharedPreferences.");
+                return;
+            }
             String query = "UPDATE " + TABLE_PARTNERSHIPS +
                     " SET " + COLUMN_RUNS + " = " + COLUMN_RUNS + " + ?, " +
-                    COLUMN_BALLS + " = " + COLUMN_BALLS + " + ? " +
+                    COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 " +
                     "WHERE " + COLUMN_PARTNERSHIP_ID + " = ?";
-
-            // Execute update
-            db.execSQL(query, new Object[]{runsScored, ballsFaced, partnershipId});
+            db.execSQL(query, new Object[]{runsScored, partnershipId});
             Log.d("DatabaseHelper", "Partnership updated successfully.");
         } catch (Exception e) {
-            e.printStackTrace();
             Log.e("DatabaseHelper", "Failed to update partnership.");
-        } finally {
-            db.close();
         }
     }
     public void updatePartnershipForByLByes(int ballsFaced) {
@@ -1144,10 +1121,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //--------------------------------------updating batsman score---------------------------
     public void updateBatsmanStatsFor0To6(long innings_id, long player_id, int runs) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        try {
-            // Prepare SQL update query for batsman stats
+        try (SQLiteDatabase db = this.getWritableDatabase()) {
             String updateQuery = "UPDATE " + TABLE_BATSMAN +
                     " SET " +
                     COLUMN_SCORE + " = " + COLUMN_SCORE + " + ?, " +
@@ -1179,24 +1153,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 default:
                     return;  // Invalid run, do nothing
             }
-
-
-
-            // Add WHERE condition to the query
             updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
-
-            // Execute the query
             SQLiteStatement statement = db.compileStatement(updateQuery);
             statement.bindLong(1, runs);  // Bind the runs value
             statement.bindLong(2, player_id);  // Bind player_id
             statement.bindLong(3, innings_id);  // Bind innings_id
-
             statement.executeUpdateDelete();  // Execute the update query
-
         } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            db.close();
+            Log.e(TAG, "updateBatsmanStatsFor0To6: failed to update stats of batsman with id" + player_id);
         }
     }
     public void updateBatsmanForByLByes(long innings_id, long player_id, int balls) {
@@ -1366,15 +1330,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //---------------------------------------- update bowlers stats-------------------------------
     public void updateBowlerStatsFor0to6(long innings_id, long player_id, int runs) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        try {
-            // Prepare SQL update query for bowler stats
+        try (SQLiteDatabase db = this.getWritableDatabase()) {
             String updateQuery = "UPDATE " + TABLE_BOWLER +
                     " SET " +
                     COLUMN_RUNS + " = " + COLUMN_RUNS + " + ?, " +
                     COLUMN_BALLS_PLAYED + " = " + COLUMN_BALLS_PLAYED + " + 1, ";
-
-            // Update the run type columns (0s, 1s, 2s, etc.)
             switch (runs) {
                 case 0:
                     updateQuery += COLUMN_ZEROES + " = " + COLUMN_ZEROES + " + 1 ";
@@ -1398,22 +1358,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     updateQuery += COLUMN_SIXES + " = " + COLUMN_SIXES + " + 1 ";
                     break;
                 default:
-                    return; // Invalid run, do nothing
+                    return;
             }
-
-            // Add WHERE condition to the query
             updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
-
-            // Execute the query
             SQLiteStatement statement = db.compileStatement(updateQuery);
-            statement.bindLong(1, runs);  // Bind the runs value
-            statement.bindLong(2, player_id);  // Bind player_id
-            statement.bindLong(3, innings_id);  // Bind innings_id
-            statement.executeUpdateDelete();  // Execute the update query
+            statement.bindLong(1, runs);
+            statement.bindLong(2, player_id);
+            statement.bindLong(3, innings_id);
+            statement.executeUpdateDelete();
         } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            db.close();
+            Log.e(TAG, "updateBatsmanStatsFor0To6: failed to update stats of bowler with id" + player_id);
         }
     }
     public void updateBowlerForByLBes(long innings_id, long player_id, String ballType) {
@@ -1702,54 +1656,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 //---------------------------------------------team stats---------------------------------------------------
     public void updateTeamStatsFor0to6(long teamStatsId, int runs) {
-    SQLiteDatabase db = this.getWritableDatabase();
-    try {
-        // Get the current values of runs and balls
-        String selectQuery = "SELECT " + COLUMN_RUNS + ", " + "balls" + " FROM " + TABLE_TEAM_STATISTICS + " WHERE " + COLUMN_TEAM_STATS_ID + " = ?";
-        Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(teamStatsId)});
-
-        int currentRuns = 0;
-        int currentBalls = 0;
-
-        if (cursor != null && cursor.moveToFirst()) {
-            // Ensure the columns exist by checking the index is not -1
-            int runsIndex = cursor.getColumnIndex(COLUMN_RUNS);
-            int ballsIndex = cursor.getColumnIndex("balls");
-
-            if (runsIndex != -1 && ballsIndex != -1) {
-                // Only proceed if the column indices are valid
-                currentRuns = cursor.getInt(runsIndex);
-                currentBalls = cursor.getInt(ballsIndex);
-            } else {
-                Log.e("DatabaseHelper", "Column not found.");
-                return; // Exit the method if column indices are invalid
+        try (SQLiteDatabase db = this.getWritableDatabase()) {
+            String selectQuery = "SELECT " + COLUMN_RUNS + ", " + COLUMN_BALLS + " FROM " + TABLE_TEAM_STATISTICS + " WHERE " + COLUMN_TEAM_STATS_ID + " = ?";
+            Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(teamStatsId)});
+            int currentRuns = 0;
+            int currentBalls = 0;
+            if (cursor != null && cursor.moveToFirst()) {
+                // Ensure the columns exist by checking the index is not -1
+                int runsIndex = cursor.getColumnIndex(COLUMN_RUNS);
+                int ballsIndex = cursor.getColumnIndex(COLUMN_BALLS);
+                if (runsIndex != -1 && ballsIndex != -1) {
+                    currentRuns = cursor.getInt(runsIndex);
+                    currentBalls = cursor.getInt(ballsIndex);
+                } else {
+                    Log.e("DatabaseHelper", "Column not found.");
+                    return;
+                }
+                cursor.close();
             }
-
-            cursor.close();
+            // Increment runs and balls
+            currentRuns += runs;
+            currentBalls += 1;
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(COLUMN_RUNS, currentRuns);
+            contentValues.put(COLUMN_BALLS, currentBalls);
+            int rowsUpdated = db.update(TABLE_TEAM_STATISTICS, contentValues, COLUMN_TEAM_STATS_ID + " = ?", new String[]{String.valueOf(teamStatsId)});
+            if (rowsUpdated > 0) {
+                Log.d("DatabaseHelper", "Team stats updated for ID: " + teamStatsId);
+            } else {
+                Log.e("DatabaseHelper", "Failed to update team stats for ID: " + teamStatsId);
+            }
+        } catch (Exception e) {
+            Log.e("DatabaseHelper", "Error during team stats update for 0 to 6 runs.");
         }
-
-        // Increment runs and balls
-        currentRuns += runs;
-        currentBalls += 1;
-
-        // Update the stats in the database
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(COLUMN_RUNS, currentRuns);
-        contentValues.put(COLUMN_BALLS, currentBalls);
-
-        int rowsUpdated = db.update(TABLE_TEAM_STATISTICS, contentValues, COLUMN_TEAM_STATS_ID + " = ?", new String[]{String.valueOf(teamStatsId)});
-
-        if (rowsUpdated > 0) {
-            Log.d("DatabaseHelper", "Team stats updated for ID: " + teamStatsId);
-        } else {
-            Log.e("DatabaseHelper", "Failed to update team stats for ID: " + teamStatsId);
-        }
-    } catch (Exception e) {
-        e.printStackTrace();
-        Log.e("DatabaseHelper", "Error during team stats update for 0 to 6 runs.");
-    } finally {
-        db.close();
-    }
 }
     public void updateTeamStatsForByesAndLegByes(long teamStatsId, int runs) {
         SQLiteDatabase db = this.getWritableDatabase();

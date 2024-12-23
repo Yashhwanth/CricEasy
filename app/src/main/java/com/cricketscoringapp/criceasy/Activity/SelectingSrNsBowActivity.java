@@ -42,9 +42,6 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES,MODE_PRIVATE);
         String currentInnings = sharedPreferences.getString(CURRENT_INNINGS_NUMBER, CURRENT_INNINGS_DEFAULT_VALUE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.remove(CURRENT_INNINGS_NUMBER);
-        editor.apply();
-
 
         //UI
         ImageView strikerButton = findViewById(R.id.srImageView);
@@ -54,19 +51,19 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
         Button backButton = findViewById(R.id.backButton);
 
         strikerButton.setOnClickListener(view ->{
-            editor.putString(PLAYER_TYPE_KEY,PLAYER_STRIKER_VALUE);
+            editor.putString(PLAYER_TYPE_KEY, PLAYER_STRIKER_VALUE);
             editor.apply();
             selectingPlayersActivity();
         });
 
         nonStrikerButton.setOnClickListener(view ->{
-            editor.putString(PLAYER_TYPE_KEY,PLAYER_NON_STRIKER_VALUE);
+            editor.putString(PLAYER_TYPE_KEY, PLAYER_NON_STRIKER_VALUE);
             editor.apply();
             selectingPlayersActivity();
         });
 
         bowlerButton.setOnClickListener(view ->{
-            editor.putString(PLAYER_TYPE_KEY,PLAYER_BOWLER_VALUE);
+            editor.putString(PLAYER_TYPE_KEY, PLAYER_BOWLER_VALUE);
             editor.apply();
             selectingPlayersActivity();
         });
@@ -170,18 +167,24 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
     private void updateInningsDetailsInSharedPreferences(long inningsId, String currentInningsNumber){
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        String PLAYED_BALLS = "playedBalls";
         String FIRST_INNINGS = "first";
         String SECOND_INNINGS = "second";
-        editor.putLong(PLAYED_BALLS, 0);
-        editor.putLong(CURRENT_INNINGS_ID_KEY, inningsId);
-        if(currentInningsNumber == null) editor.putString(CURRENT_INNINGS_NUMBER, FIRST_INNINGS);
-        else editor.putString(CURRENT_INNINGS_NUMBER, SECOND_INNINGS);
+        String PLAYED_BALLS = "playedBalls";
         String TARGET = "target";
-        editor.putLong(TARGET, 10000);
         String SCORE = "score";
-        editor.putInt(SCORE,0);
-        editor.apply();
+        if(currentInningsNumber == null) {
+            editor.putLong(PLAYED_BALLS, 0);
+            editor.putLong(CURRENT_INNINGS_ID_KEY, inningsId);
+            editor.putString(CURRENT_INNINGS_NUMBER, FIRST_INNINGS);
+            editor.putLong(TARGET, Integer.MAX_VALUE);
+            editor.putInt(SCORE,0);
+            editor.apply();
+        }else{
+            editor.putLong(PLAYED_BALLS, 0);
+            editor.putLong(CURRENT_INNINGS_ID_KEY, inningsId);
+            editor.putString(CURRENT_INNINGS_NUMBER, SECOND_INNINGS);
+            editor.apply();
+        }
     }
     private void updateOverTable(){
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
