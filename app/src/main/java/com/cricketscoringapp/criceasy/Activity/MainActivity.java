@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         //editor.clear();
+        editor.putLong("playedBalls", 0);
+        editor.putLong("target", Integer.MAX_VALUE);
         editor.apply();
         Log.d(TAG, "onCreate: Cleared all SharedPreferences");
 

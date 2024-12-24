@@ -19,7 +19,7 @@
     <!-- Input field for entering the extra runs -->
     <EditText
         android:id="@+id/extraRunsEditText"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="100dp"
         android:autofillHints="null"
         android:hint="@string/hintForExtraRunsEditText"
@@ -58,6 +58,7 @@
 
     <LinearLayout
         android:id="@+id/activityNavigationButtonsLayout"
+        style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
@@ -66,12 +67,14 @@
 
         <Button
             android:id="@+id/cancelButton"
+            style="@style/CommonButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/cancelButton" />
 
         <Button
             android:id="@+id/submitButton"
+            style="@style/CommonButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"

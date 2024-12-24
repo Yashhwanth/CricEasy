@@ -77,7 +77,7 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
                 updatePartnershipTable();
                 updateBatsmanTable();
                 updateBowlerTable();
-                if (currentInnings.equals("second")) {
+                if (currentInnings.equals("first")) {
                     Log.d("InningsCheck", "Second innings setup completed, closing the activity.");
                     finish(); // Close the page when it's the second innings
                 } else {
@@ -173,16 +173,19 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
         String TARGET = "target";
         String SCORE = "score";
         if(currentInningsNumber == null) {
-            editor.putLong(PLAYED_BALLS, 0);
             editor.putLong(CURRENT_INNINGS_ID_KEY, inningsId);
             editor.putString(CURRENT_INNINGS_NUMBER, FIRST_INNINGS);
-            editor.putLong(TARGET, Integer.MAX_VALUE);
             editor.putInt(SCORE,0);
+            editor.putLong(PLAYED_BALLS, 0);
+            editor.putLong(TARGET, Integer.MAX_VALUE);
             editor.apply();
         }else{
-            editor.putLong(PLAYED_BALLS, 0);
+            long score = sharedPreferences.getLong(SCORE, -1);
             editor.putLong(CURRENT_INNINGS_ID_KEY, inningsId);
             editor.putString(CURRENT_INNINGS_NUMBER, SECOND_INNINGS);
+            editor.putInt(SCORE, 0);
+            editor.putLong(PLAYED_BALLS, 0);
+            editor.putLong(TARGET, score + 1);
             editor.apply();
         }
     }

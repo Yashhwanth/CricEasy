@@ -65,6 +65,11 @@ public class MatchActivity extends AppCompatActivity {
     private final String CURRENT_INNINGS_NUMBER = "currentInningsNumber";
     private final String BATTING_TEAM_ID = "battingTeamId";
     private final String BOWLING_TEAM_ID = "bowlingTeamId";
+    private static final String BOWLED = "Bowled";
+    private static final String CAUGHT = "Caught";
+    private static final String LBW = "LBW";
+    private static final String RUN_OUT = "Run-Out";
+    private static final String STUMPED = "Stumped";
 
 
     @Override
@@ -97,7 +102,6 @@ public class MatchActivity extends AppCompatActivity {
         super.onResume();
         updateCurrentActivityInPreferences();
     }
-
     private void setupUI(Bundle savedInstanceState){
         infoFragmentButton = findViewById(R.id.infoFragmentButton);
         summaryFragmentButton = findViewById(R.id.summaryFragmentButton);
@@ -116,6 +120,19 @@ public class MatchActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             showFragment(new liveFragment());
         }
+    }
+    private void showFragment(Fragment fragment) {
+        // Begin a fragment transaction to replace the current fragment
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragmentLayout, fragment); // fragmentContainer is the container where the fragments will be loaded
+        transaction.addToBackStack(null); // Optionally, add the transaction to the back stack if you want to handle back navigation
+        transaction.commit();
+    }
+    private void updateCurrentActivityInPreferences() {
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(CURRENT_ACTIVITY, getClass().getSimpleName()); // Store the current activity name
+        editor.apply(); // Save changes asynchronously
     }
     public void openScoringPopup() {
         View dialogView = getLayoutInflater().inflate(R.layout.activity_scoring, null);
@@ -195,55 +212,6 @@ public class MatchActivity extends AppCompatActivity {
             showWicketDialog(dialog);
         });
     }
-    private void showFragment(Fragment fragment) {
-        // Begin a fragment transaction to replace the current fragment
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragmentLayout, fragment); // fragmentContainer is the container where the fragments will be loaded
-        transaction.addToBackStack(null); // Optionally, add the transaction to the back stack if you want to handle back navigation
-        transaction.commit();
-    }
-    private void updateCurrentActivityInPreferences() {
-        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(CURRENT_ACTIVITY, getClass().getSimpleName()); // Store the current activity name
-        editor.apply(); // Save changes asynchronously
-    }
-    private void rotateStrike(int runs) {
-        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        long strikerId = sharedPreferences.getLong(STRIKER_ID, -1);
-        long nonStrikerId = sharedPreferences.getLong(NON_STRIKER_ID, -1);
-        if (runs % 2 != 0) {
-            long temp = strikerId;
-            strikerId = nonStrikerId;
-            nonStrikerId = temp;
-        }
-        editor.putLong(STRIKER_ID, strikerId);
-        editor.putLong(NON_STRIKER_ID, nonStrikerId);
-        editor.apply();
-    }
-    private String rotateStrikeWhileRunOut(String outBatsman, String outEnd){
-        Log.d(TAG, "rotateStrikeWhileRunOut: " + outBatsman + outEnd);
-        String replacePlayer = "striker";
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        long strikerIdFromSp = sharedPreferences.getLong("striker_id", -1);
-        long NonStrikerIdFromSp = sharedPreferences.getLong("non_striker_id", -1);
-        if(outEnd.equals("non_striker")) replacePlayer = "non_striker";
-        if(outBatsman.equals("striker")){
-            if(outEnd.equals("non_striker")){
-                editor.putLong("striker_id", NonStrikerIdFromSp);
-                editor.putLong("non_striker_id", strikerIdFromSp);
-                editor.apply();
-            }
-        }else if(outBatsman.equals("non_striker")){
-            if(outEnd.equals("striker")){
-                editor.putLong("striker_id", NonStrikerIdFromSp);
-                editor.putLong("non_striker_id", strikerIdFromSp);
-                editor.apply();
-            }
-        }return replacePlayer;
-    }
     private void showExtrasDialog(String ballType, AlertDialog parentDialog) {
         View extrasDialogView = getLayoutInflater().inflate(R.layout.activity_dialog_for_extras, null);
         EditText extraRunsInput = extrasDialogView.findViewById(R.id.extraRunsEditText);
@@ -258,20 +226,16 @@ public class MatchActivity extends AppCompatActivity {
         TextView ballTypeLabel = extrasDialogView.findViewById(R.id.ballTypeHeading);
         ballTypeLabel.setText(ballType);
 
-        // Create the extras dialog
         AlertDialog.Builder extrasBuilder = new AlertDialog.Builder(this);
         extrasBuilder.setView(extrasDialogView);
         AlertDialog extrasDialog = extrasBuilder.create();
         extrasDialog.show();
-
         if (extrasDialog.getWindow() != null) {
             extrasDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
-        // Handle Cancel button
         btnCancel.setOnClickListener(view -> {
             extrasDialog.dismiss();
         });
-        // Handle Submit button
         btnSubmit.setOnClickListener(view -> {
             String extraRunsStr = extraRunsInput.getText().toString();
             int runsSourceInNoBallRadioButtonId = runsInNoBallRadioGroup.getCheckedRadioButtonId(); // Get the selected RadioButton ID
@@ -286,7 +250,6 @@ public class MatchActivity extends AppCompatActivity {
             }
             if (!extraRunsStr.isEmpty()) {
                 int extraRuns = Integer.parseInt(extraRunsStr);
-                // Check the ball type and call the corresponding method
                 switch (ballType) {
                     case BYE_BALL:
                     case LEG_BYE_BALL:
@@ -313,78 +276,69 @@ public class MatchActivity extends AppCompatActivity {
         wicketsBuilder.setView(wicketDialogView);
         AlertDialog wicketDialog = wicketsBuilder.create();
         wicketDialog.show();
-
         if (wicketDialog.getWindow() != null) {
             wicketDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
-
         EditText runs_input = wicketDialogView.findViewById(R.id.runsInWicketEditText);
+        LinearLayout runsInWicketLayout = wicketDialogView.findViewById(R.id.runsInWicketLayout); //runs input
+        LinearLayout outBatsmanLayout = wicketDialogView.findViewById(R.id.outBatsmanLayout); // out batsman
+        LinearLayout outEndLayout = wicketDialogView.findViewById(R.id.outEndLayout); //out end
+        LinearLayout runsSourceInRunOutLayout = wicketDialogView.findViewById(R.id.runsInRunOutLayout); // from bat/by layout
+        LinearLayout ballTypeInRunOutLayout = wicketDialogView.findViewById(R.id.ballTypeInWicketLayout); // ball type in run out layout
+        LinearLayout ballTypeInStumpedLayout = wicketDialogView.findViewById(R.id.ballTypeInStumpingLayout); //ball type in run out
+        RadioGroup dismissalTypeRadioGroup = wicketDialogView.findViewById(R.id.wicketTypeRadioGroup); // dismissal type
+        RadioGroup outBatsmanRadioGroup = wicketDialogView.findViewById(R.id.outBatsmanRadioGroup);
+        RadioGroup outEndRadioGroup = wicketDialogView.findViewById(R.id.outEndRadioGroup);
+        RadioGroup ballTypeInWicketRadioGroup = wicketDialogView.findViewById(R.id.ballTypeInWicketRadioGroup);
+        RadioGroup runsSourceInRunOutRadioGroup = wicketDialogView.findViewById(R.id.runsInRunOutRadioGroup);
+        RadioGroup ballTypeInStumpedRadioGroup = wicketDialogView.findViewById(R.id.ballTypeInStumpingRadioGroup);
         Button cancelButton = wicketDialogView.findViewById(R.id.cancelButton);
         Button submitButton = wicketDialogView.findViewById(R.id.submitButton);
 
-        RadioGroup dismissalTypeRadioGroup = wicketDialogView.findViewById(R.id.wicketTypeRadioGroup); // dismissal type
+        runsInWicketLayout.setVisibility(View.GONE);
+        outBatsmanLayout.setVisibility(View.GONE);
+        outEndLayout.setVisibility(View.GONE);
+        runsSourceInRunOutLayout.setVisibility(View.GONE);
+        ballTypeInRunOutLayout.setVisibility(View.GONE);
+        ballTypeInStumpedLayout.setVisibility(View.GONE);
 
-        LinearLayout runs_input_layout = wicketDialogView.findViewById(R.id.runsInWicketLayout); //runs input
-        LinearLayout out_batsman_layout = wicketDialogView.findViewById(R.id.outBatsmanLayout); // out batsman
-        LinearLayout out_end_layout = wicketDialogView.findViewById(R.id.outEndLayout); //out end
-        LinearLayout runs_from_bat_or_by_layout = wicketDialogView.findViewById(R.id.runsInRunOutLayout); // from bat/by layout
-        LinearLayout ball_type_in_run_out_layout = wicketDialogView.findViewById(R.id.ballTypeInWicketLayout); // ball type in run out layout
-        LinearLayout stumped_layout = wicketDialogView.findViewById(R.id.ballTypeInStumpingLayout); //ball type in run out
-
-        RadioGroup out_batsman_radio_group = wicketDialogView.findViewById(R.id.outBatsmanRadioGroup);
-        RadioGroup out_end_radio_group = wicketDialogView.findViewById(R.id.outEndRadioGroup);
-        RadioGroup ball_type_in_run_out_radio_group = wicketDialogView.findViewById(R.id.ballTypeInWicketRadioGroup);
-        RadioGroup from_bat_or_by_radio_group = wicketDialogView.findViewById(R.id.runsInRunOutRadioGroup);
-        RadioGroup stumped_ball_type = wicketDialogView.findViewById(R.id.ballTypeInStumpingRadioGroup);
-
-
-        runs_input_layout.setVisibility(View.GONE);
-        out_batsman_layout.setVisibility(View.GONE);
-        out_end_layout.setVisibility(View.GONE);
-        runs_from_bat_or_by_layout.setVisibility(View.GONE);
-        ball_type_in_run_out_layout.setVisibility(View.GONE);
-        stumped_layout.setVisibility(View.GONE);
-
-
-        // Add listener to RadioGroup to detect selection
         dismissalTypeRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.runOutRadioButton) {
-                runs_input_layout.setVisibility(View.VISIBLE);
-                out_batsman_layout.setVisibility(View.VISIBLE);
-                out_end_layout.setVisibility(View.VISIBLE);
-                ball_type_in_run_out_layout.setVisibility(View.VISIBLE);
-                runs_from_bat_or_by_layout.setVisibility(View.VISIBLE);
-                stumped_layout.setVisibility(View.GONE);
-                ball_type_in_run_out_radio_group.setOnCheckedChangeListener((group1, checkedId1) -> {
+                runsInWicketLayout.setVisibility(View.VISIBLE);
+                outBatsmanLayout.setVisibility(View.VISIBLE);
+                outEndLayout.setVisibility(View.VISIBLE);
+                ballTypeInRunOutLayout.setVisibility(View.VISIBLE);
+                runsSourceInRunOutLayout.setVisibility(View.VISIBLE);
+                ballTypeInStumpedLayout.setVisibility(View.GONE);
+                ballTypeInWicketRadioGroup.setOnCheckedChangeListener((group1, checkedId1) -> {
                     if(checkedId1 == R.id.wideBallRadioButton){
-                        runs_from_bat_or_by_layout.setVisibility(View.GONE);
+                        runsSourceInRunOutLayout.setVisibility(View.GONE);
                     }else{
-                        runs_from_bat_or_by_layout.setVisibility(View.VISIBLE);
+                        runsSourceInRunOutLayout.setVisibility(View.VISIBLE);
                     }
                 });
             }else if(checkedId == R.id.stumpedRadioButton) {
-                runs_input_layout.setVisibility(View.GONE);
-                out_batsman_layout.setVisibility(View.GONE);
-                out_end_layout.setVisibility(View.GONE);
-                runs_from_bat_or_by_layout.setVisibility(View.GONE);
-                ball_type_in_run_out_layout.setVisibility(View.GONE);
-                stumped_layout.setVisibility(View.GONE);
-                stumped_layout.setVisibility(View.VISIBLE);
+                runsInWicketLayout.setVisibility(View.GONE);
+                outBatsmanLayout.setVisibility(View.GONE);
+                outEndLayout.setVisibility(View.GONE);
+                runsSourceInRunOutLayout.setVisibility(View.GONE);
+                ballTypeInRunOutLayout.setVisibility(View.GONE);
+                ballTypeInStumpedLayout.setVisibility(View.GONE);
+                ballTypeInStumpedLayout.setVisibility(View.VISIBLE);
             }else{
-                // Handle other cases, e.g., hide layouts
-                runs_input_layout.setVisibility(View.GONE);
-                out_batsman_layout.setVisibility(View.GONE);
-                out_end_layout.setVisibility(View.GONE);
-                runs_from_bat_or_by_layout.setVisibility(View.GONE);
-                ball_type_in_run_out_layout.setVisibility(View.GONE);
-                stumped_layout.setVisibility(View.GONE);
+                runsInWicketLayout.setVisibility(View.GONE);
+                outBatsmanLayout.setVisibility(View.GONE);
+                outEndLayout.setVisibility(View.GONE);
+                runsSourceInRunOutLayout.setVisibility(View.GONE);
+                ballTypeInRunOutLayout.setVisibility(View.GONE);
+                ballTypeInStumpedLayout.setVisibility(View.GONE);
             }
         });
         cancelButton.setOnClickListener(view -> {
             wicketDialog.dismiss();
         });
         submitButton.setOnClickListener(view -> {
-            String playerType = "striker";
+            String playerType = STRIKER;
             int dismissalTypeID = dismissalTypeRadioGroup.getCheckedRadioButtonId();
             if (dismissalTypeID == -1) {
                 Toast.makeText(this, "Please select a dismissal type.", Toast.LENGTH_SHORT).show();
@@ -392,97 +346,89 @@ public class MatchActivity extends AppCompatActivity {
             }
             RadioButton dismissalButton = wicketDialogView.findViewById(dismissalTypeID);
             String dismissalType = dismissalButton.getText().toString();
-            int runs = 0;
-            String runsInput = runs_input.getText().toString();
-            if (!runsInput.isEmpty()) {
-                try {
-                    runs = Integer.parseInt(runsInput);
-                } catch (NumberFormatException e) {
-                    // Handle the case where the number format is invalid (e.g., non-numeric input)
-                    runs = 0; // Set to default if there's a parsing error
-                }
-            }
-            SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
-            long innings_id = sharedPreferences.getLong("Innings_id",-1);
-            long striker = sharedPreferences.getLong("striker_id", -1);
-            long non_striker_id = sharedPreferences.getLong("non_striker_id", -1);
-            long bowler_id = sharedPreferences.getLong("bowler_id", -1);
-            long over_id = sharedPreferences.getLong("over_id", -1);
-            long team_stats_id = sharedPreferences.getLong("teamStatsId", -1);
-            long partnership_id = sharedPreferences.getLong("partnership_id", -1);
+            int runsInRunOut = 0;
+            sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+            long inningsId = sharedPreferences.getLong(INNINGS_ID,-1);
+            long strikerId = sharedPreferences.getLong(STRIKER_ID, -1);
+            long nonStrikerId = sharedPreferences.getLong(NON_STRIKER_ID, -1);
+            long bowlerId = sharedPreferences.getLong(BOWLER_ID, -1);
+            long overId = sharedPreferences.getLong(OVER_ID, -1);
+            long teamStatsId = sharedPreferences.getLong(TEAM_STATS_ID, -1);
+            long partnershipId = sharedPreferences.getLong(PARTNERSHIP_ID, -1);
             switch (dismissalType) {
-                case "Bowled":
-                case "Caught":
-                case "LBW":
-                    databaseHelper.insertBallDataForWicket(over_id, "Legal", runs, striker, non_striker_id);
-                    databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, null, null, "BOWLED");
-                    databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, null, null, "BOWLED");
-                    //need a partnership helper
-                    databaseHelper.updateTeamStatsForBowCauLbw(team_stats_id);
+                case BOWLED:
+                case CAUGHT:
+                case LBW:
+                    databaseHelper.insertBallDataForWicket(overId, NORMAL_BALL, runsInRunOut, strikerId, nonStrikerId);
+                    databaseHelper.updateBatsmanStatsForWicket(inningsId, strikerId, runsInRunOut, null, null, dismissalType);
+                    databaseHelper.updateBowlerStatsForWicket(inningsId, bowlerId, runsInRunOut, null, null, dismissalType);
+                    databaseHelper.updatePartnershipFor0to6(runsInRunOut, partnershipId);
+                    databaseHelper.updateTeamStatsForBowCauLbw(teamStatsId);
                     incrementPlayedBallsInSharedPreferences();
-                    updateScoreInSharedPreferences("Normal", runs);
+                    updateScoreInSharedPreferences(NORMAL_BALL, runsInRunOut);
                     break;
-                case "Run-Out":
-                    Log.d(TAG, "showWicketDialog: " + runs);
-                    int outBatsmanRadioButtonId = out_batsman_radio_group.getCheckedRadioButtonId();
+                case RUN_OUT:
+                    String runsInputInRunOut = runs_input.getText().toString();
+                    if(runsInputInRunOut.isEmpty()) return;
+                    runsInRunOut = Integer.parseInt(runsInputInRunOut);
+                    int outBatsmanRadioButtonId = outBatsmanRadioGroup.getCheckedRadioButtonId();
                     if (outBatsmanRadioButtonId == -1) {
                         Toast.makeText(this, "Please select the out batsman for run-out.", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     RadioButton outBatsmanRadioButton = wicketDialogView.findViewById(outBatsmanRadioButtonId);
                     String outBatsman = outBatsmanRadioButton.getText().toString();
-                    int outEndRadioButtonId = out_end_radio_group.getCheckedRadioButtonId();
+                    int outEndRadioButtonId = outEndRadioGroup.getCheckedRadioButtonId();
                     if (outEndRadioButtonId == -1) {
                         Toast.makeText(this, "Please select the out end for run-out.", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     RadioButton outEndRadioButton = wicketDialogView.findViewById(outEndRadioButtonId);
                     String outEnd = outEndRadioButton.getText().toString();
-                    int ballTypeRadioButtonIdRO = ball_type_in_run_out_radio_group.getCheckedRadioButtonId();
+                    int ballTypeRadioButtonIdRO = ballTypeInWicketRadioGroup.getCheckedRadioButtonId();
                     if (ballTypeRadioButtonIdRO == -1) {
                         Toast.makeText(this, "Please select the ball type for run-out.", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     RadioButton ballTypeRadioButtonRO = wicketDialogView.findViewById(ballTypeRadioButtonIdRO);
                     String ballTypeInRo = ballTypeRadioButtonRO.getText().toString();
-                    String runsFrom = "N/A";
-                    if (!ballTypeInRo.equals("Wide") && from_bat_or_by_radio_group.getVisibility() == View.VISIBLE) {
-                        int runsFromId = from_bat_or_by_radio_group.getCheckedRadioButtonId();
-                        if (runsFromId == -1) {
+                    String runsSourceInRunOut = "N/A";
+                    if (!ballTypeInRo.equals(WIDE_BALL) && runsSourceInRunOutRadioGroup.getVisibility() == View.VISIBLE) {
+                        int runsSourceInRunOutRadioButton = runsSourceInRunOutRadioGroup.getCheckedRadioButtonId();
+                        if (runsSourceInRunOutRadioButton == -1) {
                             Toast.makeText(this, "Please select runs from (bat/byes/leg byes).", Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        RadioButton runsFromRadioButton = wicketDialogView.findViewById(runsFromId);
-                        runsFrom = runsFromRadioButton.getText().toString();
+                        RadioButton runsFromRadioButton = wicketDialogView.findViewById(runsSourceInRunOutRadioButton);
+                        runsSourceInRunOut = runsFromRadioButton.getText().toString();
                     }
-                    Log.d(TAG, "showWicketDialog: " + runsFrom);
-                    Log.d(TAG, "showWicketDialog: " + ballTypeInRo);
-                    if(ballTypeInRo.equals("Normal"))    incrementPlayedBallsInSharedPreferences();
-                    updateScoreInSharedPreferences(ballTypeInRo ,runs);
-                    databaseHelper.insertBallDataForWicket(over_id, ballTypeInRo, runs, striker, non_striker_id);
-                    databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballTypeInRo, runsFrom, "RUN-OUT");
-                    databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, ballTypeInRo, runsFrom, "RUN-OUT");
-                    databaseHelper.updateTeamStatsForRunOut(team_stats_id, runs, ballTypeInRo, runsFrom);
-                    databaseHelper.updatePartnershipForRunOut(partnership_id, runs, ballTypeInRo, runsFrom);
-                    outBatsman = outBatsman.equals("non-striker") ? "non_striker" : "striker";
-                    outEnd = outEnd.equals("non-striker") ? "non_striker" : "striker";
+                    if(ballTypeInRo.equals(NORMAL_BALL))    incrementPlayedBallsInSharedPreferences();
+                    updateScoreInSharedPreferences(ballTypeInRo ,runsInRunOut);
+                    databaseHelper.insertBallDataForWicket(overId, ballTypeInRo, runsInRunOut, strikerId, nonStrikerId);
+                    databaseHelper.updateBatsmanStatsForWicket(inningsId, strikerId, runsInRunOut, ballTypeInRo, runsSourceInRunOut, "RUN-OUT");
+                    databaseHelper.updateBowlerStatsForWicket(inningsId, bowlerId, runsInRunOut, ballTypeInRo, runsSourceInRunOut, "RUN-OUT");
+                    databaseHelper.updateTeamStatsForRunOut(teamStatsId, runsInRunOut, ballTypeInRo, runsSourceInRunOut);
+                    databaseHelper.updatePartnershipForRunOut(partnershipId, runsInRunOut, ballTypeInRo, runsSourceInRunOut);
+                    outBatsman = outBatsman.equals("non-striker") ? NON_STRIKER : STRIKER;
+                    outEnd = outEnd.equals("non-striker") ? NON_STRIKER : STRIKER;
                     playerType = rotateStrikeWhileRunOut(outBatsman, outEnd);
                     break;
-                case "Stumped":
-                    int ballTypeId = stumped_ball_type.getCheckedRadioButtonId();
+                case STUMPED:
+                    Log.d(TAG, "showWicketDialog: " + runsInRunOut);
+                    int ballTypeId = ballTypeInStumpedRadioGroup.getCheckedRadioButtonId();
                     if (ballTypeId == -1) {
                         Toast.makeText(this, "Please select the ball type for stumping.", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     RadioButton ballTypeRadioButton = wicketDialogView.findViewById(ballTypeId);
                     String ballType = ballTypeRadioButton.getText().toString();
-                    if(ballType.equals("Normal"))    incrementPlayedBallsInSharedPreferences();
-                    updateScoreInSharedPreferences(ballType, runs);
-                    databaseHelper.insertBallDataForWicket(over_id, ballType, runs, striker, non_striker_id);
-                    databaseHelper.updateBatsmanStatsForWicket(innings_id, striker, runs, ballType, null, "STUMPED");
-                    databaseHelper.updateBowlerStatsForWicket(innings_id, bowler_id, runs, ballType, null, "STUMPED");
-                    databaseHelper.updateTeamStatsForStumping(team_stats_id, ballType);
-                    //need a partnership helper
+                    if(ballType.equals(NORMAL_BALL))    incrementPlayedBallsInSharedPreferences();
+                    updateScoreInSharedPreferences(ballType, runsInRunOut);
+                    databaseHelper.insertBallDataForWicket(overId, ballType, runsInRunOut, strikerId, nonStrikerId);
+                    databaseHelper.updateBatsmanStatsForWicket(inningsId, strikerId, runsInRunOut, ballType, null, dismissalType);
+                    databaseHelper.updateBowlerStatsForWicket(inningsId, bowlerId, runsInRunOut, ballType, null, dismissalType);
+                    databaseHelper.updatePartnershipFor0to6(runsInRunOut, partnershipId);
+                    databaseHelper.updateTeamStatsForStumping(teamStatsId, ballType);
                     break;
             }
             setNewPlayer(playerType);
@@ -540,7 +486,7 @@ public class MatchActivity extends AppCompatActivity {
          long nonStrikerId = sharedPreferences.getLong(NON_STRIKER_ID, -1);
          long ballId = databaseHelper.insertBallDataForWide(overId, extraRuns, strikerId, nonStrikerId);
          databaseHelper.updateExtrasTable(ballId, ballType, extraRuns);
-         databaseHelper.updateBowlerForWide(inningsId, bowlerId, extraRuns);
+         databaseHelper.updateBowlerForWide(inningsId, bowlerId);
          updateTeamStatsForWide(extraRuns);
          updateScoreInSharedPreferences(ballType, extraRuns);
          rotateStrike(extraRuns);
@@ -555,26 +501,30 @@ public class MatchActivity extends AppCompatActivity {
          long strikerId = sharedPreferences.getLong(STRIKER_ID, -1);
          long nonStrikerId = sharedPreferences.getLong(NON_STRIKER_ID, -1);
          long partnership_id = sharedPreferences.getLong(PARTNERSHIP_ID, -1);
-         long ballId = 0;
-         ballId = databaseHelper.insertBallDataForNb(overId, extraRuns, strikerId, nonStrikerId);
+         //long ballId = 0;
+         long ballId = databaseHelper.insertBallDataForNb(overId, extraRuns, strikerId, nonStrikerId);
          databaseHelper.updateExtrasTable(ballId, ballType, extraRuns);
-         switch (runsSourceInNoBall){
-             case FROM_BAT:
-                 databaseHelper.updateBatsmanStatsForNb(inningsId, strikerId, extraRuns, "Bat");
-                 databaseHelper.updateBowlerStatsForNb(inningsId, bowlerId, extraRuns, "Bat");
-                 databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "Bat");
-                 break;
-             case BYE_BALL:
-                 databaseHelper.updateBatsmanStatsForNb(inningsId, strikerId, extraRuns, "Bye");
-                 databaseHelper.updateBowlerStatsForNb(inningsId, bowlerId, extraRuns, "Bye");
-                 databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "Bye");
-                 break;
-             case LEG_BYE_BALL:
-                 databaseHelper.updateBatsmanStatsForNb(inningsId, strikerId, extraRuns, "LegBye");
-                 databaseHelper.updateBowlerStatsForNb(inningsId, bowlerId, extraRuns, "LegBye");
-                 databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "LegBye");
-                 break;
-         }updateTeamStatsForNoBall(extraRuns, runsSourceInNoBall);
+         databaseHelper.updateBatsmanStatsForNb(inningsId, strikerId, extraRuns, runsSourceInNoBall);
+         databaseHelper.updateBowlerStatsForNb(inningsId, bowlerId, extraRuns, runsSourceInNoBall);
+         databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, runsSourceInNoBall);
+//         switch (runsSourceInNoBall){
+//             case FROM_BAT:
+//                 databaseHelper.updateBatsmanStatsForNb(inningsId, strikerId, extraRuns, "Bat");
+//                 databaseHelper.updateBowlerStatsForNb(inningsId, bowlerId, extraRuns, "Bat");
+//                 databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "Bat");
+//                 break;
+//             case BYE_BALL:
+//                 databaseHelper.updateBatsmanStatsForNb(inningsId, strikerId, extraRuns, "Bye");
+//                 databaseHelper.updateBowlerStatsForNb(inningsId, bowlerId, extraRuns, "Bye");
+//                 databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "Bye");
+//                 break;
+//             case LEG_BYE_BALL:
+//                 databaseHelper.updateBatsmanStatsForNb(inningsId, strikerId, extraRuns, "LegBye");
+//                 databaseHelper.updateBowlerStatsForNb(inningsId, bowlerId, extraRuns, "LegBye");
+//                 databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "LegBye");
+//                 break;
+         //}
+         updateTeamStatsForNoBall(extraRuns, runsSourceInNoBall);
          updateScoreInSharedPreferences(ballType, extraRuns);
          rotateStrike(extraRuns);
          checkAndHandleOverEnd();
@@ -590,8 +540,8 @@ public class MatchActivity extends AppCompatActivity {
         databaseHelper.updateTeamStatsForByesAndLegByes(teamStatsId, runs);
      }
     private void updateTeamStatsForWide(int runs){
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs",MODE_PRIVATE);
-        long teamStatsId = sharedPreferences.getLong("teamStatsId", -1);
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        long teamStatsId = sharedPreferences.getLong(TEAM_STATS_ID, -1);
         databaseHelper.updateTeamStatsForWide(teamStatsId, runs);
     }
     private void updateTeamStatsForNoBall(int runs, String runsSource){
@@ -623,8 +573,8 @@ public class MatchActivity extends AppCompatActivity {
             String playerName = String.valueOf(playerNameEditText.getText());
             updatePlayerDataInSp(playerType, playerName);
             if(playerType.equals(BOWLER)){
-                updateNewBowlerToDB(playerName);
-                insertOver();
+                long newBowlerId = updateNewBowlerToDB(playerName);
+                insertOver(newBowlerId);
             }else updateNewBatsmanToDB(playerName, playerType);
             playerDialog.dismiss();
         });
@@ -639,21 +589,29 @@ public class MatchActivity extends AppCompatActivity {
     }
     private void updateNewBatsmanToDB(String name, String player_type) {
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        String oldBatsmanType = player_type.equals(STRIKER) ? NON_STRIKER_ID : STRIKER_ID;
+        String newBatsmanType = player_type.equals(STRIKER) ? STRIKER_ID : NON_STRIKER_ID;
         long inningsId = sharedPreferences.getLong(INNINGS_ID, -1);
         long teamId = sharedPreferences.getLong(BATTING_TEAM_ID, -1);
         long newBatsmanId = databaseHelper.insertPlayer(name, teamId);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putLong(newBatsmanType, newBatsmanId);
+        editor.apply();
         databaseHelper.initializeBatsmanStats(newBatsmanId, inningsId);
-        String oldBatsmanType = player_type.equals(STRIKER) ? NON_STRIKER_ID : STRIKER_ID;
         long oldBatsmanId = sharedPreferences.getLong(oldBatsmanType, -1);
         Log.d(TAG, "striker" + newBatsmanId + "non striker" + oldBatsmanId);
         databaseHelper.insertPartnership(inningsId, newBatsmanId, oldBatsmanId);
     }
-    private void updateNewBowlerToDB(String name) {
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+    private long updateNewBowlerToDB(String name) {
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
         long teamId = sharedPreferences.getLong(BOWLING_TEAM_ID, -1);
         long inningsId = sharedPreferences.getLong(INNINGS_ID, -1);
         long playerId = databaseHelper.insertPlayer(name, teamId);
         databaseHelper.initializeBowlerStats(playerId, inningsId);
+        editor.putLong(BOWLER_ID, playerId);
+        editor.apply();
+        return playerId;
     }
     private void incrementPlayedBallsInSharedPreferences() {
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
@@ -684,22 +642,20 @@ public class MatchActivity extends AppCompatActivity {
         }
     }
     public void handleInningsEnd(String currentInnings){
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         if(currentInnings.equals("first")){
             Log.d(TAG, "handleInningsEnd: first innings is ended and second innings starts");
-            int target = sharedPreferences.getInt("score", -1);
-            editor.putString("currentInnings", "second");
-            editor.putInt("score", 0);
-            editor.putLong("target", target + 1);
-            editor.putLong("playedBalls", 0);
-            editor.apply();
-            //showInningsEndDialog("First Innings Completed", "Second Innings Starting Soon!", 5);
+            long battingTeamId = sharedPreferences.getLong(BATTING_TEAM_ID, -1);
+            long bowlingTeamId = sharedPreferences.getLong(BOWLING_TEAM_ID, -1);
+            editor.putLong(BATTING_TEAM_ID, bowlingTeamId);
+            editor.putLong(BOWLING_TEAM_ID, battingTeamId);
+            showInningsEndDialog("First Innings Completed", "Second Innings Starting Soon!", 5);
             secondInnings();
         }else{
             Log.d(TAG, "handleInningsEnd: match is over");
-            editor.putString("currentInnings", "matchOver");
-            editor.putLong("target", -10000);
+            editor.putString(CURRENT_INNINGS_NUMBER, "matchOver");
+            editor.putLong(TARGET, Integer.MIN_VALUE);
             editor.apply();
             showInningsEndDialog("Match Over", "Thanks for Playing!", 3);
             floatingButton.setEnabled(false);
@@ -715,7 +671,7 @@ public class MatchActivity extends AppCompatActivity {
             score += runs;
             currentOverScore += runs;
         }
-        else if(ballType.equals("No-ball") || ballType.equals("Wide") || ballType.equals("NoBall")) {
+        else if(ballType.equals(NO_BALL) || ballType.equals(WIDE_BALL)) {
             score += runs + 1;
             currentOverScore += runs + 1;
         }
@@ -759,14 +715,13 @@ public class MatchActivity extends AppCompatActivity {
             }
         }, durationInSeconds * 1000L); // Convert seconds to milliseconds
     }
-    private void insertOver(){
+    private void insertOver(long newBowlerId){
         Log.d(TAG, "insertOver: inside the insert over");
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         long inningsId = sharedPreferences.getLong(INNINGS_ID, -1);
-        long bowlerId = sharedPreferences.getLong(BOWLER_ID, -1);
-        databaseHelper.insertOver(inningsId, 2, bowlerId, 0);
+        long playedBalls = sharedPreferences.getLong(PLAYED_BALLS, -1);
+        databaseHelper.insertOver(inningsId, (int) ((playedBalls / 6) + 1), newBowlerId, 0);
     }
-
     private void insertMaidenOver(){
         sharedPreferences =getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         long overId = sharedPreferences.getLong(OVER_ID, -1);
@@ -777,7 +732,42 @@ public class MatchActivity extends AppCompatActivity {
         Intent intent = new Intent(MatchActivity.this, SelectingSrNsBowActivity.class);
         startActivity(intent);
     }
-
+    private void rotateStrike(int runs) {
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        long strikerId = sharedPreferences.getLong(STRIKER_ID, -1);
+        long nonStrikerId = sharedPreferences.getLong(NON_STRIKER_ID, -1);
+        if (runs % 2 != 0) {
+            long temp = strikerId;
+            strikerId = nonStrikerId;
+            nonStrikerId = temp;
+        }
+        editor.putLong(STRIKER_ID, strikerId);
+        editor.putLong(NON_STRIKER_ID, nonStrikerId);
+        editor.apply();
+    }
+    private String rotateStrikeWhileRunOut(String outBatsman, String outEnd){
+        Log.d(TAG, "rotateStrikeWhileRunOut: " + outBatsman + outEnd);
+        String replacePlayer = STRIKER;
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        long strikerIdFromSp = sharedPreferences.getLong(STRIKER_ID, -1);
+        long NonStrikerIdFromSp = sharedPreferences.getLong(NON_STRIKER_ID, -1);
+        if(outEnd.equals(NON_STRIKER)) replacePlayer = NON_STRIKER;
+        if(outBatsman.equals(STRIKER)){
+            if(outEnd.equals(NON_STRIKER)){
+                editor.putLong(STRIKER_ID, NonStrikerIdFromSp);
+                editor.putLong(NON_STRIKER_ID, strikerIdFromSp);
+                editor.apply();
+            }
+        }else if(outBatsman.equals(NON_STRIKER)){
+            if(outEnd.equals(STRIKER)){
+                editor.putLong(STRIKER_ID, NonStrikerIdFromSp);
+                editor.putLong(NON_STRIKER_ID, strikerIdFromSp);
+                editor.apply();
+            }
+        }return replacePlayer;
+    }
 
 
 
