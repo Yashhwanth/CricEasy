@@ -720,7 +720,10 @@ public class MatchActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         long inningsId = sharedPreferences.getLong(INNINGS_ID, -1);
         long playedBalls = sharedPreferences.getLong(PLAYED_BALLS, -1);
-        databaseHelper.insertOver(inningsId, (int) ((playedBalls / 6) + 1), newBowlerId, 0);
+        long overId = databaseHelper.insertOver(inningsId, (int) ((playedBalls / 6) + 1), newBowlerId, 0);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putLong(OVER_ID, overId);
+        editor.apply();
     }
     private void insertMaidenOver(){
         sharedPreferences =getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);

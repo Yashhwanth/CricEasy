@@ -134,10 +134,10 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
     }
     private void insertSNsBowl() {
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
-        String TEAM_A_ID = "teamAId";
-        long team1Id = sharedPreferences.getLong(TEAM_A_ID, -1);
-        String TEAM_B_ID = "teamBId";
-        long team2Id = sharedPreferences.getLong(TEAM_B_ID, -1);
+        String BATTING_TEAM_ID = "battingTeamId";
+        long team1Id = sharedPreferences.getLong(BATTING_TEAM_ID, -1);
+        String BOWLING_TEAM_ID = "bowlingTeamId";
+        long team2Id = sharedPreferences.getLong(BOWLING_TEAM_ID, -1);
         String strikerName = sharedPreferences.getString(PLAYER_STRIKER_VALUE, CURRENT_INNINGS_DEFAULT_VALUE);
         String nonStrikerName = sharedPreferences.getString(PLAYER_NON_STRIKER_VALUE, CURRENT_INNINGS_DEFAULT_VALUE);
         String bowlerName = sharedPreferences.getString(PLAYER_BOWLER_VALUE, CURRENT_INNINGS_DEFAULT_VALUE);
