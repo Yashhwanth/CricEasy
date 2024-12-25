@@ -155,18 +155,18 @@ public class MatchActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(dialogView);
         // Create the dialog object
-        AlertDialog dialog = builder.create();
+        AlertDialog scoringPopupDialog = builder.create();
         // Set the custom size for the dialog (width and height)
-        dialog.show();
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setLayout(
+        scoringPopupDialog.show();
+        if (scoringPopupDialog.getWindow() != null) {
+            scoringPopupDialog.getWindow().setLayout(
                     ViewGroup.LayoutParams.MATCH_PARENT,  // Set width to match parent
                     ViewGroup.LayoutParams.WRAP_CONTENT   // Set height to wrap content
             );
         }
         // Optionally: Set dialog gravity or other properties
-        if (dialog.getWindow() != null) {
-            Window window = dialog.getWindow();
+        if (scoringPopupDialog.getWindow() != null) {
+            Window window = scoringPopupDialog.getWindow();
             WindowManager.LayoutParams params = window.getAttributes();
             params.gravity = Gravity.CENTER; // Center the dialog on the screen
             window.setAttributes(params);
@@ -175,12 +175,12 @@ public class MatchActivity extends AppCompatActivity {
             int runs = Integer.parseInt(((Button) view).getText().toString().trim());
             Log.d(TAG, "openScoringPopup: runs from popup are" + runs);
             handleScoringFor0To6(runs);
-            dialog.dismiss();
+            scoringPopupDialog.dismiss();
         };
         View.OnClickListener extraBallListener = view -> {
             String extraType = ((Button) view).getText().toString().trim();
-            showExtrasDialog(extraType, dialog);
-            dialog.dismiss();
+            showExtrasDialog(extraType, scoringPopupDialog);
+            scoringPopupDialog.dismiss();
         };
         zeroScoringButton.setOnClickListener(scoringListenerFor0To8);
         oneScoringButton.setOnClickListener(scoringListenerFor0To8);
@@ -195,21 +195,8 @@ public class MatchActivity extends AppCompatActivity {
         legByeScoringButton.setOnClickListener(extraBallListener);
         wideScoringButton.setOnClickListener(extraBallListener);
         noBallScoringButton.setOnClickListener(extraBallListener);
-
-//        byeScoringButton.setOnClickListener(view -> {
-//            showExtrasDialog("Bye", dialog);
-//        });
-//        legByeScoringButton.setOnClickListener(view -> {
-//            showExtrasDialog("LegBye", dialog);
-//        });
-//        wideScoringButton.setOnClickListener(view -> {
-//            showExtrasDialog("Wide", dialog);
-//        });
-//        noBallScoringButton.setOnClickListener(view -> {
-//            showExtrasDialog("NoBall", dialog);
-//        })
         wicketScoringButton.setOnClickListener(view ->{
-            showWicketDialog(dialog);
+            showWicketDialog(scoringPopupDialog);
         });
     }
     private void showExtrasDialog(String ballType, AlertDialog parentDialog) {
@@ -355,11 +342,13 @@ public class MatchActivity extends AppCompatActivity {
             long overId = sharedPreferences.getLong(OVER_ID, -1);
             long teamStatsId = sharedPreferences.getLong(TEAM_STATS_ID, -1);
             long partnershipId = sharedPreferences.getLong(PARTNERSHIP_ID, -1);
+            long wicketBallId = -1;
             switch (dismissalType) {
                 case BOWLED:
                 case CAUGHT:
                 case LBW:
-                    databaseHelper.insertBallDataForWicket(overId, NORMAL_BALL, runsInRunOut, strikerId, nonStrikerId);
+                    wicketBallId = databaseHelper.insertBallDataForWicket(overId, NORMAL_BALL, runsInRunOut, strikerId, nonStrikerId);
+                    databaseHelper.updateWicketsTable(wicketBallId, dismissalType, strikerId, runsInRunOut);
                     databaseHelper.updateBatsmanStatsForWicket(inningsId, strikerId, runsInRunOut, null, null, dismissalType);
                     databaseHelper.updateBowlerStatsForWicket(inningsId, bowlerId, runsInRunOut, null, null, dismissalType);
                     databaseHelper.updatePartnershipFor0to6(runsInRunOut, partnershipId);
@@ -402,15 +391,17 @@ public class MatchActivity extends AppCompatActivity {
                         RadioButton runsFromRadioButton = wicketDialogView.findViewById(runsSourceInRunOutRadioButton);
                         runsSourceInRunOut = runsFromRadioButton.getText().toString();
                     }
-                    if(ballTypeInRo.equals(NORMAL_BALL))    incrementPlayedBallsInSharedPreferences();
-                    updateScoreInSharedPreferences(ballTypeInRo ,runsInRunOut);
-                    databaseHelper.insertBallDataForWicket(overId, ballTypeInRo, runsInRunOut, strikerId, nonStrikerId);
-                    databaseHelper.updateBatsmanStatsForWicket(inningsId, strikerId, runsInRunOut, ballTypeInRo, runsSourceInRunOut, "RUN-OUT");
-                    databaseHelper.updateBowlerStatsForWicket(inningsId, bowlerId, runsInRunOut, ballTypeInRo, runsSourceInRunOut, "RUN-OUT");
-                    databaseHelper.updateTeamStatsForRunOut(teamStatsId, runsInRunOut, ballTypeInRo, runsSourceInRunOut);
-                    databaseHelper.updatePartnershipForRunOut(partnershipId, runsInRunOut, ballTypeInRo, runsSourceInRunOut);
                     outBatsman = outBatsman.equals("non-striker") ? NON_STRIKER : STRIKER;
                     outEnd = outEnd.equals("non-striker") ? NON_STRIKER : STRIKER;
+                    long outBatsmanId = sharedPreferences.getLong(outBatsman + "Id", -1);
+                    if(ballTypeInRo.equals(NORMAL_BALL))    incrementPlayedBallsInSharedPreferences();
+                    updateScoreInSharedPreferences(ballTypeInRo ,runsInRunOut);
+                    wicketBallId = databaseHelper.insertBallDataForWicket(overId, ballTypeInRo, runsInRunOut, strikerId, nonStrikerId);
+                    databaseHelper.updateWicketsTable(wicketBallId, dismissalType, outBatsmanId,runsInRunOut);
+                    databaseHelper.updateBatsmanStatsForWicket(inningsId, strikerId, runsInRunOut, ballTypeInRo, runsSourceInRunOut, dismissalType);
+                    databaseHelper.updateBowlerStatsForWicket(inningsId, bowlerId, runsInRunOut, ballTypeInRo, runsSourceInRunOut, dismissalType);
+                    databaseHelper.updateTeamStatsForRunOut(teamStatsId, runsInRunOut, ballTypeInRo, runsSourceInRunOut);
+                    databaseHelper.updatePartnershipForRunOut(partnershipId, runsInRunOut, ballTypeInRo, runsSourceInRunOut);
                     playerType = rotateStrikeWhileRunOut(outBatsman, outEnd);
                     break;
                 case STUMPED:
@@ -593,7 +584,7 @@ public class MatchActivity extends AppCompatActivity {
         String newBatsmanType = player_type.equals(STRIKER) ? STRIKER_ID : NON_STRIKER_ID;
         long inningsId = sharedPreferences.getLong(INNINGS_ID, -1);
         long teamId = sharedPreferences.getLong(BATTING_TEAM_ID, -1);
-        long newBatsmanId = databaseHelper.insertPlayer(name, teamId);
+        long newBatsmanId = databaseHelper.insertPlayer(name, teamId, inningsId);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putLong(newBatsmanType, newBatsmanId);
         editor.apply();
@@ -607,7 +598,7 @@ public class MatchActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         long teamId = sharedPreferences.getLong(BOWLING_TEAM_ID, -1);
         long inningsId = sharedPreferences.getLong(INNINGS_ID, -1);
-        long playerId = databaseHelper.insertPlayer(name, teamId);
+        long playerId = databaseHelper.insertPlayer(name, teamId, inningsId);
         databaseHelper.initializeBowlerStats(playerId, inningsId);
         editor.putLong(BOWLER_ID, playerId);
         editor.apply();
@@ -699,7 +690,6 @@ public class MatchActivity extends AppCompatActivity {
         TextView messageText = dialog.findViewById(R.id.dialogMessage);
         titleText.setText(title);
         messageText.setText(message);
-
         // Show the dialog
         dialog.show();
         // Auto-dismiss the dialog after specified duration
@@ -709,7 +699,6 @@ public class MatchActivity extends AppCompatActivity {
                 Log.d(TAG, "run: dialog about to be closed");
                 if (dialog.isShowing()) {
                     dialog.dismiss();
-                    //secondInnings();
                 }
                 dialog.dismiss();
             }

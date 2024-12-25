@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             long currentMatchId = handleNewMatch();
             saveMatchIdToPreferences(currentMatchId);
             Log.d(TAG, "onCreate: opening matchInfo activity");
-            Intent intent = new Intent(MainActivity.this, MatchActivity.class);
+            Intent intent = new Intent(MainActivity.this, MatchInfoActivity.class);
             startActivity(intent);
         });
     }

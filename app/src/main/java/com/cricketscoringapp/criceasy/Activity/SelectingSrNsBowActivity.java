@@ -70,8 +70,8 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
 
         startScoringButton.setOnClickListener(view ->{
             if (validateInputs()) {
-                insertSNsBowl();
                 updateInningsTable();
+                insertSNsBowl();
                 updateTeamStatsTable();
                 updateOverTable();
                 updatePartnershipTable();
@@ -138,12 +138,13 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
         long team1Id = sharedPreferences.getLong(BATTING_TEAM_ID, -1);
         String BOWLING_TEAM_ID = "bowlingTeamId";
         long team2Id = sharedPreferences.getLong(BOWLING_TEAM_ID, -1);
+        long inningsId = sharedPreferences.getLong(CURRENT_INNINGS_ID_KEY, -1);
         String strikerName = sharedPreferences.getString(PLAYER_STRIKER_VALUE, CURRENT_INNINGS_DEFAULT_VALUE);
         String nonStrikerName = sharedPreferences.getString(PLAYER_NON_STRIKER_VALUE, CURRENT_INNINGS_DEFAULT_VALUE);
         String bowlerName = sharedPreferences.getString(PLAYER_BOWLER_VALUE, CURRENT_INNINGS_DEFAULT_VALUE);
-        long strikerId = databaseHelper.insertPlayer(strikerName, team1Id);
-        long nonStrikerId = databaseHelper.insertPlayer(nonStrikerName, team1Id);
-        long bowlerId = databaseHelper.insertPlayer(bowlerName, team2Id);
+        long strikerId = databaseHelper.insertPlayer(strikerName, team1Id, inningsId);
+        long nonStrikerId = databaseHelper.insertPlayer(nonStrikerName, team1Id, inningsId);
+        long bowlerId = databaseHelper.insertPlayer(bowlerName, team2Id, inningsId);
         updateSNsBowIdInSharedPreferences(strikerId, nonStrikerId, bowlerId);
     }
     private void updateSNsBowIdInSharedPreferences(long strikerId, long nonStrikerId, long bowlerId){

@@ -2,7 +2,6 @@ package com.cricketscoringapp.criceasy.Database;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -16,7 +15,7 @@ import static android.content.ContentValues.TAG;
 
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 13; // Update version
+    private static final int DATABASE_VERSION = 14; // Update version
     private static final String DATABASE_NAME = "CricketDB";
     private static final String NORMAL_BALL = "Normal";
     private static final String BYE_BALL = "Bye";
@@ -98,7 +97,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Places Table
     // Places table and column names
     public static final String TABLE_PLACES = "Places";
-
     public static final String COLUMN_PLACE_NAME = "place";
     public static final String CREATE_PLACES_TABLE = "CREATE TABLE " + TABLE_PLACES + " ("
             + COLUMN_PLACE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -133,19 +131,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     //
+//    public static final String TABLE_PLAYERS_TEAMS = "Players_Teams";
+//    public static final String CREATE_PLAYERS_TEAMS_TABLE = "CREATE TABLE " + TABLE_PLAYERS_TEAMS + " (" +
+//            COLUMN_TEAM_ID + " INTEGER, " +
+//            COLUMN_PLAYER_ID + " INTEGER, " +
+//            "FOREIGN KEY (" + COLUMN_TEAM_ID + ") REFERENCES Teams(" + COLUMN_TEAM_ID + ") ON DELETE CASCADE," +
+//            "FOREIGN KEY (" + COLUMN_PLAYER_ID + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE," +
+//            "PRIMARY KEY (" + COLUMN_TEAM_ID + "," + COLUMN_PLAYER_ID + "))";
     public static final String TABLE_PLAYERS_TEAMS = "Players_Teams";
+    private static final String COLUMN_INNINGS_ID = "innings_id";
     public static final String CREATE_PLAYERS_TEAMS_TABLE = "CREATE TABLE " + TABLE_PLAYERS_TEAMS + " (" +
             COLUMN_TEAM_ID + " INTEGER, " +
             COLUMN_PLAYER_ID + " INTEGER, " +
-            "FOREIGN KEY (" + COLUMN_TEAM_ID + ") REFERENCES Teams(" + COLUMN_TEAM_ID + ") ON DELETE CASCADE," +
-            "FOREIGN KEY (" + COLUMN_PLAYER_ID + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE," +
-            "PRIMARY KEY (" + COLUMN_TEAM_ID + "," + COLUMN_PLAYER_ID + "))";
+            COLUMN_INNINGS_ID + " INTEGER, " +
+            "FOREIGN KEY (" + COLUMN_TEAM_ID + ") REFERENCES Teams(" + COLUMN_TEAM_ID + ") ON DELETE CASCADE, " +
+            "FOREIGN KEY (" + COLUMN_PLAYER_ID + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE, " +
+            "FOREIGN KEY (" + COLUMN_INNINGS_ID + ") REFERENCES Innings(" + COLUMN_INNINGS_ID + ") ON DELETE CASCADE, " +
+            "PRIMARY KEY (" + COLUMN_TEAM_ID + ", " + COLUMN_PLAYER_ID + ", " + COLUMN_INNINGS_ID + "))";
+
 
 
     // Partnerships Table
     private static final String TABLE_PARTNERSHIPS = "Partnerships";
     private static final String COLUMN_PARTNERSHIP_ID = "partnership_id";
-    private static final String COLUMN_INNINGS_ID = "innings_id";
     private static final String COLUMN_BATSMAN1_ID = "batsman1_id";
     private static final String COLUMN_BATSMAN2_ID = "batsman2_id";
     private static final String COLUMN_RUNS = "runs";
@@ -773,8 +781,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         db.close();
     }
-
-    public long insertPlayer(String playerName, long teamId) {
+    public long insertPlayer(String playerName, long teamId, long inningsId) {
         SQLiteDatabase db = this.getWritableDatabase();
         long playerId = -1;
         // Check if the player already exists
@@ -796,31 +803,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
         // Now handle the player-team relation (insert or update)
-        insertPlayerTeamRelation(db, playerId, teamId);
+        insertPlayerTeamRelation(db, playerId, teamId, inningsId);
         if (cursor != null) {
             cursor.close();
         }
         db.close();
         return playerId;
     }
-    private void insertPlayerTeamRelation(SQLiteDatabase db, long playerId, long teamId) {
+    private void insertPlayerTeamRelation(SQLiteDatabase db, long playerId, long teamId, long inningsId) {
         // Check if the relation already exists
-        String relationCheckQuery = "SELECT " + COLUMN_PLAYER_ID + " FROM " + TABLE_PLAYERS_TEAMS +
-                " WHERE " + COLUMN_PLAYER_ID + " = ? AND " + COLUMN_TEAM_ID + " = ?";
-        Cursor cursor = db.rawQuery(relationCheckQuery, new String[]{String.valueOf(playerId), String.valueOf(teamId)});
+        String relationCheckQuery = "SELECT " + COLUMN_PLAYER_ID +
+                " FROM " + TABLE_PLAYERS_TEAMS +
+                " WHERE " + COLUMN_PLAYER_ID + " = ? AND " +
+                COLUMN_TEAM_ID + " = ? AND " +
+                COLUMN_INNINGS_ID + " = ?";
+        Cursor cursor = db.rawQuery(relationCheckQuery, new String[]{
+                String.valueOf(playerId),
+                String.valueOf(teamId),
+                String.valueOf(inningsId)
+        });
+
         if (cursor != null && cursor.moveToFirst()) {
             // Relation already exists, no need to insert again
-            Log.d("DatabaseHelper", "Player already linked to team for this match.");
+            Log.d("DatabaseHelper", "Player already linked to team for this innings.");
         } else {
             // Relation does not exist, insert new relation
             ContentValues playerTeamValues = new ContentValues();
             playerTeamValues.put(COLUMN_TEAM_ID, teamId);
             playerTeamValues.put(COLUMN_PLAYER_ID, playerId);
+            playerTeamValues.put(COLUMN_INNINGS_ID, inningsId); // Add innings ID
+
             long teamResult = db.insert(TABLE_PLAYERS_TEAMS, null, playerTeamValues);
             if (teamResult == -1) {
-                Log.e("DatabaseHelper", "Error inserting player-team into database");
+                Log.e("DatabaseHelper", "Error inserting player-team-innings relation into database");
             } else {
-                Log.d("DatabaseHelper", "Player-team relation inserted successfully");
+                Log.d("DatabaseHelper", "Player-team-innings relation inserted successfully");
             }
         }
 
@@ -828,7 +845,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cursor.close();
         }
     }
-
     public long startFirstInnings(long matchId, long battingTeamId, String currentInningsNumber) {
         Log.d(TAG, "startFirstInnings: current innings number is" + currentInningsNumber);
         if (matchId == -1 || battingTeamId == -1) {
@@ -1095,7 +1111,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Log.e("DatabaseHelper", "Failed to update partnership for no-ball.");
         }
     }
-    //need to edit
     public void updatePartnershipForRunOut(long partnershipId, int runsScored, String ballType, String runsFrom) {
         String query = null;
         try (SQLiteDatabase db = this.getWritableDatabase()) {
@@ -1256,7 +1271,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         statement.bindLong(2, inningsId);
                     }
                     break;
-
                 case RUN_OUT:
                     switch (ballType) {
                         case NORMAL_BALL:
@@ -1304,8 +1318,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Log.e(TAG, "updateBatsmanStatsForWicket: failed to update batter stats in runout", e);
         }
     }
-
-    // Helper method to get the specific run column based on runs
     private String getRunColumn(int runs) {
         switch (runs) {
             case 0: return COLUMN_ZEROES;
@@ -1602,9 +1614,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-
-
-
     //------------------------------------update extra table------------------------------
     public void updateExtrasTable(long ballId, String ballType, int runs) {
         try (SQLiteDatabase db = this.getWritableDatabase()) {
@@ -1651,8 +1660,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Log.e("updateExtrasTable", "Error while updating extras table: " + e.getMessage());
         }
     }
+    public void updateWicketsTable(long ballId, String wicketType, long batsmanId, int runs) {
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(DatabaseHelper.COLUMN_BALL_ID, ballId); // Associate the wicket with the ball
+            values.put(DatabaseHelper.COLUMN_WICKET_TYPE, wicketType); // Type of wicket
+            values.put(DatabaseHelper.COLUMN_WICKET_BATSMAN, batsmanId); // Dismissed batsman
+            values.put(DatabaseHelper.COLUMN_WICKET_RUNS, runs); // Runs scored during dismissal
+            values.put(DatabaseHelper.COLUMN_WICKET_CONTRIBUTOR, (Long) null); // Contributor is null for now
+            long result = db.insert(DatabaseHelper.TABLE_WICKETS, null, values);
+            if (result == -1) {
+                Log.e("updateWicketsTable", "Failed to insert wicket details for ball ID: " + ballId);
+            } else {
+                Log.d("updateWicketsTable", "Wicket details updated successfully for ball ID: " + ballId);
+            }
+        } catch (Exception e) {
+            Log.e("updateWicketsTable", "Error while updating wickets table: " + e.getMessage());
+        }
+    }
 
-//---------------------------------------------team stats---------------------------------------------------
+
+    //---------------------------------------------team stats---------------------------------------------------
     public void updateTeamStatsFor0to6(long teamStatsId, int runs) {
         try (SQLiteDatabase db = this.getWritableDatabase()) {
             String selectQuery = "SELECT " + COLUMN_RUNS + ", " + COLUMN_BALLS + " FROM " + TABLE_TEAM_STATISTICS + " WHERE " + COLUMN_TEAM_STATS_ID + " = ?";
@@ -1939,33 +1968,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } else {
             Log.e("DatabaseHelper", "Invalid ball type: " + ballType);
         }
-    }
-    public int getTarget(long teamStatsId) {
-        int target = 0; // Default value if no result is found
-        SQLiteDatabase db = this.getReadableDatabase(); // Access readable database
-
-        String query = "SELECT " + COLUMN_RUNS +
-                " FROM " + TABLE_TEAM_STATISTICS +
-                " WHERE " + COLUMN_TEAM_STATS_ID + " = " + teamStatsId;
-
-        Cursor cursor = null;
-
-        try {
-            cursor = db.rawQuery(query, null); // Execute the query
-            if (cursor.moveToFirst()) { // Check if at least one row is returned
-                int columnIndex = cursor.getColumnIndex(COLUMN_RUNS); // Get column index
-                if (columnIndex != -1) { // Ensure the column exists
-                    target = cursor.getInt(columnIndex); // Fetch value from the 'runs' column
-                }
-            }
-        } catch (Exception e) {
-            Log.e("DB_ERROR", "Error while getting target runs", e);
-        } finally {
-            if (cursor != null) cursor.close(); // Close cursor
-            db.close(); // Close database
-        }
-
-        return target; // Return the target value
     }
 
 }
