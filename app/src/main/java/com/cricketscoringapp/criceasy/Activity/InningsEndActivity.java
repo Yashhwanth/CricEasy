@@ -18,11 +18,6 @@ public class InningsEndActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_innings_end);
         Button secondInningsButton = findViewById(R.id.startSecondInningsButton);
-        secondInningsButton.setOnClickListener(v -> {
-            Intent intent = new Intent(InningsEndActivity.this, SelectingSrNsBowActivity.class);
-            startActivity(intent);
-            finish();
-        });
     }
     @Override
     protected void onResume(){
