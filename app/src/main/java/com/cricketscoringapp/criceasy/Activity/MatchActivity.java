@@ -1,6 +1,8 @@
 package com.cricketscoringapp.criceasy.Activity;
 
 import static android.content.ContentValues.TAG;
+import static android.view.View.GONE;
+
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -37,6 +39,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 public class MatchActivity extends AppCompatActivity {
     private Button infoFragmentButton, summaryFragmentButton, scorecardFragmentButton, commentaryFragmentButton, teamsFragmentButton;
     private FloatingActionButton floatingButton;
+    private Button inningsEndButton;
     private DatabaseHelper databaseHelper;
     private SharedPreferences sharedPreferences;
     private final String SHARED_PREFERENCES = "match_prefs";
@@ -71,7 +74,6 @@ public class MatchActivity extends AppCompatActivity {
     private static final String RUN_OUT = "Run-Out";
     private static final String STUMPED = "Stumped";
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,11 +82,12 @@ public class MatchActivity extends AppCompatActivity {
         setupUI(savedInstanceState);
         updateCurrentActivityInPreferences();
     }
-
     @Override
     protected void onResume() {
         super.onResume();
         updateCurrentActivityInPreferences();
+        inningsEndButton.setVisibility(GONE);
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
     }
     private void setupUI(Bundle savedInstanceState){
         infoFragmentButton = findViewById(R.id.infoFragmentButton);
@@ -98,6 +101,13 @@ public class MatchActivity extends AppCompatActivity {
         scorecardFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
         commentaryFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
         teamsFragmentButton.setOnClickListener(view -> showFragment(new TeamsFragment()));
+        inningsEndButton = findViewById(R.id.inningsEndButton);
+        inningsEndButton.setVisibility(GONE);
+        inningsEndButton.setOnClickListener(v -> {
+            String ongoingInnings = sharedPreferences.getString(CURRENT_INNINGS_NUMBER, null);
+            if(ongoingInnings != null && ongoingInnings.equals("first")) secondInnings();
+            else matchEndActivity();
+        });
         floatingButton.setOnClickListener(view ->{
             openScoringPopup();
         });
@@ -192,7 +202,7 @@ public class MatchActivity extends AppCompatActivity {
         if (NO_BALL.equals(ballType)) {
             runsInNoBallRadioGroup.setVisibility(View.VISIBLE);  // Show radio group for No Ball
         } else {
-            runsInNoBallRadioGroup.setVisibility(View.GONE);  // Hide radio group for other ball types
+            runsInNoBallRadioGroup.setVisibility(GONE);  // Hide radio group for other ball types
         }
         TextView ballTypeLabel = extrasDialogView.findViewById(R.id.ballTypeHeading);
         ballTypeLabel.setText(ballType);
@@ -266,12 +276,12 @@ public class MatchActivity extends AppCompatActivity {
         Button cancelButton = wicketDialogView.findViewById(R.id.cancelButton);
         Button submitButton = wicketDialogView.findViewById(R.id.submitButton);
 
-        runsInWicketLayout.setVisibility(View.GONE);
-        outBatsmanLayout.setVisibility(View.GONE);
-        outEndLayout.setVisibility(View.GONE);
-        runsSourceInRunOutLayout.setVisibility(View.GONE);
-        ballTypeInRunOutLayout.setVisibility(View.GONE);
-        ballTypeInStumpedLayout.setVisibility(View.GONE);
+        runsInWicketLayout.setVisibility(GONE);
+        outBatsmanLayout.setVisibility(GONE);
+        outEndLayout.setVisibility(GONE);
+        runsSourceInRunOutLayout.setVisibility(GONE);
+        ballTypeInRunOutLayout.setVisibility(GONE);
+        ballTypeInStumpedLayout.setVisibility(GONE);
 
         dismissalTypeRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.runOutRadioButton) {
@@ -280,29 +290,29 @@ public class MatchActivity extends AppCompatActivity {
                 outEndLayout.setVisibility(View.VISIBLE);
                 ballTypeInRunOutLayout.setVisibility(View.VISIBLE);
                 runsSourceInRunOutLayout.setVisibility(View.VISIBLE);
-                ballTypeInStumpedLayout.setVisibility(View.GONE);
+                ballTypeInStumpedLayout.setVisibility(GONE);
                 ballTypeInWicketRadioGroup.setOnCheckedChangeListener((group1, checkedId1) -> {
                     if(checkedId1 == R.id.wideBallRadioButton){
-                        runsSourceInRunOutLayout.setVisibility(View.GONE);
+                        runsSourceInRunOutLayout.setVisibility(GONE);
                     }else{
                         runsSourceInRunOutLayout.setVisibility(View.VISIBLE);
                     }
                 });
             }else if(checkedId == R.id.stumpedRadioButton) {
-                runsInWicketLayout.setVisibility(View.GONE);
-                outBatsmanLayout.setVisibility(View.GONE);
-                outEndLayout.setVisibility(View.GONE);
-                runsSourceInRunOutLayout.setVisibility(View.GONE);
-                ballTypeInRunOutLayout.setVisibility(View.GONE);
-                ballTypeInStumpedLayout.setVisibility(View.GONE);
+                runsInWicketLayout.setVisibility(GONE);
+                outBatsmanLayout.setVisibility(GONE);
+                outEndLayout.setVisibility(GONE);
+                runsSourceInRunOutLayout.setVisibility(GONE);
+                ballTypeInRunOutLayout.setVisibility(GONE);
+                ballTypeInStumpedLayout.setVisibility(GONE);
                 ballTypeInStumpedLayout.setVisibility(View.VISIBLE);
             }else{
-                runsInWicketLayout.setVisibility(View.GONE);
-                outBatsmanLayout.setVisibility(View.GONE);
-                outEndLayout.setVisibility(View.GONE);
-                runsSourceInRunOutLayout.setVisibility(View.GONE);
-                ballTypeInRunOutLayout.setVisibility(View.GONE);
-                ballTypeInStumpedLayout.setVisibility(View.GONE);
+                runsInWicketLayout.setVisibility(GONE);
+                outBatsmanLayout.setVisibility(GONE);
+                outEndLayout.setVisibility(GONE);
+                runsSourceInRunOutLayout.setVisibility(GONE);
+                ballTypeInRunOutLayout.setVisibility(GONE);
+                ballTypeInStumpedLayout.setVisibility(GONE);
             }
         });
         cancelButton.setOnClickListener(view -> {
@@ -543,7 +553,7 @@ public class MatchActivity extends AppCompatActivity {
         EditText playerNameEditText = playerDialogView.findViewById(R.id.playerNameEditText);
         Button submitButton = playerDialogView.findViewById(R.id.submitButton);
         Button backButton = playerDialogView.findViewById(R.id.cancelButton);
-        backButton.setVisibility(View.GONE);
+        backButton.setVisibility(GONE);
         submitButton.setOnClickListener(v -> {
             String playerName = String.valueOf(playerNameEditText.getText());
             updatePlayerDataInSp(playerType, playerName);
@@ -626,17 +636,19 @@ public class MatchActivity extends AppCompatActivity {
             editor.putLong(BATTING_TEAM_ID, bowlingTeamId);
             editor.putLong(BOWLING_TEAM_ID, battingTeamId);
             editor.apply();
-            //showInningsEndDialog("First Innings Completed", "Second Innings Starting Soon!", 5);
-            secondInnings();
+            inningsEndButton.setVisibility(View.VISIBLE);
+            inningsEndButton.setText(R.string.startSecondInningsButton);
+            //secondInnings();
         }else{
             Log.d(TAG, "handleInningsEnd: match is over");
             editor.putString(CURRENT_INNINGS_NUMBER, "matchOver");
             editor.putLong(TARGET, Integer.MIN_VALUE);
             editor.apply();
-            //showInningsEndDialog("Match Over", "Thanks for Playing!", 3);
-            floatingButton.setEnabled(false);
-            floatingButton.setAlpha(0.5f);     // Optional: Change visual appearance
+            inningsEndButton.setVisibility(View.VISIBLE);
+            inningsEndButton.setText(R.string.endInningsText);
         }
+        floatingButton.setEnabled(false);
+        floatingButton.setAlpha(0.5f);     // Optional: Change visual appearance
     }
     public void updateScoreInSharedPreferences(String ballType, int runs){
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES,MODE_PRIVATE);
@@ -660,35 +672,6 @@ public class MatchActivity extends AppCompatActivity {
         editor.putInt(CURRENT_OVER_SCORE, currentOverScore);
         editor.apply();
     }
-    private void showInningsEndDialog(String title, String message, int durationInSeconds) {
-        boolean isDialogClosed = false;
-        SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
-        String currentInnings = sharedPreferences.getString("currentInnings", "");
-        Log.d(TAG, "showInningsEndDialog:  in the dialog -=-==-=-=-=-==-=-=-=-=-=-=-=-=" + currentInnings);
-        // Create a dialog
-        final Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.activity_innings_end); // Use a custom layout if needed
-        dialog.setCancelable(false); // Prevent manual dismissal
-
-        // Set the title and message
-        TextView titleText = dialog.findViewById(R.id.dialogTitle);
-        TextView messageText = dialog.findViewById(R.id.dialogMessage);
-        titleText.setText(title);
-        messageText.setText(message);
-        // Show the dialog
-        dialog.show();
-        // Auto-dismiss the dialog after specified duration
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Log.d(TAG, "run: dialog about to be closed");
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
-                }
-                dialog.dismiss();
-            }
-        }, durationInSeconds * 1000L); // Convert seconds to milliseconds
-    }
     private void insertOver(long newBowlerId){
         Log.d(TAG, "insertOver: inside the insert over");
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
@@ -706,6 +689,14 @@ public class MatchActivity extends AppCompatActivity {
     }
     private void secondInnings(){
         Log.d(TAG, "secondInnings: entered second innings");
+        Intent intent = new Intent(MatchActivity.this, SelectingSrNsBowActivity.class);
+        startActivity(intent);
+    }
+    private void matchEndActivity(){
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+        Log.d(TAG, "match ended and cleared shared prefs");
         Intent intent = new Intent(MatchActivity.this, InningsEndActivity.class);
         startActivity(intent);
     }
@@ -745,10 +736,5 @@ public class MatchActivity extends AppCompatActivity {
             }
         }return replacePlayer;
     }
-
-
-
-
-
 
 }

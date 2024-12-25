@@ -1,7 +1,11 @@
 package com.cricketscoringapp.criceasy.Activity;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 
 import androidx.annotation.Nullable;
@@ -19,5 +23,19 @@ public class InningsEndActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+    }
+    @Override
+    protected void onResume(){
+        super.onResume();
+        updateCurrentActivityInPreferences();
+    }
+    private void updateCurrentActivityInPreferences() {
+        String SHARED_PREFERENCES = "match_prefs";
+        String CURRENT_ACTIVITY = "currentActivity";
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(CURRENT_ACTIVITY, getClass().getSimpleName());
+        editor.apply();
+        Log.d(TAG, "inside updateCurrentActivityInPreferences method: updated current activity in sp");
     }
 }

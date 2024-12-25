@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String SHARED_PREFERENCES = "match_prefs"; // SharedPreferences name
     private static final String MATCH_ID = "currentMatchId";  // Key to store match ID
     private static final String CURRENT_ACTIVITY = "currentActivity"; // Key for current activity
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: Opened Main Activity" );
@@ -37,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
         databaseHelper = new DatabaseHelper(this);
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
         editor.apply();
         Log.d(TAG, "onCreate: Cleared all SharedPreferences");
 
@@ -64,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
     }
-
     @Override
     protected void onResume() {
         super.onResume();

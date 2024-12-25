@@ -20,50 +20,50 @@
 
         <LinearLayout
             android:id="@+id/scrollableButtonsLinearLayout"
+            style="?android:attr/buttonBarStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            style="?android:attr/buttonBarStyle">
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/infoFragmentButton"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/infoButton"
-                style="?android:attr/buttonBarButtonStyle"/>
+                android:text="@string/infoButton" />
 
             <Button
                 android:id="@+id/summaryFragmentButton"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/summaryButton"
-                style="?android:attr/buttonBarButtonStyle"/>
+                android:text="@string/summaryButton" />
 
             <Button
                 android:id="@+id/scorecardFragmentButton"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/scorecardButton"
-                style="?android:attr/buttonBarButtonStyle"/>
+                android:text="@string/scorecardButton" />
 
             <Button
                 android:id="@+id/commentaryFragmentButton"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/commentaryButton"
-                style="?android:attr/buttonBarButtonStyle"/>
+                android:text="@string/commentaryButton" />
 
             <Button
                 android:id="@+id/teamsFragmentButton"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/teamsButton"
-                style="?android:attr/buttonBarButtonStyle"/>
+                android:text="@string/teamsButton" />
         </LinearLayout>
     </HorizontalScrollView>
 
@@ -118,15 +118,27 @@
             android:visibility="gone"
             tools:layout="@layout/activity_mp_teams" />
 
+
     </FrameLayout>
+
+    <Button
+        android:id="@+id/inningsEndButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/startSecondInningsButton"
+        app:layout_constraintBottom_toBottomOf="@+id/fragmentLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.92" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
-        android:focusable="true"
         android:contentDescription="@string/floatingButtonContentDescription"
+        android:focusable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.84"

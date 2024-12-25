@@ -126,6 +126,7 @@
     <string name = "startSecondInningsButton">Start Second Innings</string>
     <string name = "firstInningsOverText"> First Innings Ended</string>
     <string name = "secondInningsOverText"> Second Innings Starting Soon</string>
+    <string name = "endInningsText"> End Match</string>
 
 
 
