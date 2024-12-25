@@ -181,7 +181,7 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
             editor.putLong(TARGET, Integer.MAX_VALUE);
             editor.apply();
         }else{
-            long score = sharedPreferences.getLong(SCORE, -1);
+            int score = sharedPreferences.getInt(SCORE, -1);
             editor.putLong(CURRENT_INNINGS_ID_KEY, inningsId);
             editor.putString(CURRENT_INNINGS_NUMBER, SECOND_INNINGS);
             editor.putInt(SCORE, 0);

@@ -79,22 +79,6 @@ public class MatchActivity extends AppCompatActivity {
         databaseHelper = new DatabaseHelper(this);
         setupUI(savedInstanceState);
         updateCurrentActivityInPreferences();
-//        floatingButton.setOnClickListener(view ->{
-//                popup();
-//        });
-//
-//        // Set onClickListeners to show the corresponding fragments
-//        infoFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
-//        summaryFragmentButton.setOnClickListener(view -> showFragment(new liveFragment()));
-//        scorecardFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
-//        commentaryFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
-//        teamsFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
-
-        // Load the first fragment by default
-//        if (savedInstanceState == null) {
-//            showFragment(new liveFragment());
-//        }
-
     }
 
     @Override
@@ -641,14 +625,15 @@ public class MatchActivity extends AppCompatActivity {
             long bowlingTeamId = sharedPreferences.getLong(BOWLING_TEAM_ID, -1);
             editor.putLong(BATTING_TEAM_ID, bowlingTeamId);
             editor.putLong(BOWLING_TEAM_ID, battingTeamId);
-            showInningsEndDialog("First Innings Completed", "Second Innings Starting Soon!", 5);
+            editor.apply();
+            //showInningsEndDialog("First Innings Completed", "Second Innings Starting Soon!", 5);
             secondInnings();
         }else{
             Log.d(TAG, "handleInningsEnd: match is over");
             editor.putString(CURRENT_INNINGS_NUMBER, "matchOver");
             editor.putLong(TARGET, Integer.MIN_VALUE);
             editor.apply();
-            showInningsEndDialog("Match Over", "Thanks for Playing!", 3);
+            //showInningsEndDialog("Match Over", "Thanks for Playing!", 3);
             floatingButton.setEnabled(false);
             floatingButton.setAlpha(0.5f);     // Optional: Change visual appearance
         }
@@ -721,7 +706,7 @@ public class MatchActivity extends AppCompatActivity {
     }
     private void secondInnings(){
         Log.d(TAG, "secondInnings: entered second innings");
-        Intent intent = new Intent(MatchActivity.this, SelectingSrNsBowActivity.class);
+        Intent intent = new Intent(MatchActivity.this, InningsEndActivity.class);
         startActivity(intent);
     }
     private void rotateStrike(int runs) {

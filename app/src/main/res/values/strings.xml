@@ -115,7 +115,6 @@
     <string name="wicketScoringButton">Wicket</string>
     <string name="deadScoringButton">Dead</string>
     <string name="undoScoringButton">Undo</string>
-
     activity for extras
     <string name="hintForExtraRunsEditText">Enter Extra Runs(0 if no runs are scored)</string>
     <string name="runsFromBat">Bat</string>
@@ -123,6 +122,10 @@
     <string name="runsFromLegBye">LegBye</string>
     team fragment
     <string name="playerImage">Team</string>
+    activity secondInnings
+    <string name = "startSecondInningsButton">Start Second Innings</string>
+    <string name = "firstInningsOverText"> First Innings Ended</string>
+    <string name = "secondInningsOverText"> Second Innings Starting Soon</string>
 
 
 
