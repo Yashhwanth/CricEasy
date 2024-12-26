@@ -73,9 +73,6 @@ public class MatchActivity extends AppCompatActivity {
     private static final String LBW = "LBW";
     private static final String RUN_OUT = "Run-Out";
     private static final String STUMPED = "Stumped";
-    private boolean isDialogShowing = false;  // Flag to check if a dialog is showing
-    private boolean shouldOpenBowlerDialog = false;  // Flag to track if the bowler dialog should open after batter dialog
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,7 +106,7 @@ public class MatchActivity extends AppCompatActivity {
         inningsEndButton.setOnClickListener(v -> {
             String ongoingInnings = sharedPreferences.getString(CURRENT_INNINGS_NUMBER, null);
             if(ongoingInnings != null && ongoingInnings.equals("first")) secondInnings();
-            else  finishAffinity();
+            else  closeTheApp();
         });
         floatingButton.setOnClickListener(view ->{
             openScoringPopup();
@@ -420,7 +417,6 @@ public class MatchActivity extends AppCompatActivity {
                     break;
             }
             setNewPlayer(playerType, this::checkAndHandleOverEnd);
-            //checkAndHandleOverEnd();
             wicketDialog.dismiss();
             parentDialog.dismiss();
         });
@@ -648,7 +644,6 @@ public class MatchActivity extends AppCompatActivity {
             editor.apply();
             inningsEndButton.setVisibility(View.VISIBLE);
             inningsEndButton.setText(R.string.startSecondInningsButton);
-            //secondInnings();
         }else{
             Log.d(TAG, "handleInningsEnd: match is over");
             editor.putString(CURRENT_INNINGS_NUMBER, "matchOver");
@@ -737,6 +732,12 @@ public class MatchActivity extends AppCompatActivity {
                 editor.apply();
             }
         }return replacePlayer;
+    }
+    private void closeTheApp(){
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+        finishAffinity();
     }
 
 }
