@@ -419,8 +419,8 @@ public class MatchActivity extends AppCompatActivity {
                     databaseHelper.updateTeamStatsForStumping(teamStatsId, ballType);
                     break;
             }
-            setNewPlayer(playerType);
-            checkAndHandleOverEnd();
+            setNewPlayer(playerType, this::checkAndHandleOverEnd);
+            //checkAndHandleOverEnd();
             wicketDialog.dismiss();
             parentDialog.dismiss();
         });
@@ -537,15 +537,7 @@ public class MatchActivity extends AppCompatActivity {
     long teamStatsId = sharedPreferences.getLong("teamStatsId", -1);
     databaseHelper.updateTeamStatsForNoBall(teamStatsId, runs, runsSource);
     }
-    private void setNewPlayer(String playerType) {
-        // Check if any dialog is already open
-        if (isDialogShowing) {
-            shouldOpenBowlerDialog = true;  // Flag to open bowler dialog after current dialog is dismissed
-            Log.d(TAG, "Dialog is already showing, skipping...");
-            return;  // Skip opening a new dialog
-        }
-        // Set the flag to true to indicate that a dialog is showing
-        isDialogShowing = true;
+    private void setNewPlayer(String playerType, Runnable onDialogDismissed) {
         Log.d(TAG, "setNewPlayer: " + playerType);
         View playerDialogView = getLayoutInflater().inflate(R.layout.activity_selecting_players, null);
         AlertDialog.Builder playerBuilder = new AlertDialog.Builder(this);
@@ -554,17 +546,14 @@ public class MatchActivity extends AppCompatActivity {
         if (playerDialog.getWindow() != null) {
             playerDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
-        // Find buttons and input fields in the dialog
         TextView playerTypeTextView = playerDialogView.findViewById(R.id.playerTypeTextView);
         String newPlayerType = playerType.equals("bowler") ? "Bowler" : "Batsman";
         String formattedText = getString(R.string.selectNewPlayerSetText, newPlayerType);
         playerTypeTextView.setText(formattedText);
-
         EditText playerNameEditText = playerDialogView.findViewById(R.id.playerNameEditText);
         Button submitButton = playerDialogView.findViewById(R.id.submitButton);
         Button backButton = playerDialogView.findViewById(R.id.cancelButton);
         backButton.setVisibility(View.GONE);
-
         submitButton.setOnClickListener(v -> {
             String playerName = String.valueOf(playerNameEditText.getText());
             updatePlayerDataInSp(playerType, playerName);
@@ -574,17 +563,16 @@ public class MatchActivity extends AppCompatActivity {
             } else {
                 updateNewBatsmanToDB(playerName, playerType);
             }
-            playerDialog.dismiss();
+            playerDialog.dismiss(); // Dismiss dialog only after processing the player's input
         });
+
         playerDialog.setOnDismissListener(dialog -> {
-            // Reset the flag once the dialog is dismissed
-            isDialogShowing = false;
-            // Check if the bowler dialog should open after dismissing the batter dialog
-            if (shouldOpenBowlerDialog) {
-                shouldOpenBowlerDialog = false;  // Reset the flag
-                setNewPlayer("bowler");  // Open the bowler dialog after the batter dialog
+            // Execute the callback after the dialog is dismissed and input is valid
+            if (onDialogDismissed != null) {
+                onDialogDismissed.run();
             }
         });
+
         playerDialog.show();
     }
     private void updatePlayerDataInSp(String playerType, String playerName){
@@ -639,12 +627,12 @@ public class MatchActivity extends AppCompatActivity {
         Log.d(TAG, "checkAndHandleOverEnd: current ongoing innings " + currentInnings);
         int currentScore = sharedPreferences.getInt(SCORE, -1);
         if (playedBalls % 6 == 0 && playedBalls != 0 && playedBalls != totalBalls) {
-            Log.d(TAG, "checkAndHandleOverEnd:" + playedBalls / 6 + "Over has ended");
-            if(currentOverScore == 0) insertMaidenOver();
-            setNewPlayer("bowler");
-            if(!isDialogShowing)rotateStrike(1);
+            Log.d(TAG, "checkAndHandleOverEnd:" + playedBalls / 6 + " Over has ended");
+            if (currentOverScore == 0) insertMaidenOver();
+            // Pass rotateStrike as a callback to execute after the dialog is dismissed
+            setNewPlayer("bowler", () -> rotateStrike(1));
         }
-        if(playedBalls == totalBalls || currentScore >= target) {
+        if (playedBalls == totalBalls || currentScore >= target) {
             handleInningsEnd(currentInnings);
         }
     }
