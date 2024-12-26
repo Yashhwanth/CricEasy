@@ -677,7 +677,6 @@ public class MatchActivity extends AppCompatActivity {
         }
         else {
             score += runs;
-            currentOverScore += runs;
         }
         Log.d(TAG, "updateScoreInSharedPreferences: " + score);
         editor.putInt(SCORE, score);

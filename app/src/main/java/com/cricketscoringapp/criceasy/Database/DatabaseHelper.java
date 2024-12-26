@@ -15,7 +15,7 @@ import static android.content.ContentValues.TAG;
 
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 14; // Update version
+    private static final int DATABASE_VERSION = 15; // Update version
     private static final String DATABASE_NAME = "CricketDB";
     private static final String NORMAL_BALL = "Normal";
     private static final String BYE_BALL = "Bye";
@@ -28,7 +28,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String LBW = "LBW";
     private static final String RUN_OUT = "Run-Out";
     private static final String STUMPED = "Stumped";
-    private final Context context;
 
 
     // Table schema
@@ -129,15 +128,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COLUMN_PLAYER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COLUMN_NAME + " TEXT NOT NULL " + ");";
 
-
-    //
-//    public static final String TABLE_PLAYERS_TEAMS = "Players_Teams";
-//    public static final String CREATE_PLAYERS_TEAMS_TABLE = "CREATE TABLE " + TABLE_PLAYERS_TEAMS + " (" +
-//            COLUMN_TEAM_ID + " INTEGER, " +
-//            COLUMN_PLAYER_ID + " INTEGER, " +
-//            "FOREIGN KEY (" + COLUMN_TEAM_ID + ") REFERENCES Teams(" + COLUMN_TEAM_ID + ") ON DELETE CASCADE," +
-//            "FOREIGN KEY (" + COLUMN_PLAYER_ID + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE," +
-//            "PRIMARY KEY (" + COLUMN_TEAM_ID + "," + COLUMN_PLAYER_ID + "))";
     public static final String TABLE_PLAYERS_TEAMS = "Players_Teams";
     private static final String COLUMN_INNINGS_ID = "innings_id";
     public static final String CREATE_PLAYERS_TEAMS_TABLE = "CREATE TABLE " + TABLE_PLAYERS_TEAMS + " (" +
@@ -361,7 +351,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Constructor
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        this.context = context;
     }
 
     @Override
@@ -649,59 +638,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //-------------------------------------------*******S,Ns,Bow PAGE METHODS *****----------------------------------------------
-//    public void initializeBatsmanStats(long playerId, long inningsId) {
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        ContentValues values = new ContentValues();
-//        Log.d("batter id check", "initializeBatsmanStats: " + playerId);
-//        values.put(COLUMN_PLAYER, playerId);
-//        values.put(COLUMN_INNINGS_ID, inningsId);
-//        values.put(COLUMN_SCORE, 0);
-//        values.put(COLUMN_BALLS_PLAYED, 0);
-//        values.put(COLUMN_ZEROES, 0);
-//        values.put(COLUMN_ONES, 0);
-//        values.put(COLUMN_TWOS, 0);
-//        values.put(COLUMN_THREES, 0);
-//        values.put(COLUMN_FOURS, 0);
-//        values.put(COLUMN_FIVES, 0);
-//        values.put(COLUMN_SIXES, 0);
-//        db.insert(TABLE_BATSMAN, null, values);
-//    }
-//    public void initializeBowlerStats(long playerId, long inningsId) {
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        ContentValues values = new ContentValues();
-//        Log.d("bowler id check", "initializeBowlerStats: " + playerId);
-//        values.put(COLUMN_PLAYER, playerId);
-//        values.put(COLUMN_INNINGS_ID, inningsId);
-//        values.put(COLUMN_MAIDENS, 0);
-//        values.put(COLUMN_BALLS_PLAYED, 0);
-//        values.put(COLUMN_RUNS, 0);
-//        values.put(COLUMN_ECONOMY, 0.0);
-//        values.put(COLUMN_ZEROES, 0);
-//        values.put(COLUMN_ONES, 0);
-//        values.put(COLUMN_TWOS, 0);
-//        values.put(COLUMN_THREES, 0);
-//        values.put(COLUMN_FOURS, 0);
-//        values.put(COLUMN_FIVES, 0);
-//        values.put(COLUMN_SIXES, 0);
-//        values.put(COLUMN_WK, 0);
-//        values.put(COLUMN_BY, 0);
-//        values.put(COLUMN_LB, 0);
-//        values.put(COLUMN_WB, 0);
-//        values.put(COLUMN_NB, 0);
-//        values.put(COLUMN_DB, 0);
-//        db.insert(TABLE_BOWLER, null, values);
-//    }
-
     public void initializeBatsmanStats(long playerId, long inningsId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         Log.d("batter id check", "initializeBatsmanStats: " + playerId);
-
         // Check if player already has stats for this innings
         String checkQuery = "SELECT " + COLUMN_PLAYER + " FROM " + TABLE_BATSMAN +
                 " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
         Cursor cursor = db.rawQuery(checkQuery, new String[]{String.valueOf(playerId), String.valueOf(inningsId)});
-
         if (cursor != null && cursor.moveToFirst()) {
             // Player already exists in the Batsman table, do nothing
             Log.d("DatabaseHelper", "Batsman stats already exist, no need to insert.");
@@ -718,7 +662,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(COLUMN_FOURS, 0);
             values.put(COLUMN_FIVES, 0);
             values.put(COLUMN_SIXES, 0);
-
             long rowId = db.insert(TABLE_BATSMAN, null, values);
             if (rowId == -1) {
                 Log.e("DatabaseHelper", "Error inserting batsman stats into database");
@@ -726,7 +669,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Log.d("DatabaseHelper", "Batsman stats inserted successfully with row ID: " + rowId);
             }
         }
-
         if (cursor != null) {
             cursor.close();
         }
@@ -938,35 +880,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return teamStatsId;
     }
-    public Map<String, String> getMatchDetails(long matchId) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Map<String, String> matchDetails = new HashMap<>();
 
-        // SQL query with JOIN to get the place name from the places table
-        String query = "SELECT m.match_type, m.overs, m.ball_type, p.place AS venue, m.date_time " +
-                "FROM Matches m " +
-                "INNER JOIN Places p ON m.location = p.place_id " +
-                "WHERE m.match_id = ?";
-        Log.d("SQLQuery", "Query: " + query);  // Log the query for debugging
-        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(matchId)});
-
-        if (cursor.moveToFirst()) {
-            matchDetails.put("match_type", cursor.getString(cursor.getColumnIndexOrThrow("match_type")));
-            matchDetails.put("overs", cursor.getString(cursor.getColumnIndexOrThrow("overs")));
-            matchDetails.put("ball_type", cursor.getString(cursor.getColumnIndexOrThrow("ball_type")));
-            matchDetails.put("venue", cursor.getString(cursor.getColumnIndexOrThrow("venue"))); // place name from places table
-            matchDetails.put("datetime", cursor.getString(cursor.getColumnIndexOrThrow("date_time")));
-        }else {
-            Log.d("SQLQuery", "No data found for matchId: " + matchId);  // Log if no data is found
-        }
-
-
-        cursor.close();
-        db.close();
-        Log.d("MatchDetails", "Fetched Match Details: " + matchDetails);  // Log the match details map
-
-        return matchDetails;
-    }
 
     //---------------------------------------------ball table------------------------------
     public long insertBallDataFor0To6(long overId, int runs, long strikerId, long nonStrikerId) {
@@ -1329,73 +1243,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             default: return ""; // No specific column for invalid runs
         }
     }
-//    public void updateBatsmanStatsForWicket(long inningsId, long playerId, int runs, String ballType, String runsFrom, String wicketType) {
-//        try (SQLiteDatabase db = this.getWritableDatabase()) {
-//            String updateQuery = "UPDATE " + TABLE_BATSMAN + " SET ";
-//            SQLiteStatement statement = null;
-//            switch (wicketType) {
-//                case BOWLED:
-//                case CAUGHT:
-//                case LBW:
-//                    updateQuery += COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 ";
-//                    updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
-//                    statement = db.compileStatement(updateQuery);
-//                    statement.bindLong(1, runs);
-//                    statement.bindLong(2, playerId);
-//                    statement.bindLong(3, inningsId);
-//                    break;
-//                case STUMPED:
-//                    if (ballType.equals(NORMAL_BALL)) {
-//                        updateQuery += COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 ";
-//                        updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
-//                        statement = db.compileStatement(updateQuery);
-//                        statement.bindLong(1, runs);
-//                        statement.bindLong(2, playerId);
-//                        statement.bindLong(3, inningsId);
-//                    }
-//                    break;
-//                case RUN_OUT:
-//                    switch (ballType) {
-//                        case NORMAL_BALL:
-//                            if (runsFrom.equals(FROM_BAT)) {
-//                                updateQuery += COLUMN_SCORE + " = " + COLUMN_SCORE + " + ? ," +
-//                                        COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 ";
-//                                updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
-//                                statement = db.compileStatement(updateQuery);
-//                                statement.bindLong(1, runs);
-//                                statement.bindLong(2, playerId);
-//                                statement.bindLong(3, inningsId);
-//                            } else if (runsFrom.equals(BYE_BALL) || runsFrom.equals(LEG_BYE_BALL)) {
-//                                updateQuery += COLUMN_BALLS + " = " + COLUMN_BALLS + " + 1 ";
-//                                updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
-//                                statement = db.compileStatement(updateQuery);
-//                                statement.bindLong(1, playerId);
-//                                statement.bindLong(2, inningsId);
-//                            }
-//                            break;
-//                        case NO_BALL:
-//                            if (runsFrom.equals(FROM_BAT)) {
-//                                updateQuery += COLUMN_SCORE + " = " + COLUMN_SCORE + " + ? ";
-//                                updateQuery += " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
-//                                statement = db.compileStatement(updateQuery);
-//                                statement.bindLong(1, runs);
-//                                statement.bindLong(2, playerId);
-//                                statement.bindLong(3, inningsId);
-//                            }
-//                            break;
-//                        case WIDE_BALL:
-//                            updateQuery = null;
-//                            break;
-//                    }
-//                    break;
-//            }
-//            if (updateQuery != null && statement != null) {
-//                statement.executeUpdateDelete();
-//            }
-//        } catch (Exception e) {
-//            Log.e(TAG, "updateBatsmanStatsForWicket: failed to update batter stats in runout");
-//        }
-//
+
 
     //---------------------------------------- update bowlers stats-------------------------------
     public void updateBowlerStatsFor0to6(long innings_id, long player_id, int runs) {
@@ -1979,15 +1827,103 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
     public void updateMatchCompletionStatus(long matchId) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_IS_MATCH_COMPLETED, 1);
+        try (SQLiteDatabase db = this.getWritableDatabase()) {
+            // Step 1: Get the two innings IDs for the given match
+            String inningsQuery = "SELECT " + COLUMN_INNINGS_ID + " FROM " + TABLE_INNINGS + " WHERE " + COLUMN_MATCH_ID + " = ?";
+            Cursor inningsCursor = db.rawQuery(inningsQuery, new String[]{String.valueOf(matchId)});
+            long innings1Id = -1, innings2Id = -1;
+            if (inningsCursor.moveToNext()) {
+                innings1Id = inningsCursor.getLong(0);
+            }
+            if (inningsCursor.moveToNext()) {
+                innings2Id = inningsCursor.getLong(0);
+            }
+            inningsCursor.close();
+            if (innings1Id == -1 || innings2Id == -1) {
+                throw new Exception("Incomplete innings data for match ID: " + matchId);
+            }
+            // Step 2: Get scores and wickets from the teamStats table
+            String statsQuery = "SELECT " + COLUMN_RUNS + ", " + COLUMN_WICKETS + " FROM " + TABLE_TEAM_STATISTICS + " WHERE " + COLUMN_INNINGS_ID + " IN (?, ?)";
+            Cursor statsCursor = db.rawQuery(statsQuery, new String[]{String.valueOf(innings1Id), String.valueOf(innings2Id)});
 
-        String whereClause = COLUMN_MATCH_ID + " = ?";
-        String[] whereArgs = { String.valueOf(matchId) };
+            int team1Score = 0, team1Wickets = 0, team2Score = 0, team2Wickets = 0;
+            if (statsCursor.moveToNext()) {
+                team1Score = statsCursor.getInt(0);
+                team1Wickets = statsCursor.getInt(1);
+            }
+            if (statsCursor.moveToNext()) {
+                team2Score = statsCursor.getInt(0);
+                team2Wickets = statsCursor.getInt(1);
+            }
+            statsCursor.close();
 
-        db.update(TABLE_MATCHES, values, whereClause, whereArgs);
+            // Step 3: Determine the winner and match result
+            long winningTeamId = -1;
+            String matchResult;
+            if (team1Score > team2Score) {
+                winningTeamId = getTeamBattingId(db, innings1Id); // Implement a helper to get batting team for an innings
+                matchResult = "Team " + winningTeamId + " won by " + (team1Score - team2Score) + " runs";
+            } else if (team2Score > team1Score) {
+                winningTeamId = getTeamBattingId(db, innings2Id);
+                matchResult = "Team " + winningTeamId + " won by " + (10 - team2Wickets) + " wickets";
+            } else {
+                // Draw or tie
+                matchResult = "Match tied";
+            }
+            // Step 4: Update the Matches table
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_IS_MATCH_COMPLETED, 1);
+            values.put(COLUMN_MATCH_WON_BY, winningTeamId);
+            values.put(COLUMN_MATCH_RESULT, matchResult);
+            String whereClause = COLUMN_MATCH_ID + " = ?";
+            String[] whereArgs = {String.valueOf(matchId)};
+            db.update(TABLE_MATCHES, values, whereClause, whereArgs);
+
+        } catch (Exception e) {
+            Log.e(TAG, "updateMatchCompletionStatus: failed to update match end stats");
+        }
+    }
+    private long getTeamBattingId(SQLiteDatabase db, long inningsId) {
+        long battingTeamId = -1;
+        String query = "SELECT " + COLUMN_TEAM_BATTING + " FROM " + TABLE_INNINGS + " WHERE " + COLUMN_INNINGS_ID + " = ?";
+        try (Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(inningsId)})) {
+            if (cursor.moveToFirst()) {
+                battingTeamId = cursor.getLong(0);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "getTeamBattingId: Failed to retrieve batting team ID for inningsId " + inningsId, e);
+        }
+        return battingTeamId;
+    }
+
+
+    // --------------------------------Info Fragment ----------------------------------------
+    public Map<String, String> getMatchDetails(long matchId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Map<String, String> matchDetails = new HashMap<>();
+        // SQL query with JOIN to get the place name from the places table
+        String query = "SELECT m.match_type, m.overs, m.ball_type, p.place AS venue, m.date_time " +
+                "FROM Matches m " +
+                "INNER JOIN Places p ON m.location = p.place_id " +
+                "WHERE m.match_id = ?";
+        Log.d("SQLQuery", "Query: " + query);  // Log the query for debugging
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(matchId)});
+        if (cursor.moveToFirst()) {
+            matchDetails.put("matchType", cursor.getString(cursor.getColumnIndexOrThrow("matchType")));
+            matchDetails.put("overs", cursor.getString(cursor.getColumnIndexOrThrow("overs")));
+            matchDetails.put("ballType", cursor.getString(cursor.getColumnIndexOrThrow("ballType")));
+            matchDetails.put("venue", cursor.getString(cursor.getColumnIndexOrThrow("venue"))); // place name from places table
+            matchDetails.put("dateTime", cursor.getString(cursor.getColumnIndexOrThrow("dateTime")));
+        }else {
+            Log.d("SQLQuery", "No data found for matchId: " + matchId);  // Log if no data is found
+        }
+
+
+        cursor.close();
         db.close();
+        Log.d("MatchDetails", "Fetched Match Details: " + matchDetails);  // Log the match details map
+
+        return matchDetails;
     }
 
 
