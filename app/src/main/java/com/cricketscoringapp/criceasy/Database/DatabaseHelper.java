@@ -307,7 +307,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Bowler table name
     private static final String TABLE_BOWLER = "Bowlers";
-    // Bowler table columns
     private static final String COLUMN_MAIDENS = "maidens";
     private static final String COLUMN_ECONOMY = "economy";
     private static final String COLUMN_WK = "wk";
@@ -1969,6 +1968,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Log.e("DatabaseHelper", "Invalid ball type: " + ballType);
         }
     }
+// ------------------------------------  innings and match end ------------------------
+    public void updateInningsCompletionStatus(long inningsId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_IS_COMPLETED, 1);
+        String whereClause = COLUMN_INNINGS_ID + " = ?";
+        String[] whereArgs = { String.valueOf(inningsId) };
+        db.update(TABLE_INNINGS, values, whereClause, whereArgs);
+        db.close();
+    }
+    public void updateMatchCompletionStatus(long matchId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_IS_MATCH_COMPLETED, 1);
+
+        String whereClause = COLUMN_MATCH_ID + " = ?";
+        String[] whereArgs = { String.valueOf(matchId) };
+
+        db.update(TABLE_MATCHES, values, whereClause, whereArgs);
+        db.close();
+    }
+
 
 }
 

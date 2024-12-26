@@ -152,6 +152,7 @@ public class MatchActivity extends AppCompatActivity {
         AlertDialog scoringPopupDialog = builder.create();
         // Set the custom size for the dialog (width and height)
         scoringPopupDialog.show();
+        scoringPopupDialog.setCanceledOnTouchOutside(false);
         if (scoringPopupDialog.getWindow() != null) {
             scoringPopupDialog.getWindow().setLayout(
                     ViewGroup.LayoutParams.MATCH_PARENT,  // Set width to match parent
@@ -211,6 +212,7 @@ public class MatchActivity extends AppCompatActivity {
         extrasBuilder.setView(extrasDialogView);
         AlertDialog extrasDialog = extrasBuilder.create();
         extrasDialog.show();
+        extrasDialog.setCanceledOnTouchOutside(false);
         if (extrasDialog.getWindow() != null) {
             extrasDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
@@ -257,6 +259,7 @@ public class MatchActivity extends AppCompatActivity {
         wicketsBuilder.setView(wicketDialogView);
         AlertDialog wicketDialog = wicketsBuilder.create();
         wicketDialog.show();
+        wicketDialog.setCanceledOnTouchOutside(false);
         if (wicketDialog.getWindow() != null) {
             wicketDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
@@ -542,6 +545,7 @@ public class MatchActivity extends AppCompatActivity {
         if (playerDialog.getWindow() != null) {
             playerDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
+        playerDialog.setCanceledOnTouchOutside(false);
         TextView playerTypeTextView = playerDialogView.findViewById(R.id.playerTypeTextView);
         String newPlayerType = playerType.equals("bowler") ? "Bowler" : "Batsman";
         String formattedText = getString(R.string.selectNewPlayerSetText, newPlayerType);
@@ -568,7 +572,6 @@ public class MatchActivity extends AppCompatActivity {
                 onDialogDismissed.run();
             }
         });
-
         playerDialog.show();
     }
     private void updatePlayerDataInSp(String playerType, String playerName){
@@ -634,6 +637,9 @@ public class MatchActivity extends AppCompatActivity {
     }
     public void handleInningsEnd(String currentInnings){
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        long inningsId = sharedPreferences.getLong(INNINGS_ID, -1);
+        long matchId = sharedPreferences.getLong("currentMatchId", -1);
+        databaseHelper.updateInningsCompletionStatus(inningsId);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         if(currentInnings.equals("first")){
             Log.d(TAG, "handleInningsEnd: first innings is ended and second innings starts");
@@ -645,6 +651,7 @@ public class MatchActivity extends AppCompatActivity {
             inningsEndButton.setVisibility(View.VISIBLE);
             inningsEndButton.setText(R.string.startSecondInningsButton);
         }else{
+            databaseHelper.updateMatchCompletionStatus(matchId);
             Log.d(TAG, "handleInningsEnd: match is over");
             editor.putString(CURRENT_INNINGS_NUMBER, "matchOver");
             editor.putLong(TARGET, Integer.MIN_VALUE);
