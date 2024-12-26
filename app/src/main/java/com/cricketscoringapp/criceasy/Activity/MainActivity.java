@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         databaseHelper = new DatabaseHelper(this);
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
+        //editor.clear();
         editor.apply();
         Log.d(TAG, "onCreate: Cleared all SharedPreferences");
 
