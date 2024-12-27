@@ -34,7 +34,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate: Clearing all Shared Preferences");
         databaseHelper = new DatabaseHelper(this);
-        //SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        //editor.clear();
+        editor.apply();
         Log.d(TAG, "onCreate: Cleared all SharedPreferences");
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.mainActivity), (v, insets) -> {
@@ -56,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
             long currentMatchId = handleNewMatch();
             saveMatchIdToPreferences(currentMatchId);
             Log.d(TAG, "onCreate: opening matchInfo activity");
-            Intent intent = new Intent(MainActivity.this, MatchActivity.class);
+            Intent intent = new Intent(MainActivity.this, MatchInfoActivity.class);
             startActivity(intent);
         });
     }

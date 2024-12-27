@@ -1931,83 +1931,131 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public List<List<Player>> getPlayersForMatch(int matchId) {
+        Log.d("Database", "getPlayersForMatch started for matchId: " + matchId);
         List<Player> team1Players = new ArrayList<>();
         List<Player> team2Players = new ArrayList<>();
         List<List<Player>> playersList = new ArrayList<>();
-
         SQLiteDatabase db = this.getReadableDatabase();
 
         // Step 1: Get the innings ids for the given match id
         String inningsQuery = "SELECT " + COLUMN_INNINGS_ID +
                 " FROM " + TABLE_INNINGS +
                 " WHERE " + COLUMN_MATCH_ID + " = ?";
-
+        Log.d("Database", "Executing inningsQuery: " + inningsQuery);
         Cursor inningsCursor = db.rawQuery(inningsQuery, new String[]{String.valueOf(matchId)});
-        if (inningsCursor != null && inningsCursor.moveToFirst()) {
-            // Get the innings ids for the match
-            int inningsId1 = inningsCursor.getInt(0);
-            inningsCursor.moveToNext(); // Move to next row to get the second innings ID
-            int inningsId2 = inningsCursor.getInt(0);
 
-            // Step 2: Get players for both innings (for both teams)
+        if (inningsCursor != null && inningsCursor.moveToFirst()) {
+            // Step 2: Fetch innings ids for both innings (first and second innings)
+            int inningsId1 = inningsCursor.getInt(0);
+            Log.d(TAG, "getPlayersForMatch: fetched innings id is " + inningsId1);
+
+            int inningsId2 = -1; // Initialize second innings ID as -1 (indicating no second innings)
+            if (inningsCursor.moveToNext()) {
+                inningsId2 = inningsCursor.getInt(0);  // Fetch second innings ID if available
+                Log.d(TAG, "getPlayersForMatch: fetched second innings id is " + inningsId2);
+            }
+
+            // Step 3: Get players for the first innings (always exists)
             String playersQuery = "SELECT " + COLUMN_PLAYER_ID + ", " + COLUMN_TEAM_ID +
                     " FROM " + TABLE_PLAYERS_TEAMS +
-                    " WHERE " + COLUMN_INNINGS_ID + " IN (?, ?)";
+                    " WHERE " + COLUMN_INNINGS_ID + " = ?";
+            Log.d("Database", "Executing playersQuery for first innings: " + playersQuery);
+            Cursor playersCursor = db.rawQuery(playersQuery, new String[]{String.valueOf(inningsId1)});
 
-            Cursor playersCursor = db.rawQuery(playersQuery, new String[]{String.valueOf(inningsId1), String.valueOf(inningsId2)});
-
+            // Fetch players for the first innings
             if (playersCursor != null && playersCursor.moveToFirst()) {
-                // Step 3: For each player, fetch the name from the Players table
                 do {
-                    int playerIdColumnIndex = playersCursor.getColumnIndex(COLUMN_PLAYER_ID);
-                    int teamIdColumnIndex = playersCursor.getColumnIndex(COLUMN_TEAM_ID);
+                    int playerId = playersCursor.getInt(playersCursor.getColumnIndex(COLUMN_PLAYER_ID));
+                    int teamId = playersCursor.getInt(playersCursor.getColumnIndex(COLUMN_TEAM_ID));
+                    Log.d("Database", "Fetched playerId=" + playerId + ", teamId=" + teamId);
 
-                    if (playerIdColumnIndex != -1 && teamIdColumnIndex != -1) {
-                        int playerId = playersCursor.getInt(playerIdColumnIndex);
-                        int teamId = playersCursor.getInt(teamIdColumnIndex);
+                    // Query to get player name
+                    String playerQuery = "SELECT " + COLUMN_NAME +
+                            " FROM " + TABLE_PLAYERS +
+                            " WHERE " + COLUMN_PLAYER_ID + " = ?";
+                    Log.d("Database", "Executing playerQuery for playerId: " + playerId);
+                    Cursor playerCursor = db.rawQuery(playerQuery, new String[]{String.valueOf(playerId)});
+                    if (playerCursor != null && playerCursor.moveToFirst()) {
+                        String playerName = playerCursor.getString(playerCursor.getColumnIndex(COLUMN_NAME));
+                        Log.d("Database", "Fetched playerName: " + playerName + " for playerId: " + playerId);
 
-                        // Query to get player name
-                        String playerQuery = "SELECT " + COLUMN_NAME + " FROM " + TABLE_PLAYERS +
-                                " WHERE " + COLUMN_PLAYER_ID + " = ?";
-                        Cursor playerCursor = db.rawQuery(playerQuery, new String[]{String.valueOf(playerId)});
-                        if (playerCursor != null && playerCursor.moveToFirst()) {
-                            int nameColumnIndex = playerCursor.getColumnIndex(COLUMN_NAME);
+                        Player player = new Player();
+                        player.setPlayerId(playerId);
+                        player.setName(playerName);
 
-                            if (nameColumnIndex != -1) {
-                                String playerName = playerCursor.getString(nameColumnIndex);
-
-                                // Create a new Player object and add it to the correct team list
-                                Player player = new Player();
-                                player.setPlayerId(playerId);
-                                player.setName(playerName);
-
-                                // Assign players to their respective teams
-                                if (teamId == 1) {
-                                    team1Players.add(player);
-                                } else if (teamId == 2) {
-                                    team2Players.add(player);
-                                }
-                            }
+                        if (teamId == 1) {
+                            team1Players.add(player);
+                        } else if (teamId == 2) {
+                            team2Players.add(player);
                         }
-                        if (playerCursor != null) {
-                            playerCursor.close();
-                        }
+                    }
+
+                    if (playerCursor != null) {
+                        playerCursor.close();
                     }
                 } while (playersCursor.moveToNext());
             }
+
+            // Step 4: Get players for the second innings, if it exists
+            if (inningsId2 != -1) {
+                Log.d("Database", "Fetching players for second innings");
+                Cursor playersCursor2 = db.rawQuery(playersQuery, new String[]{String.valueOf(inningsId2)});
+
+                // Fetch players for second innings if available
+                if (playersCursor2 != null && playersCursor2.moveToFirst()) {
+                    do {
+                        int playerId = playersCursor2.getInt(playersCursor2.getColumnIndex(COLUMN_PLAYER_ID));
+                        int teamId = playersCursor2.getInt(playersCursor2.getColumnIndex(COLUMN_TEAM_ID));
+                        Log.d("Database", "Fetched playerId=" + playerId + ", teamId=" + teamId);
+
+                        String playerQuery = "SELECT " + COLUMN_NAME +
+                                " FROM " + TABLE_PLAYERS +
+                                " WHERE " + COLUMN_PLAYER_ID + " = ?";
+                        Log.d("Database", "Executing playerQuery for playerId: " + playerId);
+                        Cursor playerCursor = db.rawQuery(playerQuery, new String[]{String.valueOf(playerId)});
+                        if (playerCursor != null && playerCursor.moveToFirst()) {
+                            String playerName = playerCursor.getString(playerCursor.getColumnIndex(COLUMN_NAME));
+                            Log.d("Database", "Fetched playerName: " + playerName + " for playerId: " + playerId);
+
+                            Player player = new Player();
+                            player.setPlayerId(playerId);
+                            player.setName(playerName);
+
+                            if (teamId == 1) {
+                                team1Players.add(player);
+                            } else if (teamId == 2) {
+                                team2Players.add(player);
+                            }
+                        }
+
+                        if (playerCursor != null) {
+                            playerCursor.close();
+                        }
+                    } while (playersCursor2.moveToNext());
+                }
+
+                if (playersCursor2 != null) {
+                    playersCursor2.close();
+                }
+            }
+
             if (playersCursor != null) {
                 playersCursor.close();
             }
+
+            // Step 5: Return players for both teams (empty list for second team if second innings is not available)
+            playersList.add(team1Players);
+            playersList.add(team2Players);
+            Log.d("Database", "Returning combined playersList with size: " + playersList.size());
+        } else {
+            Log.e("Database", "No innings found for matchId: " + matchId);
         }
+
         if (inningsCursor != null) {
             inningsCursor.close();
         }
 
-        // Combine both teams' players in the required format
-        playersList.add(team1Players);
-        playersList.add(team2Players);
-
-        return playersList; // Return combined list of players for the match
+        return playersList;
     }
 
 }
