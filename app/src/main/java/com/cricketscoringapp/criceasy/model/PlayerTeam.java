@@ -1,24 +1,29 @@
 package com.cricketscoringapp.criceasy.model;
 
+import java.util.List;
+
 public class PlayerTeam {
-    private int teamId; // Foreign key to Teams
-    private int playerId; // Foreign key to Players
+    private List<Player> team1Players;
+    private List<Player> team2Players;
 
-    // Getters and Setters
-    public int getTeamId() {
-        return teamId;
+    public PlayerTeam(List<Player> team1Players, List<Player> team2Players) {
+        this.team1Players = team1Players;
+        this.team2Players = team2Players;
     }
 
-    public void setTeamId(int teamId) {
-        this.teamId = teamId;
+    public List<Player> getTeam1Players() {
+        return team1Players;
     }
 
-    public int getPlayerId() {
-        return playerId;
+    public void setTeam1Players(List<Player> team1Players) {
+        this.team1Players = team1Players;
     }
 
-    public void setPlayerId(int playerId) {
-        this.playerId = playerId;
+    public List<Player> getTeam2Players() {
+        return team2Players;
+    }
+
+    public void setTeam2Players(List<Player> team2Players) {
+        this.team2Players = team2Players;
     }
 }
-

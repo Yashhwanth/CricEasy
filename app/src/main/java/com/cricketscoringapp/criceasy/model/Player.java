@@ -6,7 +6,6 @@ public class Player {
     private String role;
     private String battingStyle;
     private String bowlingStyle;
-
     // Getters and Setters
     public int getPlayerId() {
         return playerId;

@@ -43,6 +43,7 @@ public class MatchActivity extends AppCompatActivity {
     private DatabaseHelper databaseHelper;
     private SharedPreferences sharedPreferences;
     private final String SHARED_PREFERENCES = "match_prefs";
+    private static final String MATCH_ID = "currentMatchId";
     private final String INNINGS_ID = "currentInningsId";
     private final String CURRENT_ACTIVITY = "currentActivity";
     private final String OVER_ID = "overId";
@@ -90,6 +91,8 @@ public class MatchActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
     }
     private void setupUI(Bundle savedInstanceState){
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        long matchId = sharedPreferences.getLong(MATCH_ID, -1);
         infoFragmentButton = findViewById(R.id.infoFragmentButton);
         summaryFragmentButton = findViewById(R.id.summaryFragmentButton);
         scorecardFragmentButton = findViewById(R.id.scorecardFragmentButton);
@@ -100,7 +103,7 @@ public class MatchActivity extends AppCompatActivity {
         summaryFragmentButton.setOnClickListener(view -> showFragment(new liveFragment()));
         scorecardFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
         commentaryFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
-        teamsFragmentButton.setOnClickListener(view -> showFragment(new TeamsFragment()));
+        teamsFragmentButton.setOnClickListener(view -> showFragment(new TeamsFragment(matchId)));
         inningsEndButton = findViewById(R.id.inningsEndButton);
         inningsEndButton.setVisibility(GONE);
         inningsEndButton.setOnClickListener(v -> {
@@ -694,7 +697,7 @@ public class MatchActivity extends AppCompatActivity {
         editor.apply();
     }
     private void insertMaidenOver(){
-        sharedPreferences =getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         long overId = sharedPreferences.getLong(OVER_ID, -1);
         databaseHelper.insertMaidenOver(overId);
     }

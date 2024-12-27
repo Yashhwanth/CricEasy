@@ -9,9 +9,13 @@ import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 import android.util.Pair;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import static android.content.ContentValues.TAG;
+
+import com.cricketscoringapp.criceasy.model.Player;
 
 
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -1909,11 +1913,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.d("SQLQuery", "Query: " + query);  // Log the query for debugging
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(matchId)});
         if (cursor.moveToFirst()) {
-            matchDetails.put("matchType", cursor.getString(cursor.getColumnIndexOrThrow("matchType")));
+            matchDetails.put("matchType", cursor.getString(cursor.getColumnIndexOrThrow("match_type")));
             matchDetails.put("overs", cursor.getString(cursor.getColumnIndexOrThrow("overs")));
-            matchDetails.put("ballType", cursor.getString(cursor.getColumnIndexOrThrow("ballType")));
+            matchDetails.put("ballType", cursor.getString(cursor.getColumnIndexOrThrow("ball_type")));
             matchDetails.put("venue", cursor.getString(cursor.getColumnIndexOrThrow("venue"))); // place name from places table
-            matchDetails.put("dateTime", cursor.getString(cursor.getColumnIndexOrThrow("dateTime")));
+            matchDetails.put("dateTime", cursor.getString(cursor.getColumnIndexOrThrow("date_time")));
         }else {
             Log.d("SQLQuery", "No data found for matchId: " + matchId);  // Log if no data is found
         }
@@ -1926,6 +1930,85 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return matchDetails;
     }
 
+    public List<List<Player>> getPlayersForMatch(int matchId) {
+        List<Player> team1Players = new ArrayList<>();
+        List<Player> team2Players = new ArrayList<>();
+        List<List<Player>> playersList = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Step 1: Get the innings ids for the given match id
+        String inningsQuery = "SELECT " + COLUMN_INNINGS_ID +
+                " FROM " + TABLE_INNINGS +
+                " WHERE " + COLUMN_MATCH_ID + " = ?";
+
+        Cursor inningsCursor = db.rawQuery(inningsQuery, new String[]{String.valueOf(matchId)});
+        if (inningsCursor != null && inningsCursor.moveToFirst()) {
+            // Get the innings ids for the match
+            int inningsId1 = inningsCursor.getInt(0);
+            inningsCursor.moveToNext(); // Move to next row to get the second innings ID
+            int inningsId2 = inningsCursor.getInt(0);
+
+            // Step 2: Get players for both innings (for both teams)
+            String playersQuery = "SELECT " + COLUMN_PLAYER_ID + ", " + COLUMN_TEAM_ID +
+                    " FROM " + TABLE_PLAYERS_TEAMS +
+                    " WHERE " + COLUMN_INNINGS_ID + " IN (?, ?)";
+
+            Cursor playersCursor = db.rawQuery(playersQuery, new String[]{String.valueOf(inningsId1), String.valueOf(inningsId2)});
+
+            if (playersCursor != null && playersCursor.moveToFirst()) {
+                // Step 3: For each player, fetch the name from the Players table
+                do {
+                    int playerIdColumnIndex = playersCursor.getColumnIndex(COLUMN_PLAYER_ID);
+                    int teamIdColumnIndex = playersCursor.getColumnIndex(COLUMN_TEAM_ID);
+
+                    if (playerIdColumnIndex != -1 && teamIdColumnIndex != -1) {
+                        int playerId = playersCursor.getInt(playerIdColumnIndex);
+                        int teamId = playersCursor.getInt(teamIdColumnIndex);
+
+                        // Query to get player name
+                        String playerQuery = "SELECT " + COLUMN_NAME + " FROM " + TABLE_PLAYERS +
+                                " WHERE " + COLUMN_PLAYER_ID + " = ?";
+                        Cursor playerCursor = db.rawQuery(playerQuery, new String[]{String.valueOf(playerId)});
+                        if (playerCursor != null && playerCursor.moveToFirst()) {
+                            int nameColumnIndex = playerCursor.getColumnIndex(COLUMN_NAME);
+
+                            if (nameColumnIndex != -1) {
+                                String playerName = playerCursor.getString(nameColumnIndex);
+
+                                // Create a new Player object and add it to the correct team list
+                                Player player = new Player();
+                                player.setPlayerId(playerId);
+                                player.setName(playerName);
+
+                                // Assign players to their respective teams
+                                if (teamId == 1) {
+                                    team1Players.add(player);
+                                } else if (teamId == 2) {
+                                    team2Players.add(player);
+                                }
+                            }
+                        }
+                        if (playerCursor != null) {
+                            playerCursor.close();
+                        }
+                    }
+                } while (playersCursor.moveToNext());
+            }
+            if (playersCursor != null) {
+                playersCursor.close();
+            }
+        }
+        if (inningsCursor != null) {
+            inningsCursor.close();
+        }
+
+        // Combine both teams' players in the required format
+        playersList.add(team1Players);
+        playersList.add(team2Players);
+
+        return playersList; // Return combined list of players for the match
+    }
 
 }
 

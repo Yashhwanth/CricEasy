@@ -127,6 +127,9 @@
     <string name = "firstInningsOverText"> First Innings Ended</string>
     <string name = "secondInningsOverText"> Second Innings Starting Soon</string>
     <string name = "endInningsText"> End Match</string>
+    team fragment
+    <string name = "playerNameTextView">Player name</string>
+    <string name = "playerIconContentDescription">Player Icon Image</string>
 
 
 

@@ -1,19 +1,27 @@
 package com.cricketscoringapp.criceasy.repository;
 
 import com.cricketscoringapp.criceasy.model.Player;
-import java.util.ArrayList;
+import com.cricketscoringapp.criceasy.model.PlayerTeam;
+import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
+
 import java.util.List;
 
 public class TeamRepository {
-    public List<Player> getPlayersForTeam(int teamId) {
-        List<Player> players = new ArrayList<>();
-        for (int i = 1; i <= 11; i++) {
-            Player player = new Player();
-            player.setPlayerId(i + teamId * 100);
-            player.setName("Player " + i);
-            player.setRole("Batsman");
-            players.add(player);
-        }
-        return players;
+
+    private DatabaseHelper databaseHelper;
+
+    public TeamRepository(DatabaseHelper databaseHelper) {
+        this.databaseHelper = databaseHelper;
+    }
+    public PlayerTeam getPlayersForMatch(int matchId) {
+        // Get the players for both teams (this is assumed to be a List<List<Player>>)
+        List<List<Player>> playersLists = databaseHelper.getPlayersForMatch(matchId);
+
+        // Extract the two teams' players using indexing
+        List<Player> team1Players = playersLists.get(0); // First list for team 1
+        List<Player> team2Players = playersLists.get(1); // Second list for team 2
+
+        // Return a TeamPlayers object containing both teams' players
+        return new PlayerTeam(team1Players, team2Players);
     }
 }
