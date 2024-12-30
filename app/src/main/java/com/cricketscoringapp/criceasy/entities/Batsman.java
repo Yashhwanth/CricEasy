@@ -4,23 +4,23 @@ import static androidx.room.ForeignKey.CASCADE;
 import androidx.room.*;
 @Entity(
         tableName = "Batsman",
-        primaryKeys = {"player", "innings_id"},
+        primaryKeys = {"player", "inningsId"},
         foreignKeys = {
-                @ForeignKey(entity = Player.class, parentColumns = "player_id", childColumns = "player", onDelete = CASCADE),
-                @ForeignKey(entity = Innings.class, parentColumns = "innings_id", childColumns = "innings_id", onDelete = CASCADE)
+                @ForeignKey(entity = Player.class, parentColumns = "playerId", childColumns = "player", onDelete = CASCADE),
+                @ForeignKey(entity = Innings.class, parentColumns = "inningsId", childColumns = "inningsId", onDelete = CASCADE)
         }
 )
 public class Batsman {
     @ColumnInfo(name = "player")
     public int player;
 
-    @ColumnInfo(name = "innings_id")
+    @ColumnInfo(name = "inningsId")
     public int inningsId;
 
     @ColumnInfo(name = "score")
     public int score = 0;
 
-    @ColumnInfo(name = "balls_played")
+    @ColumnInfo(name = "ballsPlayed")
     public int ballsPlayed = 0;
 
     @ColumnInfo(name = "zeroes")

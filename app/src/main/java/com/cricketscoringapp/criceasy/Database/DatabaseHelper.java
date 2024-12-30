@@ -238,16 +238,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "FOREIGN KEY(" + COLUMN_BALL_ID + ") REFERENCES Balls(" + COLUMN_BALL_ID + ") ON DELETE CASCADE" +
             ");";
 
-    //Batsmans table
+    //Batsman table
     private static final String TABLE_BATSMAN = "Batsman";
-    private static final String COLUMN_PLAYER = "batsman";
+    private static final String COLUMN_PLAYER = "player";
     private static final String COLUMN_SCORE = "score";
     private static final String COLUMN_BALLS_PLAYED = "balls";
     private static final String COLUMN_ZEROES = "zeroes";
     private static final String COLUMN_ONES = "ones";
     private static final String COLUMN_TWOS = "twos";
     private static final String COLUMN_THREES = "threes";
-    private static final String COLUMN_FOURS = "boundary";
+    private static final String COLUMN_FOURS = "fours";
     private static final String COLUMN_FIVES = "fives";
     private static final String COLUMN_SIXES = "sixes";
 
