@@ -32,17 +32,27 @@ android {
 }
 
 dependencies {
-
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.legacy.support.v4)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+
+    // Google Play Services
     implementation(libs.play.services.maps)
     implementation(libs.play.services.places)
     implementation(libs.places)
 
+    // RecyclerView and CardView
+    implementation(libs.recyclerview)
+    implementation(libs.cardview)
+
+    // Room dependencies
+    implementation(libs.room.runtime)
+    annotationProcessor(libs.room.compiler)
+
+    // Test dependencies
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(libs.espresso.core)
 }

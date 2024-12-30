@@ -16,7 +16,7 @@ import android.widget.TextView;
 import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
 import com.cricketscoringapp.criceasy.R;
 
-public class liveFragment extends Fragment {
+public class LiveFragment extends Fragment {
     // Declare the UI elements
     private TextView currentBattingTeamName;
     private TextView currentBattingScore;

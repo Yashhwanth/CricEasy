@@ -10,13 +10,10 @@ import java.util.List;
 
 public class TeamRepository {
     private static final String TAG = "TeamRepository";
-
     private DatabaseHelper databaseHelper;
-
     public TeamRepository(DatabaseHelper databaseHelper) {
         this.databaseHelper = databaseHelper;
     }
-
     public PlayerTeam getPlayersForMatch(int matchId) {
         Log.d(TAG, "getPlayersForMatch started for matchId: " + matchId);
 

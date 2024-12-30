@@ -1,24 +1,22 @@
 package com.cricketscoringapp.criceasy.model;
 
-public class Team {
-    private int teamId;
-    private String teamName;
+import java.util.List;
 
-    // Getters and Setters
+public class Team {
+    private final int teamId;
+    private final String teamName;
+    public Team(int teamId, String teamName, List<Player> players) {
+        this.teamId = teamId;
+        this.teamName = teamName;
+    }
     public int getTeamId() {
         return teamId;
-    }
-
-    public void setTeamId(int teamId) {
-        this.teamId = teamId;
     }
 
     public String getTeamName() {
         return teamName;
     }
 
-    public void setTeamName(String teamName) {
-        this.teamName = teamName;
-    }
 }
+
 

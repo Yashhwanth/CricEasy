@@ -3,12 +3,9 @@ package com.cricketscoringapp.criceasy.Activity;
 import static android.content.ContentValues.TAG;
 import static android.view.View.GONE;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -26,13 +23,16 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
 import com.cricketscoringapp.criceasy.R;
+import com.cricketscoringapp.criceasy.fragment.CommentaryFragment;
 import com.cricketscoringapp.criceasy.fragment.InfoFragment;
+import com.cricketscoringapp.criceasy.fragment.ScoreCardFragment;
 import com.cricketscoringapp.criceasy.fragment.TeamsFragment;
-import com.cricketscoringapp.criceasy.fragment.liveFragment;
+import com.cricketscoringapp.criceasy.fragment.LiveFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 
@@ -90,6 +90,16 @@ public class MatchActivity extends AppCompatActivity {
         floatingButton.setVisibility(View.VISIBLE);
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
     }
+    @Override
+    public void onBackPressed() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment currentFragment = fragmentManager.findFragmentById(R.id.fragmentLayout);
+        if (currentFragment instanceof LiveFragment) {
+            super.onBackPressed(); // Exit the activity
+        } else {
+            showFragment(LiveFragment.class, "LIVE_FRAGMENT"); // Show the default fragment
+        }
+    }
     private void setupUI(Bundle savedInstanceState){
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         long matchId = sharedPreferences.getLong(MATCH_ID, -1);
@@ -99,11 +109,11 @@ public class MatchActivity extends AppCompatActivity {
         commentaryFragmentButton = findViewById(R.id.commentaryFragmentButton);
         teamsFragmentButton = findViewById(R.id.teamsFragmentButton);
         floatingButton = findViewById(R.id.floatingButton);
-        infoFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
-        summaryFragmentButton.setOnClickListener(view -> showFragment(new liveFragment()));
-        scorecardFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
-        commentaryFragmentButton.setOnClickListener(view -> showFragment(new InfoFragment()));
-        teamsFragmentButton.setOnClickListener(view -> showFragment(new TeamsFragment(matchId)));
+        infoFragmentButton.setOnClickListener(view -> showFragment(InfoFragment.class, "INFO_FRAGMENT"));
+        summaryFragmentButton.setOnClickListener(view -> showFragment(LiveFragment.class, "LIVE_FRAGMENT"));
+        scorecardFragmentButton.setOnClickListener(view -> showFragment(ScoreCardFragment.class, "SCORE_CARD_FRAGMENT"));
+        commentaryFragmentButton.setOnClickListener(view -> showFragment(CommentaryFragment.class, "COMMENTARY_FRAGMENT"));
+        teamsFragmentButton.setOnClickListener(view -> showFragment(TeamsFragment.class, "TEAMS_FRAGMENT"));
         inningsEndButton = findViewById(R.id.inningsEndButton);
         inningsEndButton.setVisibility(GONE);
         inningsEndButton.setOnClickListener(v -> {
@@ -115,14 +125,40 @@ public class MatchActivity extends AppCompatActivity {
             openScoringPopup();
         });
         if (savedInstanceState == null) {
-            showFragment(new liveFragment());
+            showFragment(LiveFragment.class, "LIVE_FRAGMENT");
         }
     }
-    private void showFragment(Fragment fragment) {
-        // Begin a fragment transaction to replace the current fragment
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragmentLayout, fragment); // fragmentContainer is the container where the fragments will be loaded
-        transaction.addToBackStack(null); // Optionally, add the transaction to the back stack if you want to handle back navigation
+    private void showFragment(Class<? extends Fragment> fragmentClass, String tag) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+        // Hide all other fragments
+        for (Fragment existingFragment : fragmentManager.getFragments()) {
+            if (existingFragment != null && !existingFragment.getTag().equals(tag)) {
+                Log.d(TAG, "showFragment: hiding existing fragment: " + existingFragment.getTag());
+                transaction.hide(existingFragment);
+            }
+        }
+
+        // Try to find the existing fragment by its tag
+        Fragment fragment = fragmentManager.findFragmentByTag(tag);
+
+        if (fragment == null) {
+            Log.d(TAG, "showFragment: fragment is null, need to create one");
+            try {
+                fragment = fragmentClass.newInstance();
+                transaction.add(R.id.fragmentLayout, fragment, tag);
+                Log.d(TAG, "showFragment: created new fragment");
+            } catch (Exception e) {
+                Log.e(TAG, "showFragment: Error in creating fragment instance", e);
+                return;
+            }
+        }
+
+        Log.d(TAG, "Showing fragment: " + tag);
+        transaction.show(fragment);
+
+        // Commit the transaction without adding to the back stack (no back navigation)
         transaction.commit();
     }
     private void updateCurrentActivityInPreferences() {

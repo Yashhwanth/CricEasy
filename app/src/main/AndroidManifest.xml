@@ -25,7 +25,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!-- MainActivity as a regular activity -->
         <activity
             android:name=".Activity.MainActivity"
             android:launchMode="singleTask"

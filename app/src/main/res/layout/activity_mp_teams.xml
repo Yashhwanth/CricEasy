@@ -1,49 +1,39 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/teamsLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp">
-
-    <LinearLayout
-        android:id="@+id/teamsLayout"
-        android:layout_width="match_parent"
+    android:orientation="vertical">
+    <!-- Team 1 Header -->
+    <TextView
+        android:id="@+id/team1TextView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="10dp">
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="15dp"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
-        <!-- Team 1 Header -->
-        <TextView
-            android:id="@+id/team1TextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="15dp"
-            android:text="team A"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+    <!-- Team 1 Players RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/team1PlayerRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_marginBottom="16dp" />
 
-        <!-- Team 1 Players RecyclerView -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/team1PlayerRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
+    <!-- Team 2 Header -->
+    <TextView
+        android:id="@+id/team2TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
-        <!-- Team 2 Header -->
-        <TextView
-            android:id="@+id/team2TextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="team B"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+    <!-- Team 2 Players RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/team2PlayerRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_marginBottom="16dp" /> <!-- 5 columns for players -->
 
-        <!-- Team 2 Players RecyclerView -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/team2PlayerRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
-
-    </LinearLayout>
-</ScrollView>
+</LinearLayout>
