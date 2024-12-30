@@ -152,7 +152,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ");";
 
     // Innings Table
-    private static final String TABLE_INNINGS = "Inning";
+    private static final String TABLE_INNINGS = "Innings";
     private static final String COLUMN_INNINGS_NUMBER = "inningsNumber";
     private static final String COLUMN_TEAM_BATTING = "battingTeam";
     private static final String COLUMN_IS_COMPLETED = "isCompleted";
