@@ -1,5 +1,6 @@
 package com.cricketscoringapp.criceasy.entities;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
@@ -13,9 +14,15 @@ import androidx.room.PrimaryKey;
 )
 public class Over {
     @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "overId")
     public int overId;
+
+    @ColumnInfo(name = "inningsId")
     public int inningsId; // References Innings
-    public int over;
+    @ColumnInfo(name = "overNumber")
+    public int overNumber;
+    @ColumnInfo(name = "playerId")
     public int playerId; // References Players
+    @ColumnInfo(name = "isMaiden")
     public int isMaiden;
 }

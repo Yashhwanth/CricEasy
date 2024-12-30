@@ -188,7 +188,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_IS_WICKET = "isWicket";
     private static final String COLUMN_STRIKER = "striker";
     private static final String COLUMN_NON_STRIKER = "nonStriker";
-    private static final String COLUMN_IS_SYNCED = "bowler";
+    private static final String COLUMN_IS_SYNCED = "isSynced";
 
     // SQL command to create the balls table
     private static final String CREATE_BALLS_TABLE = "CREATE TABLE " + TABLE_BALLS + " (" +

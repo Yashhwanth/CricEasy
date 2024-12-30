@@ -11,34 +11,34 @@ import androidx.room.*;
 @Entity(
         tableName = "Balls",
         foreignKeys = {
-                @ForeignKey(entity = Over.class, parentColumns = "over_id", childColumns = "over_id", onDelete = CASCADE),
-                @ForeignKey(entity = Player.class, parentColumns = "player_id", childColumns = "striker", onDelete = CASCADE),
-                @ForeignKey(entity = Player.class, parentColumns = "player_id", childColumns = "non_striker", onDelete = CASCADE)
+                @ForeignKey(entity = Over.class, parentColumns = "overId", childColumns = "overId", onDelete = CASCADE),
+                @ForeignKey(entity = Player.class, parentColumns = "playerId", childColumns = "striker", onDelete = CASCADE),
+                @ForeignKey(entity = Player.class, parentColumns = "playerId", childColumns = "nonStriker", onDelete = CASCADE)
         }
 )
 public class Ball {
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "ball_id")
+    @ColumnInfo(name = "ballId")
     public int ballId;
 
-    @ColumnInfo(name = "over_id")
+    @ColumnInfo(name = "overId")
     public int overId;
 
-    @ColumnInfo(name = "type_of_ball")
-    public String typeOfBall;
+    @ColumnInfo(name = "ballType")
+    public String ballType;
 
     @ColumnInfo(name = "runs")
     public int runs;
 
-    @ColumnInfo(name = "is_wicket")
+    @ColumnInfo(name = "isWicket")
     public boolean isWicket;
 
     @ColumnInfo(name = "striker")
     public int striker;
 
-    @ColumnInfo(name = "non_striker")
+    @ColumnInfo(name = "nonStriker")
     public int nonStriker;
 
-    @ColumnInfo(name = "is_synced")
+    @ColumnInfo(name = "isSynced")
     public int isSynced = 0;
 }

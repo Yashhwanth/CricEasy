@@ -3,22 +3,22 @@ import static androidx.room.ForeignKey.CASCADE;
 
 import androidx.room.*;
 @Entity(
-        tableName = "Extras",
+        tableName = "Extra",
         foreignKeys = {
-                @ForeignKey(entity = Ball.class, parentColumns = "ball_id", childColumns = "ball_id", onDelete = CASCADE)
+                @ForeignKey(entity = Ball.class, parentColumns = "ballId", childColumns = "ballId", onDelete = CASCADE)
         }
 )
 public class Extra {
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "extra_id")
+    @ColumnInfo(name = "extraId")
     public int extraId;
 
-    @ColumnInfo(name = "ball_id")
+    @ColumnInfo(name = "ballId")
     public int ballId;
 
-    @ColumnInfo(name = "extra_type")
+    @ColumnInfo(name = "extraType")
     public String extraType;
 
-    @ColumnInfo(name = "extra_runs")
-    public int extraRuns;
+    @ColumnInfo(name = "runsInExtra")
+    public int runsInExtra;
 }
