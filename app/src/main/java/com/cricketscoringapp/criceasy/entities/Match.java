@@ -42,8 +42,8 @@ public class Match {
     @ColumnInfo(name = "ballType")  // Maps to COLUMN_BALL_TYPE
     public String ballType;
 
-    @ColumnInfo(name = "location")  // Maps to COLUMN_PLACE_NAME
-    public int location;  // References Places
+    @ColumnInfo(name = "placeName")  // Maps to COLUMN_PLACE_NAME
+    public int placeName;  // References Places
 
     @ColumnInfo(name = "dateTime")  // Maps to COLUMN_DATE_TIME
     public String dateTime;
