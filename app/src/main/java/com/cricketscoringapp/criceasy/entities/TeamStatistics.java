@@ -3,28 +3,31 @@ import static androidx.room.ForeignKey.CASCADE;
 
 import androidx.room.*;
 @Entity(
-        tableName = "Team_Statistics",
+        tableName = "TeamStatistics",
         foreignKeys = {
-                @ForeignKey(entity = Innings.class, parentColumns = "innings_id", childColumns = "innings_id", onDelete = CASCADE)
+                @ForeignKey(entity = Innings.class, parentColumns = "inningsId", childColumns = "inningsId", onDelete = CASCADE)
+        },
+        indices = {
+                @Index(value = "inningsId"),  // Added index for placeName
         }
 )
 public class TeamStatistics {
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "team_stats_id")
-    public int teamStatsId;
+    @ColumnInfo(name = "teamStatsId")
+    public Integer teamStatsId;
 
-    @ColumnInfo(name = "innings_id")
-    public int inningsId;
+    @ColumnInfo(name = "inningsId")
+    public Integer inningsId;
 
     @ColumnInfo(name = "runs")
-    public int runs = 0;
+    public Integer runs = 0;
 
     @ColumnInfo(name = "wickets")
-    public int wickets = 0;
+    public Integer wickets = 0;
 
     @ColumnInfo(name = "balls")
-    public int balls = 0;
+    public Integer balls = 0;
 
     @ColumnInfo(name = "extras")
-    public int extras = 0;
+    public Integer extras = 0;
 }

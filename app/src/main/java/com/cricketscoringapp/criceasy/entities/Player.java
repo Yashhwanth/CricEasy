@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey;
 public class Player {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "playerId")
-    public int playerId;
+    public Integer playerId;
     @ColumnInfo(name = "playerName")
     public String playerName; // Player name
 }

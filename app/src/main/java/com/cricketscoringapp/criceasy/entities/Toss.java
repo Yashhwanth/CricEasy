@@ -3,6 +3,7 @@ package com.cricketscoringapp.criceasy.entities;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 @Entity(
@@ -10,16 +11,21 @@ import androidx.room.PrimaryKey;
         foreignKeys = {
                 @ForeignKey(entity = Team.class, parentColumns = "teamId", childColumns = "tossCallingTeam"),
                 @ForeignKey(entity = Team.class, parentColumns = "teamId", childColumns = "tossWinningTeam")
+        },
+        indices = {
+                @Index(value = "tossCallingTeam"),  // Added index for placeName
+                @Index(value = "tossWinningTeam")  // Added index for toss
         }
+
 )
 public class Toss {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "tossId")
-    public int tossId;
+    public Integer tossId;
     @ColumnInfo(name = "tossCallingTeam")
-    public int tossCallingTeam; // References Teams
+    public Integer tossCallingTeam; // References Teams
     @ColumnInfo(name = "tossWinningTeam")
-    public int tossWinningTeam; // References Teams
+    public Integer tossWinningTeam; // References Teams
     @ColumnInfo(name = "tossWonTeamChooseTo")
     public String tossWonTeamChooseTo;
 }

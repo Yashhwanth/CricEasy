@@ -19,7 +19,7 @@ import com.cricketscoringapp.criceasy.model.Player;
 
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 16; // Update version
+    private static final int DATABASE_VERSION = 19; // Update version
     private static final String DATABASE_NAME = "CricketDB";
     private static final String NORMAL_BALL = "Normal";
     private static final String BYE_BALL = "Bye";
@@ -62,9 +62,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + COLUMN_IS_MATCH_COMPLETED + " INTEGER, "
             + COLUMN_MATCH_WON_BY + " INTEGER, "
             + COLUMN_MATCH_RESULT + " TEXT, "
-            + "FOREIGN KEY(" + COLUMN_PLACE_NAME + ") REFERENCES Places(" + COLUMN_PLACE_ID + "), "
+            + "FOREIGN KEY(" + COLUMN_PLACE_NAME + ") REFERENCES Place(" + COLUMN_PLACE_ID + "), "
             + "FOREIGN KEY(" + COLUMN_TOSS + ") REFERENCES Toss(" + COLUMN_TOSS_ID + "), "
-            + "FOREIGN KEY(" + COLUMN_MATCH_WON_BY + ") REFERENCES Teams(" + COLUMN_TEAM_ID + ")"
+            + "FOREIGN KEY(" + COLUMN_MATCH_WON_BY + ") REFERENCES Team(" + COLUMN_TEAM_ID + ")"
             + ");";
 
     //Team Table
@@ -88,8 +88,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_TEAM1_ID + " INTEGER, " +
                     COLUMN_TEAM2_ID + " INTEGER, " +
                     "FOREIGN KEY(" + COLUMN_MATCH_ID + ") REFERENCES Matches(" + COLUMN_MATCH_ID + "), " +
-                    "FOREIGN KEY(" + COLUMN_TEAM1_ID + ") REFERENCES Teams(" + COLUMN_TEAM_ID + "), " +
-                    "FOREIGN KEY(" + COLUMN_TEAM2_ID + ") REFERENCES Teams(" + COLUMN_TEAM_ID + ")" +
+                    "FOREIGN KEY(" + COLUMN_TEAM1_ID + ") REFERENCES Team(" + COLUMN_TEAM_ID + "), " +
+                    "FOREIGN KEY(" + COLUMN_TEAM2_ID + ") REFERENCES Team(" + COLUMN_TEAM_ID + ")" +
                     ");";
 
     public static final String TABLE_PLACES = "Place";
@@ -108,8 +108,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + COLUMN_TOSS_CALL_BY + " INTEGER, "
             + COLUMN_TOSS_WON_BY + " INTEGER, "
             + COLUMN_TOSS_WON_TEAM_CHOOSE_TO + " TEXT, "
-            + "FOREIGN KEY(" + COLUMN_TOSS_CALL_BY + ") REFERENCES Teams(" + COLUMN_TEAM_ID + "), "
-            + "FOREIGN KEY(" + COLUMN_TOSS_WON_BY + ") REFERENCES Teams(" + COLUMN_TEAM_ID + ")"
+            + "FOREIGN KEY(" + COLUMN_TOSS_CALL_BY + ") REFERENCES Team(" + COLUMN_TEAM_ID + "), "
+            + "FOREIGN KEY(" + COLUMN_TOSS_WON_BY + ") REFERENCES Team(" + COLUMN_TEAM_ID + ")"
             + ");";
 
     // Table Players
@@ -127,8 +127,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COLUMN_TEAM_ID + " INTEGER, " +
             COLUMN_PLAYER_ID + " INTEGER, " +
             COLUMN_INNINGS_ID + " INTEGER, " +
-            "FOREIGN KEY (" + COLUMN_TEAM_ID + ") REFERENCES Teams(" + COLUMN_TEAM_ID + ") ON DELETE CASCADE, " +
-            "FOREIGN KEY (" + COLUMN_PLAYER_ID + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE, " +
+            "FOREIGN KEY (" + COLUMN_TEAM_ID + ") REFERENCES Team(" + COLUMN_TEAM_ID + ") ON DELETE CASCADE, " +
+            "FOREIGN KEY (" + COLUMN_PLAYER_ID + ") REFERENCES Player(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE, " +
             "FOREIGN KEY (" + COLUMN_INNINGS_ID + ") REFERENCES Innings(" + COLUMN_INNINGS_ID + ") ON DELETE CASCADE, " +
             "PRIMARY KEY (" + COLUMN_TEAM_ID + ", " + COLUMN_PLAYER_ID + ", " + COLUMN_INNINGS_ID + "))";
 
@@ -147,8 +147,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COLUMN_RUNS + " INTEGER, " +
             COLUMN_BALLS + " INTEGER, " +
             "FOREIGN KEY(" + COLUMN_INNINGS_ID + ") REFERENCES Innings(" + COLUMN_INNINGS_ID + ") ON DELETE CASCADE, " +
-            "FOREIGN KEY(" + COLUMN_BATSMAN1_ID + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE, " +
-            "FOREIGN KEY(" + COLUMN_BATSMAN2_ID + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE" +
+            "FOREIGN KEY(" + COLUMN_BATSMAN1_ID + ") REFERENCES Player(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE, " +
+            "FOREIGN KEY(" + COLUMN_BATSMAN2_ID + ") REFERENCES Player(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE" +
             ");";
 
     // Innings Table
@@ -163,7 +163,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COLUMN_TEAM_BATTING + " INTEGER, " +
             COLUMN_IS_COMPLETED + " INTEGER, " +
             "FOREIGN KEY(" + COLUMN_MATCH_ID + ") REFERENCES Matches(" + COLUMN_MATCH_ID + ") ON DELETE CASCADE, " +
-            "FOREIGN KEY(" + COLUMN_TEAM_BATTING + ") REFERENCES Teams(" + COLUMN_TEAM_ID + ") ON DELETE CASCADE" +
+            "FOREIGN KEY(" + COLUMN_TEAM_BATTING + ") REFERENCES Team(" + COLUMN_TEAM_ID + ") ON DELETE CASCADE" +
             ");";
 
     // Over Table
@@ -178,7 +178,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COLUMN_PLAYER_ID + " INTEGER, " +
             COLUMN_IS_MAIDEN + " INTEGER, " +
             "FOREIGN KEY(" + COLUMN_INNINGS_ID + ") REFERENCES Innings(" + COLUMN_INNINGS_ID + ") ON DELETE CASCADE, " +
-            "FOREIGN KEY(" + COLUMN_PLAYER_ID + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE" +
+            "FOREIGN KEY(" + COLUMN_PLAYER_ID + ") REFERENCES Player(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE" +
             ");";
 
     // Balls Table
@@ -200,9 +200,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COLUMN_STRIKER + " INTEGER, " +
             COLUMN_NON_STRIKER + " INTEGER, " +
             COLUMN_IS_SYNCED + "INTEGER DEFAULT 0, " + // New column to track sync status (0 = not synced, 1 = synced)
-            "FOREIGN KEY(" + COLUMN_OVER_ID + ") REFERENCES Overs(" + COLUMN_OVER_ID + ") ON DELETE CASCADE, " +
-            "FOREIGN KEY(" + COLUMN_STRIKER + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE, " +
-            "FOREIGN KEY(" + COLUMN_NON_STRIKER + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE " +
+            "FOREIGN KEY(" + COLUMN_OVER_ID + ") REFERENCES Over(" + COLUMN_OVER_ID + ") ON DELETE CASCADE, " +
+            "FOREIGN KEY(" + COLUMN_STRIKER + ") REFERENCES Player(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE, " +
+            "FOREIGN KEY(" + COLUMN_NON_STRIKER + ") REFERENCES Player(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE " +
             ");";
 
 
@@ -220,9 +220,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COLUMN_WICKET_BATSMAN + " INTEGER, " +
             COLUMN_WICKET_RUNS + " INTEGER, " +
             COLUMN_WICKET_CONTRIBUTOR + " INTEGER, " +
-            "FOREIGN KEY(" + COLUMN_BALL_ID + ") REFERENCES Balls(" + COLUMN_BALL_ID + ") ON DELETE CASCADE, " +
-            "FOREIGN KEY(" + COLUMN_WICKET_BATSMAN + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE, " +
-            "FOREIGN KEY(" + COLUMN_WICKET_CONTRIBUTOR + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE" +
+            "FOREIGN KEY(" + COLUMN_BALL_ID + ") REFERENCES Ball(" + COLUMN_BALL_ID + ") ON DELETE CASCADE, " +
+            "FOREIGN KEY(" + COLUMN_WICKET_BATSMAN + ") REFERENCES Player(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE, " +
+            "FOREIGN KEY(" + COLUMN_WICKET_CONTRIBUTOR + ") REFERENCES Player(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE" +
             ");";
 
     // Extras Table
@@ -235,7 +235,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COLUMN_BALL_ID + " INTEGER, " +
             COLUMN_EXTRA_TYPE + " TEXT, " +
             COLUMN_EXTRA_RUNS + " INTEGER, " +
-            "FOREIGN KEY(" + COLUMN_BALL_ID + ") REFERENCES Balls(" + COLUMN_BALL_ID + ") ON DELETE CASCADE" +
+            "FOREIGN KEY(" + COLUMN_BALL_ID + ") REFERENCES Ball(" + COLUMN_BALL_ID + ") ON DELETE CASCADE" +
             ");";
 
     //Batsman table
@@ -264,7 +264,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COLUMN_FIVES + " INTEGER DEFAULT 0, " +
             COLUMN_SIXES + " INTEGER DEFAULT 0, " +
             "PRIMARY KEY(" + COLUMN_PLAYER + ", " + COLUMN_INNINGS_ID + "), " +
-            "FOREIGN KEY (" + COLUMN_PLAYER + ") REFERENCES Players(player_id), " +
+            "FOREIGN KEY (" + COLUMN_PLAYER + ") REFERENCES Player(player_id), " +
             "FOREIGN KEY (" + COLUMN_INNINGS_ID + ") REFERENCES Innings(innings_id)" +
             ")";
 
@@ -299,7 +299,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + COLUMN_NB + " INTEGER DEFAULT 0, "
             + COLUMN_DB + " INTEGER DEFAULT 0, "
             + "PRIMARY KEY(" + COLUMN_PLAYER + ", " + COLUMN_INNINGS_ID + "), "
-            + "FOREIGN KEY (" + COLUMN_PLAYER + ") REFERENCES Players(player_id), "
+            + "FOREIGN KEY (" + COLUMN_PLAYER + ") REFERENCES Player(player_id), "
             + "FOREIGN KEY (" + COLUMN_INNINGS_ID + ") REFERENCES Innings(innings_id));";
 
     // Team Statistics Table
@@ -314,7 +314,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COLUMN_WICKETS + " INTEGER DEFAULT 0, " +      // Total wickets lost
             COLUMN_BALLS + " INTEGER DEFAULT 0, " +
             COLUMN_EXTRAS + " INTEGER DEFAULT 0, " +
-            "FOREIGN KEY(" + COLUMN_INNINGS_ID + ") REFERENCES " + TABLE_INNINGS + "(" + COLUMN_INNINGS_ID + ") ON DELETE CASCADE" +
+            "FOREIGN KEY(" + COLUMN_INNINGS_ID + ") REFERENCES " + TABLE_INNINGS + " (" + COLUMN_INNINGS_ID + ") ON DELETE CASCADE" +
             ");";
 
     // Constructor
@@ -346,20 +346,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS Matches");
-        db.execSQL("DROP TABLE IF EXISTS Teams");
-        db.execSQL("DROP TABLE IF EXISTS Places");
+        db.execSQL("DROP TABLE IF EXISTS Team");
+        db.execSQL("DROP TABLE IF EXISTS Place");
         db.execSQL("DROP TABLE IF EXISTS Toss");
-        db.execSQL("DROP TABLE IF EXISTS Matches_Teams");
-        db.execSQL("DROP TABLE IF EXISTS Players_Teams");
-        db.execSQL("DROP TABLE IF EXISTS Players");
-        db.execSQL("DROP TABLE IF EXISTS Partnerships");
+        db.execSQL("DROP TABLE IF EXISTS MatchTeams");
+        db.execSQL("DROP TABLE IF EXISTS TeamPlayers");
+        db.execSQL("DROP TABLE IF EXISTS Player");
+        db.execSQL("DROP TABLE IF EXISTS Partnership");
         db.execSQL("DROP TABLE IF EXISTS Innings");
-        db.execSQL("DROP TABLE IF EXISTS Overs");
-        db.execSQL("DROP TABLE IF EXISTS Balls");
-        db.execSQL("DROP TABLE IF EXISTS Wickets");
-        db.execSQL("DROP TABLE IF EXISTS Extras");
-        db.execSQL("DROP TABLE IF EXISTS Batsmans");
-        db.execSQL("DROP TABLE IF EXISTS Bowlers");
+        db.execSQL("DROP TABLE IF EXISTS Over");
+        db.execSQL("DROP TABLE IF EXISTS Ball");
+        db.execSQL("DROP TABLE IF EXISTS Wicket");
+        db.execSQL("DROP TABLE IF EXISTS Extra");
+        db.execSQL("DROP TABLE IF EXISTS Batsman");
+        db.execSQL("DROP TABLE IF EXISTS Bowler");
         db.execSQL("DROP TABLE IF EXISTS TeamStatistics");
         onCreate(db);
     }
@@ -593,7 +593,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ContentValues matchValues = new ContentValues();
             matchValues.put(COLUMN_TOSS, tossId); // Update toss ID in the match
             // Update the MATCHES table with the new toss ID
-            int rowsUpdatedInMatch = db.update(TABLE_MATCH, matchValues, "match_id = ?", new String[]{String.valueOf(currentMatchId)});
+            int rowsUpdatedInMatch = db.update(TABLE_MATCH, matchValues, "matchId = ?", new String[]{String.valueOf(currentMatchId)});
             if (rowsUpdatedInMatch > 0) {
                 Log.d("DatabaseHelper", "Match updated successfully with toss ID: " + tossId);
                 updatedTossId = tossId;
@@ -1874,7 +1874,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String query = "SELECT m.match_type, m.overs, m.ball_type, p.place AS venue, m.date_time " +
                 "FROM Matches m " +
                 "INNER JOIN Places p ON m.location = p.place_id " +
-                "WHERE m.match_id = ?";
+                "WHERE m.matchId = ?";
         Log.d("SQLQuery", "Query: " + query);  // Log the query for debugging
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(matchId)});
         if (cursor.moveToFirst()) {

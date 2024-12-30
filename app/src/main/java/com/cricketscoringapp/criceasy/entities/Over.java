@@ -3,6 +3,7 @@ package com.cricketscoringapp.criceasy.entities;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 @Entity(
@@ -10,19 +11,23 @@ import androidx.room.PrimaryKey;
         foreignKeys = {
                 @ForeignKey(entity = Innings.class, parentColumns = "inningsId", childColumns = "inningsId", onDelete = ForeignKey.CASCADE),
                 @ForeignKey(entity = Player.class, parentColumns = "playerId", childColumns = "playerId", onDelete = ForeignKey.CASCADE)
+        },
+        indices = {
+                @Index(value = "inningsId"),  // Added index for placeName
+                @Index(value = "playerId"),  // Added index for toss
         }
 )
 public class Over {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "overId")
-    public int overId;
+    public Integer overId;
 
     @ColumnInfo(name = "inningsId")
-    public int inningsId; // References Innings
+    public Integer inningsId; // References Innings
     @ColumnInfo(name = "overNumber")
-    public int overNumber;
+    public Integer overNumber;
     @ColumnInfo(name = "playerId")
-    public int playerId; // References Players
+    public Integer playerId; // References Players
     @ColumnInfo(name = "isMaiden")
-    public int isMaiden;
+    public Integer isMaiden;
 }

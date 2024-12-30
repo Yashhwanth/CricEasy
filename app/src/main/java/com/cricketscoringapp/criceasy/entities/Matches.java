@@ -3,6 +3,7 @@ package com.cricketscoringapp.criceasy.entities;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 @Entity(
@@ -26,36 +27,41 @@ import androidx.room.PrimaryKey;
                         childColumns = "matchWonBy",  // 'matchWonBy' in the Match table
                         onDelete = ForeignKey.CASCADE
                 )
+        },
+        indices = {
+                @Index(value = "placeName"),  // Added index for placeName
+                @Index(value = "toss"),  // Added index for toss
+                @Index(value = "matchWonBy")  // Added index for matchWonBy
         }
 )
-public class Match {
+public class Matches {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "matchId")  // Maps to COLUMN_MATCH_ID
-    public int matchId;
+    public Integer matchId;
 
     @ColumnInfo(name = "matchType")  // Maps to COLUMN_MATCH_TYPE
     public String matchType;
 
     @ColumnInfo(name = "numberOfOvers")  // Maps to COLUMN_NO_OF_OVERS
-    public int numberOfOvers;
+    public Integer numberOfOvers;
 
     @ColumnInfo(name = "ballType")  // Maps to COLUMN_BALL_TYPE
     public String ballType;
 
     @ColumnInfo(name = "placeName")  // Maps to COLUMN_PLACE_NAME
-    public int placeName;  // References Places
+    public Integer placeName;  // References Places
 
     @ColumnInfo(name = "dateTime")  // Maps to COLUMN_DATE_TIME
     public String dateTime;
 
     @ColumnInfo(name = "toss")  // Maps to COLUMN_TOSS
-    public int toss;  // References Toss
+    public Integer toss;  // References Toss
 
     @ColumnInfo(name = "isMatchCompleted")  // Maps to COLUMN_IS_MATCH_COMPLETED
-    public int isMatchCompleted;
+    public Integer isMatchCompleted;
 
     @ColumnInfo(name = "matchWonBy")  // Maps to COLUMN_MATCH_WON_BY
-    public int matchWonBy;  // References Teams
+    public Integer matchWonBy;  // References Teams
 
     @ColumnInfo(name = "matchResult")  // Maps to COLUMN_MATCH_RESULT
     public String matchResult;

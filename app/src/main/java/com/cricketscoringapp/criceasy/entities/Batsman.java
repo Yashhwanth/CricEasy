@@ -1,13 +1,21 @@
 package com.cricketscoringapp.criceasy.entities;
+
 import static androidx.room.ForeignKey.CASCADE;
 
-import androidx.room.*;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Index;
+
 @Entity(
         tableName = "Batsman",
         primaryKeys = {"player", "inningsId"},
         foreignKeys = {
                 @ForeignKey(entity = Player.class, parentColumns = "playerId", childColumns = "player", onDelete = CASCADE),
                 @ForeignKey(entity = Innings.class, parentColumns = "inningsId", childColumns = "inningsId", onDelete = CASCADE)
+        },
+        indices = {
+                @Index(value = "inningsId")
         }
 )
 public class Batsman {
@@ -18,29 +26,29 @@ public class Batsman {
     public int inningsId;
 
     @ColumnInfo(name = "score")
-    public int score = 0;
+    public Integer score = 0;
 
     @ColumnInfo(name = "ballsPlayed")
-    public int ballsPlayed = 0;
+    public Integer ballsPlayed = 0;
 
     @ColumnInfo(name = "zeroes")
-    public int zeroes = 0;
+    public Integer zeroes = 0;
 
     @ColumnInfo(name = "ones")
-    public int ones = 0;
+    public Integer ones = 0;
 
     @ColumnInfo(name = "twos")
-    public int twos = 0;
+    public Integer twos = 0;
 
     @ColumnInfo(name = "threes")
-    public int threes = 0;
+    public Integer threes = 0;
 
     @ColumnInfo(name = "fours")
-    public int fours = 0;
+    public Integer fours = 0;
 
     @ColumnInfo(name = "fives")
-    public int fives = 0;
+    public Integer fives = 0;
 
     @ColumnInfo(name = "sixes")
-    public int sixes = 0;
+    public Integer sixes = 0;
 }

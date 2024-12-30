@@ -6,19 +6,22 @@ import androidx.room.*;
         tableName = "Extra",
         foreignKeys = {
                 @ForeignKey(entity = Ball.class, parentColumns = "ballId", childColumns = "ballId", onDelete = CASCADE)
+        },
+        indices = {
+        @Index(value = "ballId")
         }
 )
 public class Extra {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "extraId")
-    public int extraId;
+    public Integer extraId;
 
     @ColumnInfo(name = "ballId")
-    public int ballId;
+    public Integer ballId;
 
     @ColumnInfo(name = "extraType")
     public String extraType;
 
     @ColumnInfo(name = "runsInExtra")
-    public int runsInExtra;
+    public Integer runsInExtra;
 }

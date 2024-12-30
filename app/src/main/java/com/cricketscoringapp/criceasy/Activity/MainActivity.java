@@ -16,16 +16,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.room.Room;
 
 
 import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
+import com.cricketscoringapp.criceasy.Database.*;
 import com.cricketscoringapp.criceasy.R;
+import com.cricketscoringapp.criceasy.dao.MatchDao;
 
 public class MainActivity extends AppCompatActivity {
     private DatabaseHelper databaseHelper;
     private static final String SHARED_PREFERENCES = "match_prefs"; // SharedPreferences name
     private static final String MATCH_ID = "currentMatchId";  // Key to store match ID
     private static final String CURRENT_ACTIVITY = "currentActivity"; // Key for current activity
+    private database appDatabase;
+    private MatchDao matchDao;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: Opened Main Activity" );
@@ -33,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate: Clearing all Shared Preferences");
+
         databaseHelper = new DatabaseHelper(this);
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -140,6 +146,5 @@ public class MainActivity extends AppCompatActivity {
 
         return false; // No navigation occurred
     }
-
 
 }

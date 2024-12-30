@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey;
 public class Place {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "placeId")
-    public int placeId;
+    public Integer placeId;
     @ColumnInfo(name = "placeName")
     public String placeName;
 }
