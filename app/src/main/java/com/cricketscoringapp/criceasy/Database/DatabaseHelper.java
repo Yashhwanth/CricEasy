@@ -78,7 +78,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Matches-Teams Table
     public static final String TABLE_MATCHES_TEAMS = "MatchTeams";
-    public static final String COLUMN_MATCHES_TEAMS_ID = "matchTeamId";
+    public static final String COLUMN_MATCHES_TEAMS_ID = "matchTeamsId";
     public static final String COLUMN_TEAM1_ID = "team1Id";
     public static final String COLUMN_TEAM2_ID = "team2Id";
     public static final String CREATE_MATCHES_TEAMS_TABLE =
