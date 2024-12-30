@@ -1,5 +1,6 @@
 package com.cricketscoringapp.criceasy.entities;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 
@@ -13,7 +14,11 @@ import androidx.room.ForeignKey;
         }
 )
 public class TeamPlayers {
+    @ColumnInfo(name = "teamId")
     public int teamId; // References Teams
+    @ColumnInfo(name = "playerId")
     public int playerId; // References Players
+
+    @ColumnInfo(name = "inningsId")
     public int inningsId; // References Innings
 }
