@@ -19,7 +19,7 @@ import com.cricketscoringapp.criceasy.model.Player;
 
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 15; // Update version
+    private static final int DATABASE_VERSION = 16; // Update version
     private static final String DATABASE_NAME = "CricketDB";
     private static final String NORMAL_BALL = "Normal";
     private static final String BYE_BALL = "Bye";
@@ -33,45 +33,43 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String RUN_OUT = "Run-Out";
     private static final String STUMPED = "Stumped";
 
-
     // Table schema
     //Matches Table
-    public static final String TABLE_MATCHES = "Matches";
-    public static final String COLUMN_MATCH_ID = "match_id";
-    public static final String COLUMN_MATCH_TYPE = "match_type";
-    public static final String COLUMN_OVERS = "overs";
-    public static final String COLUMN_BALL_TYPE = "ball_type";
-    public static final String COLUMN_LOCATION = "location";
-    public static final String COLUMN_DATE_TIME = "date_time";
+    public static final String TABLE_MATCH = "Matches";
+    public static final String COLUMN_MATCH_ID = "matchId";
+    public static final String COLUMN_MATCH_TYPE = "matchType";
+    public static final String COLUMN_NO_OF_OVERS = "numberOfOvers";
+    public static final String COLUMN_BALL_TYPE = "ballType";
+    public static final String COLUMN_PLACE_NAME = "placeName";
+    public static final String COLUMN_DATE_TIME = "dateTime";
     public static final String COLUMN_TOSS = "toss";
-    public static final String COLUMN_IS_MATCH_COMPLETED = "is_match_completed";
-    public static final String COLUMN_MATCH_WON_BY = "match_won_by";
-    public static final String COLUMN_MATCH_RESULT = "match_result";
-    public static final String COLUMN_PLACE_ID = "place_id";
-    public static final String COLUMN_TOSS_ID = "toss_id";
-    public static final String COLUMN_TEAM_ID = "team_id";
+    public static final String COLUMN_IS_MATCH_COMPLETED = "isMatchCompleted";
+    public static final String COLUMN_MATCH_WON_BY = "matchWonBy";
+    public static final String COLUMN_MATCH_RESULT = "matchResult";
+    public static final String COLUMN_PLACE_ID = "placeId";
+    public static final String COLUMN_TOSS_ID = "tossId";
+    public static final String COLUMN_TEAM_ID = "teamId";
 
     // Create table SQL query
-    public static final String CREATE_MATCHES_TABLE = "CREATE TABLE " + TABLE_MATCHES + " ("
+    public static final String CREATE_MATCHES_TABLE = "CREATE TABLE " + TABLE_MATCH + " ("
             + COLUMN_MATCH_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_MATCH_TYPE + " TEXT, "
-            + COLUMN_OVERS + " INTEGER, "
+            + COLUMN_NO_OF_OVERS + " INTEGER, "
             + COLUMN_BALL_TYPE + " TEXT, "
-            + COLUMN_LOCATION + " INTEGER, "
+            + COLUMN_PLACE_NAME + " INTEGER, "
             + COLUMN_DATE_TIME + " DATETIME, "
             + COLUMN_TOSS + " INTEGER, "
             + COLUMN_IS_MATCH_COMPLETED + " INTEGER, "
             + COLUMN_MATCH_WON_BY + " INTEGER, "
             + COLUMN_MATCH_RESULT + " TEXT, "
-            + "FOREIGN KEY(" + COLUMN_LOCATION + ") REFERENCES Places(" + COLUMN_PLACE_ID + "), "
+            + "FOREIGN KEY(" + COLUMN_PLACE_NAME + ") REFERENCES Places(" + COLUMN_PLACE_ID + "), "
             + "FOREIGN KEY(" + COLUMN_TOSS + ") REFERENCES Toss(" + COLUMN_TOSS_ID + "), "
             + "FOREIGN KEY(" + COLUMN_MATCH_WON_BY + ") REFERENCES Teams(" + COLUMN_TEAM_ID + ")"
             + ");";
 
-
     //Team Table
-    public static final String TABLE_TEAMS = "Teams";
-    public static final String COLUMN_TEAM_NAME = "team_name";
+    public static final String TABLE_TEAMS = "Team";
+    public static final String COLUMN_TEAM_NAME = "teamName";
     public static final String CREATE_TEAMS_TABLE = "CREATE TABLE " + TABLE_TEAMS + " ("
             + COLUMN_TEAM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_TEAM_NAME + " TEXT NOT NULL "
@@ -79,12 +77,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     // Matches-Teams Table
-    public static final String TABLE_MATCHES_TEAMS = "Matches_Teams";
-    public static final String COLUMN_MATCHES_TEAMS_ID = "Match_Team_id";
-    public static final String COLUMN_TEAM1_ID = "team1_id";
-    public static final String COLUMN_TEAM2_ID = "team2_id";
-
-
+    public static final String TABLE_MATCHES_TEAMS = "MatchTeams";
+    public static final String COLUMN_MATCHES_TEAMS_ID = "matchTeamId";
+    public static final String COLUMN_TEAM1_ID = "team1Id";
+    public static final String COLUMN_TEAM2_ID = "team2Id";
     public static final String CREATE_MATCHES_TEAMS_TABLE =
             "CREATE TABLE " + TABLE_MATCHES_TEAMS + " (" +
                     COLUMN_MATCHES_TEAMS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -96,23 +92,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "FOREIGN KEY(" + COLUMN_TEAM2_ID + ") REFERENCES Teams(" + COLUMN_TEAM_ID + ")" +
                     ");";
 
-
-    // Places Table
-    // Places table and column names
-    public static final String TABLE_PLACES = "Places";
-    public static final String COLUMN_PLACE_NAME = "place";
+    public static final String TABLE_PLACES = "Place";
     public static final String CREATE_PLACES_TABLE = "CREATE TABLE " + TABLE_PLACES + " ("
             + COLUMN_PLACE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_PLACE_NAME + " TEXT NOT NULL UNIQUE"
             + ");";
 
-
     // Toss table and column names
     public static final String TABLE_TOSS = "Toss";
-    public static final String COLUMN_TOSS_CALL_BY = "toss_call_by";
-    public static final String COLUMN_TOSS_WON_BY = "toss_won_by";
-    public static final String COLUMN_TOSS_WON_TEAM_CHOOSE_TO = "toss_won_team_choose_to";
-    // SQL statement to create the Toss table
+    public static final String COLUMN_TOSS_CALL_BY = "tossCallingTeam";
+    public static final String COLUMN_TOSS_WON_BY = "tossWinningTeam";
+    public static final String COLUMN_TOSS_WON_TEAM_CHOOSE_TO = "tossWonTeamChooseTo";
     String CREATE_TOSS_TABLE = "CREATE TABLE " + TABLE_TOSS + " ("
             + COLUMN_TOSS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_TOSS_CALL_BY + " INTEGER, "
@@ -122,18 +112,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + "FOREIGN KEY(" + COLUMN_TOSS_WON_BY + ") REFERENCES Teams(" + COLUMN_TEAM_ID + ")"
             + ");";
 
-
     // Table Players
-    public static final String TABLE_PLAYERS = "Players";
-    // Column names
-    public static final String COLUMN_PLAYER_ID = "player_id";
-    public static final String COLUMN_NAME = "name";
+    public static final String TABLE_PLAYERS = "Player";
+    public static final String COLUMN_PLAYER_ID = "playerId";
+    public static final String COLUMN_PLAYER_NAME = "playerName";
     public static final String CREATE_PLAYERS_TABLE = "CREATE TABLE " + TABLE_PLAYERS + " (" +
             COLUMN_PLAYER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            COLUMN_NAME + " TEXT NOT NULL " + ");";
+            COLUMN_PLAYER_NAME + " TEXT NOT NULL " + ");";
 
-    public static final String TABLE_PLAYERS_TEAMS = "Players_Teams";
-    private static final String COLUMN_INNINGS_ID = "innings_id";
+    // Table TeamPlayers
+    public static final String TABLE_PLAYERS_TEAMS = "TeamPlayers";
+    private static final String COLUMN_INNINGS_ID = "inningsId";
     public static final String CREATE_PLAYERS_TEAMS_TABLE = "CREATE TABLE " + TABLE_PLAYERS_TEAMS + " (" +
             COLUMN_TEAM_ID + " INTEGER, " +
             COLUMN_PLAYER_ID + " INTEGER, " +
@@ -143,17 +132,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "FOREIGN KEY (" + COLUMN_INNINGS_ID + ") REFERENCES Innings(" + COLUMN_INNINGS_ID + ") ON DELETE CASCADE, " +
             "PRIMARY KEY (" + COLUMN_TEAM_ID + ", " + COLUMN_PLAYER_ID + ", " + COLUMN_INNINGS_ID + "))";
 
-
-
     // Partnerships Table
-    private static final String TABLE_PARTNERSHIPS = "Partnerships";
-    private static final String COLUMN_PARTNERSHIP_ID = "partnership_id";
-    private static final String COLUMN_BATSMAN1_ID = "batsman1_id";
-    private static final String COLUMN_BATSMAN2_ID = "batsman2_id";
+    private static final String TABLE_PARTNERSHIPS = "Partnership";
+    private static final String COLUMN_PARTNERSHIP_ID = "partnershipId";
+    private static final String COLUMN_BATSMAN1_ID = "batsman1Id";
+    private static final String COLUMN_BATSMAN2_ID = "batsman2Id";
     private static final String COLUMN_RUNS = "runs";
     private static final String COLUMN_BALLS = "balls";
-
-    // SQL command to create the partnerships table
     private static final String CREATE_PARTNERSHIPS_TABLE = "CREATE TABLE " + TABLE_PARTNERSHIPS + " (" +
             COLUMN_PARTNERSHIP_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COLUMN_INNINGS_ID + " INTEGER, " +
@@ -166,14 +151,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "FOREIGN KEY(" + COLUMN_BATSMAN2_ID + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE" +
             ");";
 
-
     // Innings Table
-    private static final String TABLE_INNINGS = "Innings";
-    private static final String COLUMN_INNINGS_NUMBER = "innings_number";
-    private static final String COLUMN_TEAM_BATTING = "batting_team";
-    private static final String COLUMN_IS_COMPLETED = "is_completed";
-
-    // SQL command to create the innings table
+    private static final String TABLE_INNINGS = "Inning";
+    private static final String COLUMN_INNINGS_NUMBER = "inningsNumber";
+    private static final String COLUMN_TEAM_BATTING = "battingTeam";
+    private static final String COLUMN_IS_COMPLETED = "isCompleted";
     private static final String CREATE_INNINGS_TABLE = "CREATE TABLE " + TABLE_INNINGS + " (" +
             COLUMN_INNINGS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COLUMN_INNINGS_NUMBER + " INTEGER, " +
@@ -184,32 +166,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "FOREIGN KEY(" + COLUMN_TEAM_BATTING + ") REFERENCES Teams(" + COLUMN_TEAM_ID + ") ON DELETE CASCADE" +
             ");";
 
-
     // Over Table
-    private static final String TABLE_OVERS = "Overs";
-    private static final String COLUMN_OVER_ID = "over_id";
-    private static final String COLUMN_OVER = "over";
-    private static final String COLUMN_IS_MAIDEN = "is_maiden";
-
-    // SQL command to create the overs table
+    private static final String TABLE_OVERS = "Over";
+    private static final String COLUMN_OVER_ID = "overId";
+    private static final String COLUMN_OVER_NUMBER = "overNumber";
+    private static final String COLUMN_IS_MAIDEN = "isMaiden";
     private static final String CREATE_OVERS_TABLE = "CREATE TABLE " + TABLE_OVERS + " (" +
             COLUMN_OVER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COLUMN_INNINGS_ID + " INTEGER, " +
-            COLUMN_OVER + " INTEGER, " +
+            COLUMN_OVER_NUMBER + " INTEGER, " +
             COLUMN_PLAYER_ID + " INTEGER, " +
             COLUMN_IS_MAIDEN + " INTEGER, " +
             "FOREIGN KEY(" + COLUMN_INNINGS_ID + ") REFERENCES Innings(" + COLUMN_INNINGS_ID + ") ON DELETE CASCADE, " +
             "FOREIGN KEY(" + COLUMN_PLAYER_ID + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE" +
             ");";
 
-
     // Balls Table
-    private static final String TABLE_BALLS = "Balls";
-    private static final String COLUMN_BALL_ID = "ball_id";
-    private static final String COLUMN_TYPE_OF_BALL = "ball_type";
-    private static final String COLUMN_IS_WICKET = "is_wicket";
+    private static final String TABLE_BALLS = "Ball";
+    private static final String COLUMN_BALL_ID = "ballId";
+    private static final String COLUMN_TYPE_OF_BALL = "ballType";
+    private static final String COLUMN_IS_WICKET = "isWicket";
     private static final String COLUMN_STRIKER = "striker";
-    private static final String COLUMN_NON_STRIKER = "non_striker";
+    private static final String COLUMN_NON_STRIKER = "nonStriker";
     private static final String COLUMN_IS_SYNCED = "bowler";
 
     // SQL command to create the balls table
@@ -229,14 +207,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     // Wickets Table
-    private static final String TABLE_WICKETS = "Wickets";
-    private static final String COLUMN_WICKET_ID = "wicket_id";
-    private static final String COLUMN_WICKET_TYPE = "wicket_type";
-    private static final String COLUMN_WICKET_BATSMAN = "wicket_batsman";
-    private static final String COLUMN_WICKET_RUNS = "wicket_runs";
-    private static final String COLUMN_WICKET_CONTRIBUTOR = "wicket_contributor";
-
-    // SQL command to create the Wickets table
+    private static final String TABLE_WICKETS = "Wicket";
+    private static final String COLUMN_WICKET_ID = "wicketId";
+    private static final String COLUMN_WICKET_TYPE = "wicketType";
+    private static final String COLUMN_WICKET_BATSMAN = "wicketBatsman";
+    private static final String COLUMN_WICKET_RUNS = "runsInWicket";
+    private static final String COLUMN_WICKET_CONTRIBUTOR = "wicketContributor";
     private static final String CREATE_WICKETS_TABLE = "CREATE TABLE " + TABLE_WICKETS + " (" +
             COLUMN_WICKET_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COLUMN_BALL_ID + " INTEGER, " +
@@ -249,14 +225,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "FOREIGN KEY(" + COLUMN_WICKET_CONTRIBUTOR + ") REFERENCES Players(" + COLUMN_PLAYER_ID + ") ON DELETE CASCADE" +
             ");";
 
-
     // Extras Table
-    private static final String TABLE_EXTRAS = "Extras";
-    private static final String COLUMN_EXTRA_ID = "extra_id";
-    private static final String COLUMN_EXTRA_TYPE = "extra_type";
-    private static final String COLUMN_EXTRA_RUNS = "extra_runs";
-
-    // SQL command to create the Extras table
+    private static final String TABLE_EXTRAS = "Extra";
+    private static final String COLUMN_EXTRA_ID = "extraId";
+    private static final String COLUMN_EXTRA_TYPE = "extraType";
+    private static final String COLUMN_EXTRA_RUNS = "runsInExtra";
     private static final String CREATE_EXTRAS_TABLE = "CREATE TABLE " + TABLE_EXTRAS + " (" +
             COLUMN_EXTRA_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COLUMN_BALL_ID + " INTEGER, " +
@@ -265,19 +238,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "FOREIGN KEY(" + COLUMN_BALL_ID + ") REFERENCES Balls(" + COLUMN_BALL_ID + ") ON DELETE CASCADE" +
             ");";
 
-
-
     //Batsmans table
-    private static final String TABLE_BATSMAN = "Batsmans";
-    // Batsman Table columns
-    private static final String COLUMN_PLAYER = "player";
+    private static final String TABLE_BATSMAN = "Batsman";
+    private static final String COLUMN_PLAYER = "batsman";
     private static final String COLUMN_SCORE = "score";
     private static final String COLUMN_BALLS_PLAYED = "balls";
     private static final String COLUMN_ZEROES = "zeroes";
     private static final String COLUMN_ONES = "ones";
     private static final String COLUMN_TWOS = "twos";
     private static final String COLUMN_THREES = "threes";
-    private static final String COLUMN_FOURS = "bndry";
+    private static final String COLUMN_FOURS = "boundary";
     private static final String COLUMN_FIVES = "fives";
     private static final String COLUMN_SIXES = "sixes";
 
@@ -298,19 +268,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "FOREIGN KEY (" + COLUMN_INNINGS_ID + ") REFERENCES Innings(innings_id)" +
             ")";
 
-
     // Bowler table name
-    private static final String TABLE_BOWLER = "Bowlers";
+    private static final String TABLE_BOWLER = "Bowler";
     private static final String COLUMN_MAIDENS = "maidens";
     private static final String COLUMN_ECONOMY = "economy";
-    private static final String COLUMN_WK = "wk";
-    private static final String COLUMN_BY = "bye";
-    private static final String COLUMN_LB = "lb";
-    private static final String COLUMN_WB = "wb";
-    private static final String COLUMN_NB = "nb";
-    private static final String COLUMN_DB = "db";
-
-    // SQL query to create the Bowler table
+    private static final String COLUMN_WK = "wickets";
+    private static final String COLUMN_BY = "byes";
+    private static final String COLUMN_LB = "legByes";
+    private static final String COLUMN_WB = "wides";
+    private static final String COLUMN_NB = "noBalls";
+    private static final String COLUMN_DB = "deadBalls";
     private static final String CREATE_BOWLER_TABLE = "CREATE TABLE " + TABLE_BOWLER + " ("
             + COLUMN_INNINGS_ID + " INTEGER, "
             + COLUMN_PLAYER + " INTEGER, "
@@ -340,7 +307,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_TEAM_STATS_ID = "TeamStatsId";
     private static final String COLUMN_EXTRAS = "extras";
     private static final String COLUMN_WICKETS = "wickets";
-    // SQL command to create the Team Statistics table
     private static final String CREATE_TEAM_STATISTICS_TABLE = "CREATE TABLE " + TABLE_TEAM_STATISTICS + " (" +
             COLUMN_TEAM_STATS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COLUMN_INNINGS_ID + " INTEGER , " + // Links to Innings table
@@ -350,7 +316,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COLUMN_EXTRAS + " INTEGER DEFAULT 0, " +
             "FOREIGN KEY(" + COLUMN_INNINGS_ID + ") REFERENCES " + TABLE_INNINGS + "(" + COLUMN_INNINGS_ID + ") ON DELETE CASCADE" +
             ");";
-
 
     // Constructor
     public DatabaseHelper(Context context) {
@@ -406,7 +371,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Check if there is an ongoing match
     public Cursor getOngoingMatch() {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(" SELECT " + COLUMN_MATCH_ID + " FROM " + TABLE_MATCHES + " WHERE " + COLUMN_IS_MATCH_COMPLETED + "=0", null);
+        Cursor cursor = db.rawQuery(" SELECT " + COLUMN_MATCH_ID + " FROM " + TABLE_MATCH + " WHERE " + COLUMN_IS_MATCH_COMPLETED + "=0", null);
         Log.d(TAG, "getOngoingMatch: " + cursor);
         return cursor;
     }
@@ -416,7 +381,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_IS_MATCH_COMPLETED, 0); // Match is not completed initially
-        long matchId = db.insert(TABLE_MATCHES, null, values);
+        long matchId = db.insert(TABLE_MATCH, null, values);
         db.close();
         return matchId;
     }
@@ -435,13 +400,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(COLUMN_MATCH_ID, matchId);
         values.put(COLUMN_MATCH_TYPE, matchType);
-        values.put(COLUMN_OVERS, overs);
+        values.put(COLUMN_NO_OF_OVERS, overs);
         values.put(COLUMN_BALL_TYPE, ballType);
-        values.put(COLUMN_LOCATION, placeId);
+        values.put(COLUMN_PLACE_NAME, placeId);
         values.put(COLUMN_DATE_TIME, time);
         values.put(COLUMN_IS_MATCH_COMPLETED, isCompleted);
         // Check if the row exists
-        int rowsUpdated = db.update(TABLE_MATCHES, values, COLUMN_MATCH_ID + "=?", new String[]{String.valueOf(matchId)});
+        int rowsUpdated = db.update(TABLE_MATCH, values, COLUMN_MATCH_ID + "=?", new String[]{String.valueOf(matchId)});
         db.close();
         return rowsUpdated != 0;
     }
@@ -628,7 +593,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ContentValues matchValues = new ContentValues();
             matchValues.put(COLUMN_TOSS, tossId); // Update toss ID in the match
             // Update the MATCHES table with the new toss ID
-            int rowsUpdatedInMatch = db.update(TABLE_MATCHES, matchValues, "match_id = ?", new String[]{String.valueOf(currentMatchId)});
+            int rowsUpdatedInMatch = db.update(TABLE_MATCH, matchValues, "match_id = ?", new String[]{String.valueOf(currentMatchId)});
             if (rowsUpdatedInMatch > 0) {
                 Log.d("DatabaseHelper", "Match updated successfully with toss ID: " + tossId);
                 updatedTossId = tossId;
@@ -730,7 +695,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         long playerId = -1;
         // Check if the player already exists
-        String selectQuery = "SELECT " + COLUMN_PLAYER_ID + " FROM " + TABLE_PLAYERS + " WHERE " + COLUMN_NAME + " = ?";
+        String selectQuery = "SELECT " + COLUMN_PLAYER_ID + " FROM " + TABLE_PLAYERS + " WHERE " + COLUMN_PLAYER_NAME + " = ?";
         Cursor cursor = db.rawQuery(selectQuery, new String[]{playerName});
         if (cursor != null && cursor.moveToFirst()) {
             // Player exists, return the existing ID
@@ -739,7 +704,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } else {
             // Player does not exist, insert a new record
             ContentValues contentValues = new ContentValues();
-            contentValues.put(COLUMN_NAME, playerName);
+            contentValues.put(COLUMN_PLAYER_NAME, playerName);
             playerId = db.insert(TABLE_PLAYERS, null, contentValues);
             if (playerId == -1) {
                 Log.e("DatabaseHelper", "Error inserting player into database");
@@ -821,7 +786,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             ContentValues values = new ContentValues();
             values.put(COLUMN_INNINGS_ID, inningsId);
-            values.put(COLUMN_OVER, over);
+            values.put(COLUMN_OVER_NUMBER, over);
             values.put(COLUMN_PLAYER_ID, bowlerId);
             values.put(COLUMN_IS_MAIDEN, isMaiden);
             over_id = db.insert(TABLE_OVERS, null, values);
@@ -1881,7 +1846,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(COLUMN_MATCH_RESULT, matchResult);
             String whereClause = COLUMN_MATCH_ID + " = ?";
             String[] whereArgs = {String.valueOf(matchId)};
-            db.update(TABLE_MATCHES, values, whereClause, whereArgs);
+            db.update(TABLE_MATCH, values, whereClause, whereArgs);
 
         } catch (Exception e) {
             Log.e(TAG, "updateMatchCompletionStatus: failed to update match end stats");
@@ -1970,13 +1935,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     Log.d("Database", "Fetched playerId=" + playerId + ", teamId=" + teamId);
 
                     // Query to get player name
-                    String playerQuery = "SELECT " + COLUMN_NAME +
+                    String playerQuery = "SELECT " + COLUMN_PLAYER_NAME +
                             " FROM " + TABLE_PLAYERS +
                             " WHERE " + COLUMN_PLAYER_ID + " = ?";
                     Log.d("Database", "Executing playerQuery for playerId: " + playerId);
                     Cursor playerCursor = db.rawQuery(playerQuery, new String[]{String.valueOf(playerId)});
                     if (playerCursor != null && playerCursor.moveToFirst()) {
-                        String playerName = playerCursor.getString(playerCursor.getColumnIndex(COLUMN_NAME));
+                        String playerName = playerCursor.getString(playerCursor.getColumnIndex(COLUMN_PLAYER_NAME));
                         Log.d("Database", "Fetched playerName: " + playerName + " for playerId: " + playerId);
 
                         Player player = new Player();
@@ -2008,13 +1973,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         int teamId = playersCursor2.getInt(playersCursor2.getColumnIndex(COLUMN_TEAM_ID));
                         Log.d("Database", "Fetched playerId=" + playerId + ", teamId=" + teamId);
 
-                        String playerQuery = "SELECT " + COLUMN_NAME +
+                        String playerQuery = "SELECT " + COLUMN_PLAYER_NAME +
                                 " FROM " + TABLE_PLAYERS +
                                 " WHERE " + COLUMN_PLAYER_ID + " = ?";
                         Log.d("Database", "Executing playerQuery for playerId: " + playerId);
                         Cursor playerCursor = db.rawQuery(playerQuery, new String[]{String.valueOf(playerId)});
                         if (playerCursor != null && playerCursor.moveToFirst()) {
-                            String playerName = playerCursor.getString(playerCursor.getColumnIndex(COLUMN_NAME));
+                            String playerName = playerCursor.getString(playerCursor.getColumnIndex(COLUMN_PLAYER_NAME));
                             Log.d("Database", "Fetched playerName: " + playerName + " for playerId: " + playerId);
 
                             Player player = new Player();
