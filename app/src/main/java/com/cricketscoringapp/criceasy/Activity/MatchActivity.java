@@ -25,22 +25,29 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.room.Room;
 
 import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
 import com.cricketscoringapp.criceasy.R;
+import com.cricketscoringapp.criceasy.ViewModel.TeamPlayersViewModel;
+import com.cricketscoringapp.criceasy.ViewModel.TeamPlayersViewModelFactory;
+import com.cricketscoringapp.criceasy.dao.TeamPlayersDao;
 import com.cricketscoringapp.criceasy.fragment.CommentaryFragment;
 import com.cricketscoringapp.criceasy.fragment.InfoFragment;
 import com.cricketscoringapp.criceasy.fragment.ScoreCardFragment;
 import com.cricketscoringapp.criceasy.fragment.TeamsFragment;
 import com.cricketscoringapp.criceasy.fragment.LiveFragment;
+import com.cricketscoringapp.criceasy.repository.TeamPlayersRepository;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
+import com.cricketscoringapp.criceasy.Database.database;
 
 public class MatchActivity extends AppCompatActivity {
     private Button infoFragmentButton, summaryFragmentButton, scorecardFragmentButton, commentaryFragmentButton, teamsFragmentButton;
     private FloatingActionButton floatingButton;
     private Button inningsEndButton;
     private DatabaseHelper databaseHelper;
+    private TeamPlayersViewModel teamPlayersViewModel;
     private SharedPreferences sharedPreferences;
     private final String SHARED_PREFERENCES = "match_prefs";
     private static final String MATCH_ID = "currentMatchId";
@@ -78,6 +85,20 @@ public class MatchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_match);
+
+        // Initialize Room database
+        database database = Room.databaseBuilder(
+                getApplicationContext(),
+                database.class,
+                "CricketDB"  // Your database name
+        ).build();
+
+        // Get the DAO from the Room database instance
+        TeamPlayersDao teamPlayersDao = database.teamPlayersDao();
+        // Initialize the repository with the DAO
+        TeamPlayersRepository teamPlayersRepository = new TeamPlayersRepository(teamPlayersDao);
+        // Initialize the ViewModel using the factory
+        teamPlayersViewModel = new ViewModelProvider(this, new TeamPlayersViewModelFactory(teamPlayersRepository)).get(TeamPlayersViewModel.class);
         databaseHelper = new DatabaseHelper(this);
         setupUI(savedInstanceState);
         updateCurrentActivityInPreferences();
@@ -628,6 +649,11 @@ public class MatchActivity extends AppCompatActivity {
         long teamId = sharedPreferences.getLong(BATTING_TEAM_ID, -1);
         long newBatsmanId = databaseHelper.insertPlayer(name, teamId, inningsId);
 
+        // Update TeamPlayers using Room
+        new Thread(() -> {
+            teamPlayersViewModel.addPlayerToTeam((int) teamId, (int) newBatsmanId, (int) inningsId);
+        }).start();
+
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putLong(newBatsmanType, newBatsmanId);
         editor.apply();
@@ -642,6 +668,10 @@ public class MatchActivity extends AppCompatActivity {
         long teamId = sharedPreferences.getLong(BOWLING_TEAM_ID, -1);
         long inningsId = sharedPreferences.getLong(INNINGS_ID, -1);
         long playerId = databaseHelper.insertPlayer(name, teamId, inningsId);
+        // Update TeamPlayers using Room
+        new Thread(() -> {
+            teamPlayersViewModel.addPlayerToTeam((int) teamId, (int) playerId, (int) inningsId);
+        }).start();
         databaseHelper.initializeBowlerStats(playerId, inningsId);
         editor.putLong(BOWLER_ID, playerId);
         editor.apply();
