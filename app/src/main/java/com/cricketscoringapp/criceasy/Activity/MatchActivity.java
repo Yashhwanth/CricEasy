@@ -627,6 +627,7 @@ public class MatchActivity extends AppCompatActivity {
         long inningsId = sharedPreferences.getLong(INNINGS_ID, -1);
         long teamId = sharedPreferences.getLong(BATTING_TEAM_ID, -1);
         long newBatsmanId = databaseHelper.insertPlayer(name, teamId, inningsId);
+
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putLong(newBatsmanType, newBatsmanId);
         editor.apply();
