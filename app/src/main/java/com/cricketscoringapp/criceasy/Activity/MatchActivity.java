@@ -234,7 +234,6 @@ public class MatchActivity extends AppCompatActivity {
                 CommentaryFragment commentaryFragment = (CommentaryFragment) currShowingFragment;
                 commentaryFragment.updateCommentary();  // Your method to update CommentaryFragment
             } else {
-                //cacheUpdate(runsScored, extraType);  // Store necessary data to apply later
                 editor.putBoolean("livePageUpdateNeeded", true);
                 editor.putBoolean("scorecardPageUpdateNeeded", true);
                 editor.putBoolean("commentaryPageUpdateNeeded", true);
