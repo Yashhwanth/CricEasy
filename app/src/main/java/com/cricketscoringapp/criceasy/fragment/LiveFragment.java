@@ -125,7 +125,7 @@ public class LiveFragment extends Fragment {
     public void getTeamScore(){
         long inningsId = sharedPreferences.getLong("currentInningsId", -1);
         HashMap<String, String> map = databaseHelper.getTeamStats(inningsId);
-        String score = map.get("runs") + " / " + map.get("wickets") +  " ( " + map.get("balls") + " ) ";
+        String score = map.get("runs") + " / " + map.get("wickets") +  " ( " + map.get("overs") + " ) ";
         currentBattingScore.setText(score);
         float teamRunRate = Float.parseFloat(map.get("runs")) / Float.parseFloat(map.get("balls"));
         runRate.setText(String.valueOf(teamRunRate));
