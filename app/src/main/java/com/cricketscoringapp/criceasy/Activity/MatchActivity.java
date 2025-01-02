@@ -49,6 +49,7 @@ public class MatchActivity extends AppCompatActivity {
     private DatabaseHelper databaseHelper;
     private TeamPlayersViewModel teamPlayersViewModel;
     private SharedPreferences sharedPreferences;
+    private FragmentManager fragmentManager = getSupportFragmentManager();
     private final String SHARED_PREFERENCES = "match_prefs";
     private static final String MATCH_ID = "currentMatchId";
     private final String INNINGS_ID = "currentInningsId";
@@ -150,20 +151,15 @@ public class MatchActivity extends AppCompatActivity {
         }
     }
     private void showFragment(Class<? extends Fragment> fragmentClass, String tag) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        //fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-
-        // Hide all other fragments
         for (Fragment existingFragment : fragmentManager.getFragments()) {
             if (existingFragment != null && !existingFragment.getTag().equals(tag)) {
                 Log.d(TAG, "showFragment: hiding existing fragment: " + existingFragment.getTag());
                 transaction.hide(existingFragment);
             }
         }
-
-        // Try to find the existing fragment by its tag
         Fragment fragment = fragmentManager.findFragmentByTag(tag);
-
         if (fragment == null) {
             Log.d(TAG, "showFragment: fragment is null, need to create one");
             try {
@@ -174,13 +170,13 @@ public class MatchActivity extends AppCompatActivity {
                 Log.e(TAG, "showFragment: Error in creating fragment instance", e);
                 return;
             }
-        }
-
+        }else Log.d(TAG, "showFragment: fragment already exists");
         Log.d(TAG, "Showing fragment: " + tag);
         transaction.show(fragment);
-
-        // Commit the transaction without adding to the back stack (no back navigation)
-        transaction.commit();
+        transaction.commitNow();
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("currentShowingFragment", tag);
+        editor.apply();
     }
     private void updateCurrentActivityInPreferences() {
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
@@ -212,6 +208,40 @@ public class MatchActivity extends AppCompatActivity {
         AlertDialog scoringPopupDialog = builder.create();
         // Set the custom size for the dialog (width and height)
         scoringPopupDialog.show();
+        scoringPopupDialog.setOnDismissListener(dialog -> {
+            sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+            SharedPreferences.Editor editor= sharedPreferences.edit();
+            Log.d(TAG, "openScoringPopup: dialog is about to close");
+            Fragment currShowingFragment = fragmentManager.findFragmentByTag(sharedPreferences.getString("currentShowingFragment",null));
+            Log.d(TAG, "openScoringPopup:current fragment is " + currShowingFragment);
+            if (currShowingFragment instanceof LiveFragment) {
+                Log.d(TAG, "openScoringPopup: urgent refresh needed");
+                editor.putBoolean("scorecardPageUpdateNeeded", true);
+                editor.putBoolean("commentaryPageUpdateNeeded", true);
+                editor.apply();
+                LiveFragment liveFragment = (LiveFragment) currShowingFragment;
+                liveFragment.refreshUI();  // Your method to update LiveFragment
+            } else if (currShowingFragment instanceof ScoreCardFragment) {
+                Log.d(TAG, "openScoringPopup: urgent refresh needed");
+                editor.putBoolean("livePageUpdateNeeded", true);
+                editor.putBoolean("commentaryPageUpdateNeeded", true);
+                ScoreCardFragment scorecardFragment = (ScoreCardFragment) currShowingFragment;
+                scorecardFragment.updateScorecard();  // Your method to update ScorecardFragment
+            } else if (currShowingFragment instanceof CommentaryFragment) {
+                Log.d(TAG, "openScoringPopup: urgent refresh needed");
+                editor.putBoolean("livePageUpdateNeeded", true);
+                editor.putBoolean("scorecardPageUpdateNeeded", true);
+                CommentaryFragment commentaryFragment = (CommentaryFragment) currShowingFragment;
+                commentaryFragment.updateCommentary();  // Your method to update CommentaryFragment
+            } else {
+                //cacheUpdate(runsScored, extraType);  // Store necessary data to apply later
+                editor.putBoolean("livePageUpdateNeeded", true);
+                editor.putBoolean("scorecardPageUpdateNeeded", true);
+                editor.putBoolean("commentaryPageUpdateNeeded", true);
+                editor.apply();
+                Log.d(TAG, "openScoringPopup: no urgent refresh needed, need to cache the flags");
+            }
+        });
         scoringPopupDialog.setCanceledOnTouchOutside(false);
         if (scoringPopupDialog.getWindow() != null) {
             scoringPopupDialog.getWindow().setLayout(
@@ -235,7 +265,7 @@ public class MatchActivity extends AppCompatActivity {
         View.OnClickListener extraBallListener = view -> {
             String extraType = ((Button) view).getText().toString().trim();
             showExtrasDialog(extraType, scoringPopupDialog);
-            scoringPopupDialog.dismiss();
+            //scoringPopupDialog.dismiss();
         };
         zeroScoringButton.setOnClickListener(scoringListenerFor0To8);
         oneScoringButton.setOnClickListener(scoringListenerFor0To8);

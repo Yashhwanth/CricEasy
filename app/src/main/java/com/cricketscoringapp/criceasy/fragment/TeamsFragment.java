@@ -1,5 +1,7 @@
 package com.cricketscoringapp.criceasy.fragment;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -72,7 +74,7 @@ public class TeamsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume called");
+        Log.d(TAG, "teams onResume called");
         matchId = sharedPreferences.getLong("currentMatchId", -1);
         teamViewModel.getPlayersForMatch((int) matchId).observe(getViewLifecycleOwner(), playerTeam -> {
             Log.d(TAG, "LiveData observed, updating UI");
@@ -94,5 +96,14 @@ public class TeamsFragment extends Fragment {
                 Log.e(TAG, "PlayerTeam object is null");
             }
         });Log.d(TAG, "onResume completed");
+    }
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden) { // Fragment is now visible
+            Log.d(TAG, "onHiddenChanged: teams Fragment is now visible");
+        } else { // Fragment is now hidden
+            Log.d(TAG, "onHiddenChanged: teams Fragment is now hidden");
+        }
     }
 }

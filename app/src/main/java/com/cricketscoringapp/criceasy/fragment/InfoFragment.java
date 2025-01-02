@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class InfoFragment extends Fragment {
     private TextView team1TextView, team2TextView, matchTypeTextView, oversTextView, ballTypeTextView, venueTextView, dateTextView;
-    private DatabaseHelper databaseHelper;  // Assuming you have a DatabaseHelper class for DB operations
+    private DatabaseHelper databaseHelper;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -33,9 +33,7 @@ public class InfoFragment extends Fragment {
         ballTypeTextView = view.findViewById(R.id.ballTypeValueTextView);
         venueTextView = view.findViewById(R.id.venueValueTextView);
         dateTextView = view.findViewById(R.id.dateValueTextView);
-        // Initialize DatabaseHelper
         databaseHelper = new DatabaseHelper(requireContext());
-        // Populate data
         populateData();
         return view;
     }

@@ -1871,22 +1871,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Map<String, String> matchDetails = new HashMap<>();
         // SQL query with JOIN to get the place name from the places table
-        String query = "SELECT m.match_type, m.overs, m.ball_type, p.place AS venue, m.date_time " +
+        String query = "SELECT m.matchType, m.numberOfOvers, m.ballType, p.placeName AS venue, m.dateTime " +
                 "FROM Matches m " +
-                "INNER JOIN Places p ON m.location = p.place_id " +
+                "INNER JOIN Place p ON m.placeName = p.placeId " +
                 "WHERE m.matchId = ?";
         Log.d("SQLQuery", "Query: " + query);  // Log the query for debugging
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(matchId)});
         if (cursor.moveToFirst()) {
-            matchDetails.put("matchType", cursor.getString(cursor.getColumnIndexOrThrow("match_type")));
-            matchDetails.put("overs", cursor.getString(cursor.getColumnIndexOrThrow("overs")));
-            matchDetails.put("ballType", cursor.getString(cursor.getColumnIndexOrThrow("ball_type")));
+            matchDetails.put("matchType", cursor.getString(cursor.getColumnIndexOrThrow("matchType")));
+            matchDetails.put("overs", cursor.getString(cursor.getColumnIndexOrThrow("numberOfOvers")));
+            matchDetails.put("ballType", cursor.getString(cursor.getColumnIndexOrThrow("ballType")));
             matchDetails.put("venue", cursor.getString(cursor.getColumnIndexOrThrow("venue"))); // place name from places table
-            matchDetails.put("dateTime", cursor.getString(cursor.getColumnIndexOrThrow("date_time")));
+            matchDetails.put("dateTime", cursor.getString(cursor.getColumnIndexOrThrow("dateTime")));
         }else {
             Log.d("SQLQuery", "No data found for matchId: " + matchId);  // Log if no data is found
         }
-
 
         cursor.close();
         db.close();
@@ -1894,7 +1893,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return matchDetails;
     }
-
     public List<List<Player>> getPlayersForMatch(int matchId) {
         Log.d("Database", "getPlayersForMatch started for matchId: " + matchId);
         List<Player> team1Players = new ArrayList<>();
@@ -2022,6 +2020,157 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return playersList;
     }
+
+    //-----------------------------live fragment ----------------
+    public HashMap<String, String> getTeamStats(long inningsId) {
+        Log.d(TAG, "getTeamStats: inside get team stats");
+        HashMap<String, String> teamStats = new HashMap<>();
+        SQLiteDatabase db = this.getWritableDatabase(); // Ensure you get the database instance appropriately in your implementation
+        Cursor cursor = null;
+        try {
+            String query = "SELECT " + COLUMN_RUNS + ", " + COLUMN_WICKETS + ", " + COLUMN_BALLS +
+                    " FROM " + TABLE_TEAM_STATISTICS +
+                    " WHERE " + COLUMN_INNINGS_ID + " = ?";
+
+            // Open the database and execute the query
+            cursor = db.rawQuery(query, new String[]{String.valueOf(inningsId)});
+            if (cursor != null && cursor.moveToFirst()) {
+                int overs = balls / 6;
+                int partialBalls = balls % 6;
+                String oversFormatted = overs + "." + partialBalls;
+                teamStats.put("runs", String.valueOf(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_RUNS))));
+                teamStats.put("wickets", String.valueOf(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_WICKETS))));
+                teamStats.put("balls", String.valueOf(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_BALLS))));
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "getTeamStats: error getting team stats");
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+        Log.d(TAG, "getTeamStats: " + teamStats.toString());
+        return teamStats;
+    }
+    public String getTeamNameFromId(long teamId) {
+        Log.d(TAG, "getTeamNameFromId: inside getetam from id");
+        SQLiteDatabase db = this.getReadableDatabase(); // Use getReadableDatabase since we are only reading data.
+        String teamName = null; // Variable to store the result
+        String query = "SELECT " + COLUMN_TEAM_NAME + " FROM " + TABLE_TEAMS + " WHERE " + COLUMN_TEAM_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(teamId)});
+        if (cursor.moveToFirst()) {
+            teamName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TEAM_NAME));
+        }
+        cursor.close(); // Always close the cursor to avoid memory leaks
+        return teamName; // Return the fetched team name
+    }
+    public HashMap<String, String> getCurrentBattersStats(long inningsId, long playerId) {
+        Log.d(TAG, "getCurrentBattersStats: inside get current batter");
+        SQLiteDatabase db = this.getReadableDatabase();
+        HashMap<String, String> batterStats = new HashMap<>();
+        String query = "SELECT " +
+                COLUMN_SCORE + ", " +
+                COLUMN_BALLS_PLAYED + ", " +
+                COLUMN_FOURS + ", " +
+                COLUMN_SIXES +
+                " FROM " + TABLE_BATSMAN +
+                " WHERE " + COLUMN_PLAYER + " = ? AND " + COLUMN_INNINGS_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{
+                String.valueOf(playerId),
+                String.valueOf(inningsId)
+        });
+        if (cursor.moveToFirst()) {
+            batterStats.put("runs", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SCORE)));
+            batterStats.put("balls", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_BALLS_PLAYED)));
+            batterStats.put("fours", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FOURS)));
+            batterStats.put("sixes", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SIXES)));
+            String playerName = getPlayerNameById(playerId);
+            batterStats.put("Name", playerName);
+        }
+        cursor.close(); // Close the cursor to avoid memory leaks
+        Log.d(TAG, "getTeamStats: " + batterStats.toString());
+        return batterStats;
+    }
+    public String getPlayerNameById(long playerId) {
+        Log.d(TAG, "getPlayerNameById: inside get player from id");
+        SQLiteDatabase db = this.getReadableDatabase();
+        String playerName = null;
+        String query = "SELECT " + COLUMN_PLAYER_NAME +
+                " FROM " + TABLE_PLAYERS +
+                " WHERE " + COLUMN_PLAYER_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(playerId)});
+        if (cursor.moveToFirst()) {
+            playerName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PLAYER_NAME));
+        }
+        cursor.close(); // Close the cursor to avoid memory leaks
+        return playerName;
+    }
+    public HashMap<String, String> getPartnershipStats(long partnershipId) {
+        Log.d(TAG, "getCurrentBowlerStats: inside getCurrentBowlerStats and arguments are " + partnershipId);
+        HashMap<String, String> partnershipStats = new HashMap<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        try {
+            String query = "SELECT " + COLUMN_RUNS + ", " + COLUMN_BALLS +
+                    " FROM " + TABLE_PARTNERSHIPS +
+                    " WHERE " + COLUMN_PARTNERSHIP_ID + " = ?";
+            cursor = db.rawQuery(query, new String[]{String.valueOf(partnershipId)});
+            if (cursor != null && cursor.moveToFirst()) {
+                partnershipStats.put("runs", String.valueOf(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_RUNS))));
+                partnershipStats.put("balls", String.valueOf(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_BALLS))));
+            }
+        } catch (Exception e) {
+            Log.e("DatabaseHelper", "Error fetching partnership stats", e);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        Log.d(TAG, "getTeamStats: " + partnershipStats.toString());
+        return partnershipStats;
+    }
+    public HashMap<String, String> getCurrentBowlerStats(long inningsId, long bowlerId) {
+        Log.d(TAG, "getCurrentBowlerStats: inside getCurrentBowlerStats and arguments are " + inningsId + bowlerId);
+        HashMap<String, String> bowlerStats = new HashMap<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        try {
+            // Get the bowler's name using the previously defined method
+            String bowlerName = getPlayerNameById(bowlerId);
+            if (bowlerName != null) {
+                bowlerStats.put("name", bowlerName);
+            }
+            String query = "SELECT " +
+                    COLUMN_BALLS_PLAYED + ", " +
+                    COLUMN_RUNS + ", " +
+                    COLUMN_MAIDENS + ", " +
+                    COLUMN_WK +
+                    " FROM " + TABLE_BOWLER +
+                    " WHERE " + COLUMN_INNINGS_ID + " = ? AND " + COLUMN_PLAYER + " = ?";
+            cursor = db.rawQuery(query, new String[]{String.valueOf(inningsId), String.valueOf(bowlerId)});
+            if (cursor != null && cursor.moveToFirst()) {
+                int balls = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_BALLS_PLAYED));
+                int runs = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_RUNS));
+                int maidens = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_MAIDENS));
+                int wickets = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_WK));
+                int overs = balls / 6;
+                int partialBalls = balls % 6;
+                String oversFormatted = overs + "." + partialBalls;
+                bowlerStats.put("overs", oversFormatted);
+                bowlerStats.put("runs", String.valueOf(runs));
+                bowlerStats.put("maidens", String.valueOf(maidens));
+                bowlerStats.put("wickets", String.valueOf(wickets));
+            }
+        } catch (Exception e) {
+            Log.e("DatabaseHelper", "Error fetching bowler stats", e);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if(db.isOpen()) db.close();
+        }
+        Log.d(TAG, "getCurrentBowlerStats: bowlersmap =" + bowlerStats.toString());
+        return bowlerStats;
+    }
+
 
 }
 

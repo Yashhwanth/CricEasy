@@ -1,6 +1,9 @@
 package com.cricketscoringapp.criceasy.fragment;
 
 
+import static android.content.ContentValues.TAG;
+
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -16,54 +19,42 @@ import android.widget.TextView;
 import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
 import com.cricketscoringapp.criceasy.R;
 
+import java.util.HashMap;
+
 public class LiveFragment extends Fragment {
-    // Declare the UI elements
     private TextView currentBattingTeamName;
     private TextView currentBattingScore;
-
-    // Batting stats for the current batsman
     private TextView batter1Name;
     private TextView batter1R;
     private TextView batter1B;
     private TextView batter1Fours;
     private TextView batter1Sixes;
     private TextView batter1SR;
-
-    // Batting stats for the current batsman
     private TextView batter2Name;
     private TextView batter2R;
     private TextView batter2B;
     private TextView batter2Fours;
     private TextView batter2Sixes;
     private TextView batter2SR;
-
-    // Bowling stats for the current bowler
     private TextView bowlerName;
     private TextView bowlerO;
     private TextView bowlerM;
     private TextView bowlerR;
     private TextView bowlerW;
     private TextView bowlerECO;
-
-    // Other stats
     private TextView runRate;
-    private TextView partnership;
-
-    // SharedPreferences to store and retrieve match data
+    private TextView partnershipRuns;
+    private TextView partnershipBalls;
     private SharedPreferences sharedPreferences;
-
-    private DatabaseHelper databaseHelper;  // Assuming you have a DatabaseHelper class for DB operations
-
+    private DatabaseHelper databaseHelper;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        databaseHelper = new DatabaseHelper(requireContext());
         View view = inflater.inflate(R.layout.activity_mp_summary, container, false);
-        // Initialize the views
         currentBattingTeamName = view.findViewById(R.id.tv_batting_team);
         Log.d("LiveFragment", "currentBattingTeamName: " + currentBattingTeamName);
         currentBattingScore = view.findViewById(R.id.tv_batting_score);
         Log.d("LiveFragment", "currentBattingScore: " + currentBattingScore);
-
         batter1Name = view.findViewById(R.id.tv_batter_1_name);
         batter1R = view.findViewById(R.id.tv_batter_1_runs);
         batter1B = view.findViewById(R.id.tv_batter_1_balls);
@@ -86,66 +77,104 @@ public class LiveFragment extends Fragment {
         bowlerECO = view.findViewById(R.id.tv_bowler_economy);
 
         runRate = view.findViewById(R.id.tv_run_rate);
-        partnership = view.findViewById(R.id.tv_partnership_runs);
-        // Load match details
-        displayMatchResult();
+        partnershipRuns = view.findViewById(R.id.tv_partnership_runs);
+        partnershipBalls = view.findViewById(R.id.tv_partnership_balls);
         return view;
     }
-
-    private void loadMatchDetails() {
-        // Placeholder method to load match data (you need to replace it with actual logic)
-        if (isMatchOngoing()) {
-            // Show ongoing match details (current batting team, current batsman stats, etc.)
-            currentBattingTeamName.setText("Team 1");
-            currentBattingScore.setText("120/3");
-
-            // Batting stats example
-            batter1Name.setText("bat1");
-            batter1R.setText("45");
-            batter1B.setText("35");
-            batter1Fours.setText("5");
-            batter1Sixes.setText("2");
-            batter1SR.setText("128.57");
-
-            // Batting stats example
-            batter2Name.setText("bat2");
-            batter2R.setText("45");
-            batter2B.setText("35");
-            batter2Fours.setText("5");
-            batter2Sixes.setText("2");
-            batter2SR.setText("128.57");
-
-
-            // Bowling stats example
-            bowlerName.setText("bat1");
-            bowlerO.setText("5");
-            bowlerM.setText("1");
-            bowlerR.setText("30");
-            bowlerW.setText("2");
-            bowlerECO.setText("6.00");
-
-            // Additional stats
-            runRate.setText("7.5");
-            partnership.setText("50 runs off 35 balls");
-
-        } else {
-            // Show match result (when match is completed)
-            //displayMatchResult();
+    @Override
+    public void onResume() {
+        Log.d(TAG, "live onResume called");
+        super.onResume();
+        checkAndRefreshUIIfNeeded();
+    }
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden) { // Fragment is now visible
+            Log.d(TAG, "onHiddenChanged: live Fragment is now visible");
+            checkAndRefreshUIIfNeeded();
+        } else { // Fragment is now hidden
+            Log.d(TAG, "onHiddenChanged: live Fragment is now hidden");
         }
     }
-
-    private boolean isMatchOngoing() {
-        // Placeholder method to check if the match is ongoing or completed
-        return true;  // Example return value
+    private void checkAndRefreshUIIfNeeded() {
+        sharedPreferences = requireContext().getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
+        boolean doesRefreshNeeded = sharedPreferences.getBoolean("livePageUpdateNeeded", false);
+        if(doesRefreshNeeded){
+            Log.d(TAG, "checkAndRefreshIfNeeded: refresh needed and in the below method");
+            refreshUI();
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("isScoreUpdated", false);
+            editor.apply();
+        }
+        else Log.d(TAG, "checkAndRefreshIfNeeded: no refresh needed");
     }
+    public void refreshUI(){
+        Log.d(TAG, "testMethod: inside the live fragment test method");
+        getTeamName();
+        getTeamScore();
+        getBatterStats();
+        getPartnerShip();
+        getBowlerStats();
+    }
+    public void getTeamName(){
+        long teamId = sharedPreferences.getLong("battingTeamId", -1);
+        String teamName = databaseHelper.getTeamNameFromId(teamId);
+        currentBattingTeamName.setText(teamName);
+    }
+    public void getTeamScore(){
+        long inningsId = sharedPreferences.getLong("currentInningsId", -1);
+        HashMap<String, String> map = databaseHelper.getTeamStats(inningsId);
+        String score = map.get("runs") + " / " + map.get("wickets") +  " ( " + map.get("balls") + " ) ";
+        currentBattingScore.setText(score);
+        float teamRunRate = Float.parseFloat(map.get("runs")) / Float.parseFloat(map.get("balls"));
+        runRate.setText(String.valueOf(teamRunRate));
+    }
+    public void getBatterStats(){
+        long inningsId = sharedPreferences.getLong("currentInningsId", -1);
+        long batter1Id = sharedPreferences.getLong("strikerId", -1);
+        long batter2Id = sharedPreferences.getLong("nonStrikerId", -1);
+        HashMap<String, String> map1 = databaseHelper.getCurrentBattersStats(inningsId, batter1Id);
+        HashMap<String, String> map2 = databaseHelper.getCurrentBattersStats(inningsId, batter2Id);
 
-    private void displayMatchResult() {
-        // Logic to display match result, both teams' scores, top batsmen, top bowlers
-        // Example:
-        currentBattingTeamName.setText("Match Completed");
-        currentBattingScore.setText("250/8");
+        String batter1Runs = map1.get("runs");
+        String batter1Balls = map1.get("balls");
+        float batter1Sr = Float.parseFloat(batter1Runs) / Float.parseFloat(batter1Balls);
 
+        batter1Name.setText(map1.get("name"));
+        batter1R.setText(batter1Runs);
+        batter1B.setText(batter1Balls);
+        batter1Fours.setText(map1.get("fours"));
+        batter1Sixes.setText(map1.get("sixes"));
+        batter1SR.setText(String.valueOf(batter1Sr));
 
-        // Add top batsmen and bowlers stats here
+        String batter2Runs = map2.get("runs");
+        String batter2Balls = map2.get("balls");
+        float batter2Sr = Float.parseFloat(batter2Runs) / Float.parseFloat(batter2Balls);
+
+        batter2Name.setText(map2.get("name"));
+        batter2R.setText(batter2Runs);
+        batter2B.setText(batter2Balls);
+        batter2Fours.setText(map2.get("fours"));
+        batter2Sixes.setText(map2.get("sixes"));
+        batter2SR.setText(String.valueOf(batter2Sr));
+    }
+    public void getPartnerShip(){
+        long partnerShipId = sharedPreferences.getLong("partnershipId", -1);
+        HashMap<String, String> partnershipStats = databaseHelper.getPartnershipStats(partnerShipId);
+        partnershipRuns.setText(partnershipStats.get("runs"));
+        partnershipBalls.setText(partnershipStats.get("balls"));
+    }
+    public void getBowlerStats(){
+        long inningsId = sharedPreferences.getLong("currentInningsId", -1);
+        long bowlerId = sharedPreferences.getLong("bowlerId", -1);
+        HashMap<String,String> bowlerMap = databaseHelper.getCurrentBowlerStats(inningsId, bowlerId);
+        //float bowlerEconomy = Float.parseFloat(bowlerMap.get("runs")) / Float.parseFloat(bowlerMap.get("overs"));
+        bowlerName.setText(bowlerMap.get("name"));
+        bowlerO.setText(bowlerMap.get("overs"));
+        bowlerR.setText(bowlerMap.get("runs"));
+        bowlerW.setText(bowlerMap.get("wickets"));
+        bowlerECO.setText(String.valueOf("0.00"));
+        bowlerM.setText(bowlerMap.get("maidens"));
     }
 }
