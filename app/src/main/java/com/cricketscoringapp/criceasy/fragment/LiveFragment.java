@@ -79,6 +79,7 @@ public class LiveFragment extends Fragment {
         runRate = view.findViewById(R.id.tv_run_rate);
         partnershipRuns = view.findViewById(R.id.tv_partnership_runs);
         partnershipBalls = view.findViewById(R.id.tv_partnership_balls);
+        //refreshUI();
         return view;
     }
     @Override
@@ -104,7 +105,7 @@ public class LiveFragment extends Fragment {
             Log.d(TAG, "checkAndRefreshIfNeeded: refresh needed and in the below method");
             refreshUI();
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("isScoreUpdated", false);
+            editor.putBoolean("livePageUpdateNeeded", false);
             editor.apply();
         }
         else Log.d(TAG, "checkAndRefreshIfNeeded: no refresh needed");

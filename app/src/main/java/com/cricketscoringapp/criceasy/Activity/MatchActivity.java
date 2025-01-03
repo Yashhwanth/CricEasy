@@ -33,12 +33,14 @@ import com.cricketscoringapp.criceasy.R;
 import com.cricketscoringapp.criceasy.ViewModel.TeamPlayersViewModel;
 import com.cricketscoringapp.criceasy.ViewModel.TeamPlayersViewModelFactory;
 import com.cricketscoringapp.criceasy.dao.TeamPlayersDao;
+import com.cricketscoringapp.criceasy.entities.Team;
 import com.cricketscoringapp.criceasy.fragment.CommentaryFragment;
 import com.cricketscoringapp.criceasy.fragment.InfoFragment;
 import com.cricketscoringapp.criceasy.fragment.ScoreCardFragment;
 import com.cricketscoringapp.criceasy.fragment.TeamsFragment;
 import com.cricketscoringapp.criceasy.fragment.LiveFragment;
 import com.cricketscoringapp.criceasy.repository.TeamPlayersRepository;
+import com.google.android.datatransport.runtime.firebase.transport.LogEventDropped;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.cricketscoringapp.criceasy.Database.database;
 
@@ -631,6 +633,7 @@ public class MatchActivity extends AppCompatActivity {
         AlertDialog.Builder playerBuilder = new AlertDialog.Builder(this);
         playerBuilder.setView(playerDialogView);
         AlertDialog playerDialog = playerBuilder.create();
+        playerDialog.show();
         if (playerDialog.getWindow() != null) {
             playerDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
@@ -654,14 +657,24 @@ public class MatchActivity extends AppCompatActivity {
             }
             playerDialog.dismiss(); // Dismiss dialog only after processing the player's input
         });
-
         playerDialog.setOnDismissListener(dialog -> {
-            // Execute the callback after the dialog is dismissed and input is valid
+            Log.d(TAG, "setNewPlayer: set on dismiss called for set new player popup");
+            sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+            Fragment currShowingFragment = fragmentManager.findFragmentByTag(sharedPreferences.getString("currentShowingFragment", null));
+            if (currShowingFragment instanceof TeamsFragment) {
+                Log.d(TAG, "setNewPlayer: urgent refresh needed for teams");
+                TeamsFragment teamsFragment = (TeamsFragment) currShowingFragment;
+                teamsFragment.refreshTeams();
+            } else {
+                Log.d(TAG, "setNewPlayer: no urgent need to cache the update");
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean("teamsPageUpdateNeeded", true);
+                editor.apply();
+            }
             if (onDialogDismissed != null) {
                 onDialogDismissed.run();
             }
         });
-        playerDialog.show();
     }
     private void updatePlayerDataInSp(String playerType, String playerName){
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
@@ -677,19 +690,14 @@ public class MatchActivity extends AppCompatActivity {
         long inningsId = sharedPreferences.getLong(INNINGS_ID, -1);
         long teamId = sharedPreferences.getLong(BATTING_TEAM_ID, -1);
         long newBatsmanId = databaseHelper.insertPlayer(name, teamId, inningsId);
-
-        // Update TeamPlayers using Room
-        new Thread(() -> {
-            teamPlayersViewModel.addPlayerToTeam((int) teamId, (int) newBatsmanId, (int) inningsId);
-        }).start();
-
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putLong(newBatsmanType, newBatsmanId);
-        editor.apply();
         databaseHelper.initializeBatsmanStats(newBatsmanId, inningsId);
         long oldBatsmanId = sharedPreferences.getLong(oldBatsmanType, -1);
         Log.d(TAG, "striker" + newBatsmanId + "non striker" + oldBatsmanId);
-        databaseHelper.insertPartnership(inningsId, newBatsmanId, oldBatsmanId);
+        long partnershipId = databaseHelper.insertPartnership(inningsId, newBatsmanId, oldBatsmanId);
+        editor.putLong(PARTNERSHIP_ID, partnershipId);
+        editor.apply();
     }
     private long updateNewBowlerToDB(String name) {
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
@@ -697,10 +705,6 @@ public class MatchActivity extends AppCompatActivity {
         long teamId = sharedPreferences.getLong(BOWLING_TEAM_ID, -1);
         long inningsId = sharedPreferences.getLong(INNINGS_ID, -1);
         long playerId = databaseHelper.insertPlayer(name, teamId, inningsId);
-        // Update TeamPlayers using Room
-        new Thread(() -> {
-            teamPlayersViewModel.addPlayerToTeam((int) teamId, (int) playerId, (int) inningsId);
-        }).start();
         databaseHelper.initializeBowlerStats(playerId, inningsId);
         editor.putLong(BOWLER_ID, playerId);
         editor.apply();

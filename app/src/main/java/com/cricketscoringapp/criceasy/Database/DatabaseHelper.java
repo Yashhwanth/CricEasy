@@ -2044,7 +2044,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } finally {
             if (cursor != null) cursor.close();
         }
-        Log.d(TAG, "getTeamStats: " + teamStats.toString());
         return teamStats;
     }
     public String getTeamNameFromId(long teamId) {
@@ -2057,7 +2056,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             teamName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TEAM_NAME));
         }
         cursor.close(); // Always close the cursor to avoid memory leaks
-        Log.d(TAG, "getTeamNameFromId: team name is " + teamName);
         return teamName; // Return the fetched team name
     }
     public HashMap<String, String> getCurrentBattersStats(long inningsId, long playerId) {
@@ -2102,7 +2100,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cursor.close();  // Closing cursor to avoid memory leaks
             }
         }
-        Log.d(TAG, "getCurrentBattersStats: batterStats = " + batterStats.toString());
         return batterStats;
     }
     public String getPlayerNameById(long playerId) {
@@ -2117,7 +2114,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             playerName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PLAYER_NAME));
         }
         cursor.close(); // Close the cursor to avoid memory leaks
-        Log.d(TAG, "getPlayerNameById: player name is " + playerName);
         return playerName;
     }
     public HashMap<String, String> getPartnershipStats(long partnershipId) {
@@ -2141,7 +2137,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cursor.close();
             }
         }
-        Log.d(TAG, "getTeamStats: " + partnershipStats.toString());
         return partnershipStats;
     }
     public HashMap<String, String> getCurrentBowlerStats(long inningsId, long bowlerId) {
@@ -2184,7 +2179,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
             if(db.isOpen()) db.close();
         }
-        Log.d(TAG, "getCurrentBowlerStats: bowlersmap =" + bowlerStats.toString());
         return bowlerStats;
     }
 
