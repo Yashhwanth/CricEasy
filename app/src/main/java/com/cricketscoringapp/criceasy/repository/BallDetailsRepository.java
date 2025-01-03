@@ -6,11 +6,8 @@ import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
 import java.util.List;
 
 public class BallDetailsRepository {
-
     private static final String TAG = "BallDetailsRepository";
     private DatabaseHelper databaseHelper;
-
-    // Constructor for dependency injection
     public BallDetailsRepository(DatabaseHelper databaseHelper) {
         this.databaseHelper = databaseHelper;
     }

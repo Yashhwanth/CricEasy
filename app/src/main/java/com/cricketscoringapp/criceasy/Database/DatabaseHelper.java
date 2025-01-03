@@ -1786,6 +1786,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Log.e("DatabaseHelper", "Invalid ball type: " + ballType);
         }
     }
+
 // ------------------------------------  innings and match end ------------------------
     public void updateInningsCompletionStatus(long inningsId) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -2206,8 +2207,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     long bowlerId = overCursor.getLong(bowlerIdIndex);
 
                     // Query to get balls for the current over
-                    String ballQuery = "SELECT " + COLUMN_TYPE_OF_BALL + ", " + COLUMN_RUNS + ", " + COLUMN_IS_WICKET + ", " +
-                            COLUMN_STRIKER + ", " + COLUMN_NON_STRIKER +
+                    String ballQuery = "SELECT " + COLUMN_BALL_ID + ", " + COLUMN_TYPE_OF_BALL + ", " + COLUMN_RUNS + ", " +
+                            COLUMN_IS_WICKET + ", " + COLUMN_STRIKER + ", " + COLUMN_NON_STRIKER +
                             " FROM " + TABLE_BALLS +
                             " WHERE " + COLUMN_OVER_ID + " = ?";
                     Cursor ballCursor = db.rawQuery(ballQuery, new String[]{String.valueOf(overId)});
@@ -2215,6 +2216,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     if (ballCursor != null && ballCursor.moveToFirst()) {
                         do {
                             // Fetch ball details
+                            int ballIdIndex = ballCursor.getColumnIndex(COLUMN_BALL_ID);  // Fetch the ball ID
                             int ballTypeIndex = ballCursor.getColumnIndex(COLUMN_TYPE_OF_BALL);
                             int runsIndex = ballCursor.getColumnIndex(COLUMN_RUNS);
                             int isWicketIndex = ballCursor.getColumnIndex(COLUMN_IS_WICKET);
@@ -2222,7 +2224,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                             int nonStrikerIndex = ballCursor.getColumnIndex(COLUMN_NON_STRIKER);
 
                             // Check if the indices are valid
-                            if (ballTypeIndex != -1 && runsIndex != -1 && isWicketIndex != -1 && strikerIndex != -1 && nonStrikerIndex != -1) {
+                            if (ballIdIndex != -1 && ballTypeIndex != -1 && runsIndex != -1 &&
+                                    isWicketIndex != -1 && strikerIndex != -1 && nonStrikerIndex != -1) {
+
+                                long ballId = ballCursor.getLong(ballIdIndex);  // Get ball ID
                                 String ballType = ballCursor.getString(ballTypeIndex);
                                 int runs = ballCursor.getInt(runsIndex);
                                 int isWicket = ballCursor.getInt(isWicketIndex);
@@ -2233,8 +2238,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                 String strikerName = getPlayerNameById(strikerId);
                                 String nonStrikerName = getPlayerNameById(nonStrikerId);
                                 String bowlerName = getPlayerNameById(bowlerId);
-                                // Create BallDetails object
-                                BallDetails ballDetails = new BallDetails(ballType, runs, isWicket == 1, strikerName, nonStrikerName, bowlerName);
+
+                                // Create BallDetails object with ballId
+                                BallDetails ballDetails = new BallDetails((int) ballId, ballType, runs, isWicket == 1,
+                                        strikerName, nonStrikerName, bowlerName);
                                 ballDetailsList.add(ballDetails);
                             }
                         } while (ballCursor.moveToNext());
