@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import static android.content.ContentValues.TAG;
 
+import com.cricketscoringapp.criceasy.model.BallDetails;
 import com.cricketscoringapp.criceasy.model.Player;
 
 
@@ -2183,6 +2184,74 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return bowlerStats;
     }
 
+    public List<BallDetails> getBallDetailsForInnings(long inningsId) {
+        List<BallDetails> ballDetailsList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Query to get all overs for the given inningsId
+        String overQuery = "SELECT " + COLUMN_OVER_ID + ", " + COLUMN_PLAYER_ID +
+                " FROM " + TABLE_OVERS +
+                " WHERE " + COLUMN_INNINGS_ID + " = ?";
+        Cursor overCursor = db.rawQuery(overQuery, new String[]{String.valueOf(inningsId)});
+
+        if (overCursor != null && overCursor.moveToFirst()) {
+            do {
+                // Fetch overId and bowlerId for each over
+                int overIdIndex = overCursor.getColumnIndex(COLUMN_OVER_ID);
+                int bowlerIdIndex = overCursor.getColumnIndex(COLUMN_PLAYER_ID);
+
+                // Check if the column indices are valid
+                if (overIdIndex != -1 && bowlerIdIndex != -1) {
+                    long overId = overCursor.getLong(overIdIndex);
+                    long bowlerId = overCursor.getLong(bowlerIdIndex);
+
+                    // Query to get balls for the current over
+                    String ballQuery = "SELECT " + COLUMN_TYPE_OF_BALL + ", " + COLUMN_RUNS + ", " + COLUMN_IS_WICKET + ", " +
+                            COLUMN_STRIKER + ", " + COLUMN_NON_STRIKER +
+                            " FROM " + TABLE_BALLS +
+                            " WHERE " + COLUMN_OVER_ID + " = ?";
+                    Cursor ballCursor = db.rawQuery(ballQuery, new String[]{String.valueOf(overId)});
+
+                    if (ballCursor != null && ballCursor.moveToFirst()) {
+                        do {
+                            // Fetch ball details
+                            int ballTypeIndex = ballCursor.getColumnIndex(COLUMN_TYPE_OF_BALL);
+                            int runsIndex = ballCursor.getColumnIndex(COLUMN_RUNS);
+                            int isWicketIndex = ballCursor.getColumnIndex(COLUMN_IS_WICKET);
+                            int strikerIndex = ballCursor.getColumnIndex(COLUMN_STRIKER);
+                            int nonStrikerIndex = ballCursor.getColumnIndex(COLUMN_NON_STRIKER);
+
+                            // Check if the indices are valid
+                            if (ballTypeIndex != -1 && runsIndex != -1 && isWicketIndex != -1 && strikerIndex != -1 && nonStrikerIndex != -1) {
+                                String ballType = ballCursor.getString(ballTypeIndex);
+                                int runs = ballCursor.getInt(runsIndex);
+                                int isWicket = ballCursor.getInt(isWicketIndex);
+                                long strikerId = ballCursor.getLong(strikerIndex);
+                                long nonStrikerId = ballCursor.getLong(nonStrikerIndex);
+
+                                // Get player names for striker, non-striker, and bowler
+                                String strikerName = getPlayerNameById(strikerId);
+                                String nonStrikerName = getPlayerNameById(nonStrikerId);
+                                String bowlerName = getPlayerNameById(bowlerId);
+                                // Create BallDetails object
+                                BallDetails ballDetails = new BallDetails(ballType, runs, isWicket == 1, strikerName, nonStrikerName, bowlerName);
+                                ballDetailsList.add(ballDetails);
+                            }
+                        } while (ballCursor.moveToNext());
+                        ballCursor.close();
+                    }
+                } else {
+                    Log.e(TAG, "Invalid column indices in overs table");
+                }
+            } while (overCursor.moveToNext());
+            overCursor.close();
+        } else {
+            Log.e(TAG, "No overs found for inningsId: " + inningsId);
+        }
+        db.close();
+        Log.d(TAG, "getBallDetailsForInnings: " + ballDetailsList.size());
+        return ballDetailsList;
+    }
 
 }
 

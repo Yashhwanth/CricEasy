@@ -14,16 +14,18 @@ import androidx.fragment.app.Fragment;
 
 import static android.content.ContentValues.TAG;
 
+import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
 import com.cricketscoringapp.criceasy.R;
 
 public class CommentaryFragment extends Fragment {
+    private SharedPreferences sharedPreferences;
+    private DatabaseHelper databaseHelper;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        sharedPreferences = requireActivity().getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
+        databaseHelper = new DatabaseHelper(requireContext());
         View view = inflater.inflate(R.layout.activity_mp_commentary, container, false);
         return view;
-    }
-    public void updateCommentary(){
-        Log.d(TAG, "testMethod: inside the commentary fragment test method");
     }
     @Override
     public void onResume() {
@@ -41,7 +43,6 @@ public class CommentaryFragment extends Fragment {
             Log.d(TAG, "onHiddenChanged: commentary Fragment is now hidden");
         }
     }
-
     private void checkAndRefreshIfNeeded() {
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
         boolean doesRefreshNeeded = sharedPreferences.getBoolean("commentaryPageUpdateNeeded", false);
@@ -52,5 +53,10 @@ public class CommentaryFragment extends Fragment {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("isScoreUpdated", false);
         editor.apply();
+    }
+    public void updateCommentary(){
+        Log.d(TAG, "testMethod: inside the commentary fragment test method");
+        long inningsId = sharedPreferences.getLong("currentInningsId", -1);
+        databaseHelper.getBallDetailsForInnings(inningsId);
     }
 }
