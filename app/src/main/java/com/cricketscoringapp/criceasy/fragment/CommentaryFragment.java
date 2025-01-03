@@ -45,7 +45,7 @@ public class CommentaryFragment extends Fragment {
         // Initialize the RecyclerView and Adapter
         recyclerView = view.findViewById(R.id.ballDetailsRecyclerView); // Replace with actual RecyclerView ID
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        commentaryAdapter = new BallDetailsAdapter(ballDetailsList);
+        commentaryAdapter = new BallDetailsAdapter(ballDetailsList, sharedPreferences);
         recyclerView.setAdapter(commentaryAdapter);
 
         ballDetailsViewModel = new ViewModelProvider(this).get(BallDetailsViewModel.class);

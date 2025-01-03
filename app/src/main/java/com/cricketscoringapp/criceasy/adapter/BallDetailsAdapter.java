@@ -1,5 +1,6 @@
 package com.cricketscoringapp.criceasy.adapter;
 
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,10 +12,13 @@ import com.cricketscoringapp.criceasy.R;
 import com.cricketscoringapp.criceasy.model.BallDetails;
 import java.util.List;
 
+
 public class BallDetailsAdapter extends RecyclerView.Adapter<BallDetailsAdapter.BallDetailsViewHolder> {
+    SharedPreferences sharedPreferences;
     private List<BallDetails> ballDetailsList;
-    public BallDetailsAdapter(List<BallDetails> ballDetailsList) {
+    public BallDetailsAdapter(List<BallDetails> ballDetailsList, SharedPreferences sharedPreferences) {
         this.ballDetailsList = ballDetailsList;
+        this.sharedPreferences = sharedPreferences;
     }
     @NonNull
     @Override
@@ -35,7 +39,7 @@ public class BallDetailsAdapter extends RecyclerView.Adapter<BallDetailsAdapter.
                 .append(ballDetails.getRuns())
                 .append(" runs");
 
-        if (!"NORMAL".equals(ballDetails.getBallType())) {
+        if (!"Normal".equals(ballDetails.getBallType())) {
             details.append(", ").append(ballDetails.getBallType());
         }
         if (ballDetails.isWicket()) {
@@ -86,7 +90,7 @@ public class BallDetailsAdapter extends RecyclerView.Adapter<BallDetailsAdapter.
 
         public BallDetailsViewHolder(@NonNull View itemView) {
             super(itemView);
-            //overDetailTextView = itemView.findViewById(R.id.overNumberTextView);
+            overDetailTextView = itemView.findViewById(R.id.overNumberTextView);
             ballDetailTextView = itemView.findViewById(R.id.ballDetailTextView);
         }
     }

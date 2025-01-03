@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginTop="15dp"
     android:orientation="horizontal"
-    android:padding="8dp"
-    android:layout_marginTop="15dp">
+    android:padding="8dp">
 
     <!-- TextView for Over.Ball -->
     <TextView
         android:id="@+id/overNumberTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:text="0.1"
-        android:textSize="16sp"
         android:textColor="@android:color/black"
-        android:layout_marginEnd="8dp" />
+        android:textSize="16sp" />
 
     <!-- TextView for Details -->
     <TextView
@@ -23,10 +22,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="Bowler to Batsman, 4 runs, no ball"
-        android:textSize="16sp"
-        android:textColor="@android:color/black"
         android:ellipsize="end"
-        android:singleLine="true" />
+        android:singleLine="true"
+        android:text="Bowler to Batsman, 4 runs, no ball"
+        android:textColor="@android:color/black"
+        android:textSize="16sp" />
 
 </LinearLayout>
