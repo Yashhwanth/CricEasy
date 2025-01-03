@@ -29,7 +29,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
-                android:text="Team A"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -38,7 +37,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="120/3 (15.2 Overs)"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
@@ -124,7 +122,6 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:gravity="start"
-                    android:text="Batter 1*"
                     android:textColor="@color/black" />
 
                 <TextView
@@ -132,40 +129,35 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="45" />
+                    android:gravity="center" />
 
                 <TextView
                     android:id="@+id/tv_batter_1_balls"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="30" />
+                    android:gravity="center"/>
 
                 <TextView
                     android:id="@+id/tv_batter_1_fours"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="5" />
+                    android:gravity="center" />
 
                 <TextView
                     android:id="@+id/tv_batter_1_sixes"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="2" />
+                    android:gravity="center" />
 
                 <TextView
                     android:id="@+id/tv_batter_1_sr"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="150.0" />
+                    android:gravity="center" />
             </LinearLayout>
 
             <!-- Batters Stats Row 2 -->
@@ -182,7 +174,6 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:gravity="start"
-                    android:text="Batter 2"
                     android:textColor="@color/black" />
 
                 <TextView
@@ -190,40 +181,35 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="20" />
+                    android:gravity="center" />
 
                 <TextView
                     android:id="@+id/tv_batter_2_balls"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="25" />
+                    android:gravity="center" />
 
                 <TextView
                     android:id="@+id/tv_batter_2_fours"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="2" />
+                    android:gravity="center" />
 
                 <TextView
                     android:id="@+id/tv_batter_2_sixes"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="0" />
+                    android:gravity="center" />
 
                 <TextView
                     android:id="@+id/tv_batter_2_sr"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="80.0" />
+                    android:gravity="center" />
             </LinearLayout>
         </LinearLayout>
 
@@ -251,16 +237,14 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center"
-                android:text="80" />
+                android:gravity="center" />
 
             <TextView
                 android:id="@+id/tv_partnership_balls"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center"
-                android:text="45" />
+                android:gravity="center" />
         </LinearLayout>
 
         <!-- Run Rate Section -->
@@ -279,7 +263,6 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:paddingTop="4dp"
-            android:text="7.5"
             android:textSize="16sp" />
 
         <LinearLayout
@@ -355,7 +338,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:gravity="start"
-                android:text="Bowler1"
                 android:textColor="@color/black" />
 
             <TextView
@@ -363,40 +345,35 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center"
-                android:text="45" />
+                android:gravity="center" />
 
             <TextView
                 android:id="@+id/tv_bowler_maidens"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center"
-                android:text="30" />
+                android:gravity="center"/>
 
             <TextView
                 android:id="@+id/tv_bowler_runs"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center"
-                android:text="5" />
+                android:gravity="center"/>
 
             <TextView
                 android:id="@+id/tv_bowler_wickets"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center"
-                android:text="2" />
+                android:gravity="center" />
 
             <TextView
                 android:id="@+id/tv_bowler_economy"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center"
-                android:text="150.0" />
+                android:gravity="center" />
         </LinearLayout>
 
         <!-- More Bowler Rows can be added dynamically -->
