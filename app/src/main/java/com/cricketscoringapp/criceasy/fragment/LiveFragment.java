@@ -79,14 +79,14 @@ public class LiveFragment extends Fragment {
         runRate = view.findViewById(R.id.tv_run_rate);
         partnershipRuns = view.findViewById(R.id.tv_partnership_runs);
         partnershipBalls = view.findViewById(R.id.tv_partnership_balls);
-        //refreshUI();
         return view;
     }
     @Override
     public void onResume() {
+        sharedPreferences = requireContext().getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
         Log.d(TAG, "live onResume called");
         super.onResume();
-        checkAndRefreshUIIfNeeded();
+        refreshUI();
     }
     @Override
     public void onHiddenChanged(boolean hidden) {
@@ -120,6 +120,7 @@ public class LiveFragment extends Fragment {
     }
     public void getTeamName(){
         long teamId = sharedPreferences.getLong("battingTeamId", -1);
+        Log.d(TAG, "getTeamName: team id is" + teamId);
         String teamName = databaseHelper.getTeamNameFromId(teamId);
         currentBattingTeamName.setText(teamName);
     }

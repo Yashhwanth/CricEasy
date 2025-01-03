@@ -66,14 +66,13 @@ public class TeamsFragment extends Fragment {
         // Initialize ViewModel
         teamViewModel = new ViewModelProvider(this).get(TeamViewModel.class);
         Log.d(TAG, "onCreateView completed");
-        refreshTeams();
         return view;
     }
     @Override
     public void onResume() {
         super.onResume();
         Log.d(TAG, "teams onResume called");
-        checkAndRefreshTeams();
+        refreshTeams();
         Log.d(TAG, "onResume completed");
     }
     @Override

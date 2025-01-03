@@ -2056,6 +2056,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             teamName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TEAM_NAME));
         }
         cursor.close(); // Always close the cursor to avoid memory leaks
+        Log.d(TAG, "getTeamNameFromId: team name is" + teamName);
         return teamName; // Return the fetched team name
     }
     public HashMap<String, String> getCurrentBattersStats(long inningsId, long playerId) {
