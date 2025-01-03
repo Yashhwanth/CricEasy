@@ -51,9 +51,9 @@ public class LiveFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         databaseHelper = new DatabaseHelper(requireContext());
         View view = inflater.inflate(R.layout.activity_mp_summary, container, false);
-        currentBattingTeamName = view.findViewById(R.id.tv_batting_team);
+        currentBattingTeamName = view.findViewById(R.id.battingTeamTextView);
         Log.d("LiveFragment", "currentBattingTeamName: " + currentBattingTeamName);
-        currentBattingScore = view.findViewById(R.id.tv_batting_score);
+        currentBattingScore = view.findViewById(R.id.battingTeamScoreTextView);
         Log.d("LiveFragment", "currentBattingScore: " + currentBattingScore);
         batter1Name = view.findViewById(R.id.tv_batter_1_name);
         batter1R = view.findViewById(R.id.tv_batter_1_runs);

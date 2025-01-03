@@ -120,16 +120,32 @@
     <string name="runsFromBat">Bat</string>
     <string name="runsFromBye">Bye</string>
     <string name="runsFromLegBye">LegBye</string>
-    team fragment
-    <string name="playerImage">Team</string>
     activity secondInnings
     <string name = "startSecondInningsButton">Start Second Innings</string>
     <string name = "firstInningsOverText"> First Innings Ended</string>
     <string name = "secondInningsOverText"> Second Innings Starting Soon</string>
     <string name = "endInningsText"> End Match</string>
     team fragment
+    <string name="playerImage">Team</string>
     <string name = "playerNameTextView">Player name</string>
     <string name = "playerIconContentDescription">Player Icon Image</string>
+    live fragment
+    <string name="batterName">Batter</string>
+    <string name="batterRuns">R</string>
+    <string name="batterBalls">B</string>
+    <string name="batterFours">4s</string>
+    <string name="batterSixes">6s</string>
+    <string name="batterStrikeRate">SR</string>
+    <string name="partnershipHeading">Partnership</string>
+    <string name="runRateHeading">RunRate</string>
+    <string name="bowlerName">Bowler</string>
+    <string name="bowlerOvers">O</string>
+    <string name="bowlerMaidens">M</string>
+    <string name="bowlerRuns">R</string>
+    <string name="bowlerWickets">W</string>
+    <string name="bowlerEconomy">ECO</string>
+
+
 
 
 

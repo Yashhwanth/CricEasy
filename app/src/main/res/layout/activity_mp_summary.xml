@@ -16,7 +16,7 @@
 
         <!-- Batting Stats Section -->
         <LinearLayout
-            android:id="@+id/batSectionLL"
+            android:id="@+id/batterLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -25,7 +25,7 @@
 
             <!-- Batters Header -->
             <TextView
-                android:id="@+id/tv_batting_team"
+                android:id="@+id/battingTeamTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
@@ -33,7 +33,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tv_batting_score"
+                android:id="@+id/battingTeamScoreTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
@@ -42,68 +42,69 @@
 
             <!-- Labels for Batters -->
             <LinearLayout
-                android:id="@+id/batterHeaderN"
+                android:id="@+id/batterHeaderSection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="4dp">
 
                 <TextView
+                    android:id="@+id/batterNameHeading"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:gravity="start"
-                    android:text="Batter"
+                    android:text="@string/batterName"
                     android:textColor="@color/black"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/batterHeaderR"
+                    android:id="@+id/batterRunsHeading"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="R"
+                    android:text="@string/batterRuns"
                     android:textColor="@color/black"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/batterHeaderB"
+                    android:id="@+id/batterBallsHeading"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="B"
+                    android:text="@string/batterBalls"
                     android:textColor="@color/black"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/batterHeader4s"
+                    android:id="@+id/batterFoursHeading"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="4s"
+                    android:text="@string/batterFours"
                     android:textColor="@color/black"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/batterHeader6s"
+                    android:id="@+id/batterSixesHeading"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="6s"
+                    android:text="@string/batterSixes"
                     android:textColor="@color/black"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/batterHeaderSR"
+                    android:id="@+id/batterStrikerRateHeading"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="SR"
+                    android:text="@string/batterStrikeRate"
                     android:textColor="@color/black"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -222,7 +223,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="8dp"
-            android:text="Partnership"
+            android:text="@string/partnershipHeading"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -253,7 +254,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="8dp"
-            android:text="Run Rate"
+            android:text="@string/runRateHeading"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -276,7 +277,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:gravity="start"
-                android:text="Bowler"
+                android:text="@string/bowlerName"
                 android:textColor="@color/black"
                 android:textStyle="bold" />
 
@@ -285,7 +286,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="O"
+                android:text="@string/bowlerOvers"
                 android:textColor="@color/black"
                 android:textStyle="bold" />
 
@@ -294,7 +295,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="M"
+                android:text="@string/bowlerMaidens"
                 android:textColor="@color/black"
                 android:textStyle="bold" />
 
@@ -303,7 +304,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="R"
+                android:text="@string/bowlerRuns"
                 android:textColor="@color/black"
                 android:textStyle="bold" />
 
@@ -312,7 +313,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="W"
+                android:text="@string/bowlerWickets"
                 android:textColor="@color/black"
                 android:textStyle="bold" />
 
@@ -321,7 +322,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="ECO"
+                android:text="@string/bowlerEconomy"
                 android:textColor="@color/black"
                 android:textStyle="bold" />
         </LinearLayout>
