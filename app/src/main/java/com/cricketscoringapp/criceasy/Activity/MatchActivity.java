@@ -204,7 +204,7 @@ public class MatchActivity extends AppCompatActivity {
                 editor.putBoolean("livePageUpdateNeeded", true);
                 editor.putBoolean("commentaryPageUpdateNeeded", true);
                 ScoreCardFragment scorecardFragment = (ScoreCardFragment) currShowingFragment;
-                scorecardFragment.updateScorecard();  // Your method to update ScorecardFragment
+                scorecardFragment.observePlayers();  // Your method to update ScorecardFragment
             } else if (currShowingFragment instanceof CommentaryFragment) {
                 Log.d(TAG, "openScoringPopup: urgent refresh needed");
                 editor.putBoolean("livePageUpdateNeeded", true);

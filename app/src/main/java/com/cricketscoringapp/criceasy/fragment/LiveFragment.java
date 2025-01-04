@@ -104,11 +104,11 @@ public class LiveFragment extends Fragment {
         if(doesRefreshNeeded){
             Log.d(TAG, "checkAndRefreshIfNeeded: refresh needed and in the below method");
             refreshUI();
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("livePageUpdateNeeded", false);
-            editor.apply();
         }
         else Log.d(TAG, "checkAndRefreshIfNeeded: no refresh needed");
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("livePageUpdateNeeded", false);
+        editor.apply();
     }
     public void refreshUI(){
         Log.d(TAG, "testMethod: inside the live fragment test method");

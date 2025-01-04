@@ -87,14 +87,11 @@ public class CommentaryFragment extends Fragment {
 
     public void updateCommentary() {
         Log.d(TAG, "updateCommentary: inside the commentary fragment test method");
-
         // Get the current innings ID
         long inningsId = sharedPreferences.getLong("currentInningsId", -1);
-
         // Observe LiveData from ViewModel to get the ball details for the innings
         ballDetailsViewModel.getBallDetailsForInnings(inningsId).observe(getViewLifecycleOwner(), ballDetailsList -> {
             Log.d(TAG, "LiveData observed, updating UI");
-
             if (ballDetailsList != null) {
                 commentaryAdapter.updateBallDetailsList(ballDetailsList);  // Assuming your adapter has a method for updating the list
                 // Log the ball details for debugging

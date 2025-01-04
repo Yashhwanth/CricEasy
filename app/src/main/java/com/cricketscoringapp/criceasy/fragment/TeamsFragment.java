@@ -89,10 +89,10 @@ public class TeamsFragment extends Fragment {
         boolean doesUpdateNeeded = sharedPreferences.getBoolean("teamsPageUpdateNeeded", false);
         if(doesUpdateNeeded){
             refreshTeams();
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("teamsPageUpdateNeeded", false);
-            editor.apply();
         }else Log.d(TAG, "onResume: no new players added");
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("teamsPageUpdateNeeded", false);
+        editor.apply();
     }
     public void refreshTeams(){
         matchId = sharedPreferences.getLong("currentMatchId", -1);

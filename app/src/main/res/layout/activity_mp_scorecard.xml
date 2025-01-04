@@ -1,21 +1,74 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ScoreCardFragment">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="8dp">
 
-    <!-- Parent RecyclerView for Teams -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_teams"
+    <!-- Team 1 Section -->
+
+    <!-- Team 2 Section (Replicate Team 1 Section with appropriate changes) -->
+    <LinearLayout
+        android:id="@+id/teamStatsLayout2"
         android:layout_width="match_parent"
-        android:layout_height="500dp"
-        android:clipToPadding="false"
-        android:padding="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:listitem="@layout/item_team" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Team 2 Name with Expand/Collapse Icon -->
+        <TextView
+            android:id="@+id/teamNameTv2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:text="@string/teamNameTextView"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textStyle="bold"
+            android:drawablePadding="8dp"
+            app:drawableEndCompat="@drawable/ic_expand_more" />
+
+        <!-- Expandable Section for Team 2 Stats -->
+        <LinearLayout
+            android:id="@+id/teamBExpandableLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="8dp"
+            android:visibility="visible">
+
+            <!-- Batter Header Section for Team 2 -->
+            <LinearLayout
+                android:id="@+id/batterHeaderSection2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="4dp">
+                <!-- Repeat batter header structure for Team 2 -->
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_batter_stats_team2"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:nestedScrollingEnabled="false"
+                tools:listitem="@layout/item_batter_stats" />
+
+            <!-- Bowler Stats Section for Team 2 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="20dp"
+                android:padding="4dp">
+                <!-- Repeat bowler header structure for Team 2 -->
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_bowler_stats_team2"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:nestedScrollingEnabled="false"
+                tools:listitem="@layout/item_bowler_stats" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
