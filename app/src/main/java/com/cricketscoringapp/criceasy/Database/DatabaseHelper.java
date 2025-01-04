@@ -2284,14 +2284,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 int fours = cursor.getInt(cursor.getColumnIndex(COLUMN_FOURS));
                 int fives = cursor.getInt(cursor.getColumnIndex(COLUMN_FIVES));
                 int sixes = cursor.getInt(cursor.getColumnIndex(COLUMN_SIXES));
-
                 // Add the Batter object to the list
                 Batsman batsman = new Batsman(playerId, playerName, inningsId, score, ballsPlayed, zeroes, ones, twos,
                         threes, fours, fives, sixes);
                 batterList.add(batsman);
             } while (cursor.moveToNext());
         }
-        // Close the cursor and database connection
         cursor.close();
         db.close();
         return batterList;
