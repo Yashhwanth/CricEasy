@@ -1,7 +1,8 @@
 package com.cricketscoringapp.criceasy.model;
 
 public class Batsman {
-    private int player;
+    private int playerId;
+    private String playerName;
     private int inningsId;
     private int score;
     private int ballsPlayed;
@@ -13,13 +14,38 @@ public class Batsman {
     private int fives;
     private int sixes;
 
-    // Getters and Setters
-    public int getPlayer() {
-        return player;
+    // Constructor
+    public Batsman(int playerId, String playerName, int inningsId, int score, int ballsPlayed, int zeroes, int ones,
+                  int twos, int threes, int fours, int fives, int sixes) {
+        this.playerId = playerId;
+        this.playerName = playerName;
+        this.inningsId = inningsId;
+        this.score = score;
+        this.ballsPlayed = ballsPlayed;
+        this.zeroes = zeroes;
+        this.ones = ones;
+        this.twos = twos;
+        this.threes = threes;
+        this.fours = fours;
+        this.fives = fives;
+        this.sixes = sixes;
     }
 
-    public void setPlayer(int player) {
-        this.player = player;
+    // Getters and Setters for all fields
+    public int getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(int playerId) {
+        this.playerId = playerId;
+    }
+
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
     }
 
     public int getInningsId() {

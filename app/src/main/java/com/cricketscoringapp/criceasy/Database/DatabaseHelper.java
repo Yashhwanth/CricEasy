@@ -16,6 +16,7 @@ import java.util.Map;
 import static android.content.ContentValues.TAG;
 
 import com.cricketscoringapp.criceasy.model.BallDetails;
+import com.cricketscoringapp.criceasy.model.Batsman;
 import com.cricketscoringapp.criceasy.model.Player;
 
 
@@ -2184,7 +2185,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return bowlerStats;
     }
-
     public List<BallDetails> getBallDetailsForInnings(long inningsId) {
         List<BallDetails> ballDetailsList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -2258,6 +2258,43 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         Log.d(TAG, "getBallDetailsForInnings: " + ballDetailsList.size());
         return ballDetailsList;
+    }
+
+    //------------------------------ score card fragment--------------------------------------
+    public List<Batsman> getAllBatterStats(long inningsId) {
+        List<Batsman> batterList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Query to get all batter stats for the given inningsId
+        String query = "SELECT * FROM " + TABLE_BATSMAN + " WHERE " + COLUMN_INNINGS_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(inningsId)});
+
+        // Check if there are results
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                // Create a new Batter object from the query result
+                int playerId = cursor.getInt(cursor.getColumnIndex(COLUMN_PLAYER));
+                String playerName = getPlayerNameById(playerId);
+                int score = cursor.getInt(cursor.getColumnIndex(COLUMN_SCORE));
+                int ballsPlayed = cursor.getInt(cursor.getColumnIndex(COLUMN_BALLS_PLAYED));
+                int zeroes = cursor.getInt(cursor.getColumnIndex(COLUMN_ZEROES));
+                int ones = cursor.getInt(cursor.getColumnIndex(COLUMN_ONES));
+                int twos = cursor.getInt(cursor.getColumnIndex(COLUMN_TWOS));
+                int threes = cursor.getInt(cursor.getColumnIndex(COLUMN_THREES));
+                int fours = cursor.getInt(cursor.getColumnIndex(COLUMN_FOURS));
+                int fives = cursor.getInt(cursor.getColumnIndex(COLUMN_FIVES));
+                int sixes = cursor.getInt(cursor.getColumnIndex(COLUMN_SIXES));
+
+                // Add the Batter object to the list
+                Batsman batsman = new Batsman(playerId, playerName, inningsId, score, ballsPlayed, zeroes, ones, twos,
+                        threes, fours, fives, sixes);
+                batterList.add(batsman);
+            } while (cursor.moveToNext());
+        }
+        // Close the cursor and database connection
+        cursor.close();
+        db.close();
+        return batterList;
     }
 
 }

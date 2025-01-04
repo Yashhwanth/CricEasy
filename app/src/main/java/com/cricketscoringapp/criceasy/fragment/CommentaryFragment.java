@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,7 +42,6 @@ public class CommentaryFragment extends Fragment {
         databaseHelper = new DatabaseHelper(requireContext());
         // Inflate the view
         View view = inflater.inflate(R.layout.activity_mp_commentary, container, false);
-
         // Initialize the RecyclerView and Adapter
         recyclerView = view.findViewById(R.id.ballDetailsRecyclerView); // Replace with actual RecyclerView ID
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -81,7 +81,7 @@ public class CommentaryFragment extends Fragment {
             Log.d(TAG, "checkAndRefreshIfNeeded: no refresh needed");
         }
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("isScoreUpdated", false);
+        editor.putBoolean("commentaryPageUpdateNeeded", false);
         editor.apply();
     }
 

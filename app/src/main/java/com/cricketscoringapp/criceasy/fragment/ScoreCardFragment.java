@@ -22,9 +22,7 @@ public class ScoreCardFragment extends Fragment {
         View view = inflater.inflate(R.layout.activity_mp_scorecard, container, false);
         return view;
     }
-    public void updateScorecard(){
-        Log.d(TAG, "testMethod: inside the scorecard fragment test method");
-    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -42,7 +40,6 @@ public class ScoreCardFragment extends Fragment {
             Log.d(TAG, "onHiddenChanged: scorecard Fragment is now hidden");
         }
     }
-
     private void checkAndRefreshIfNeeded() {
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
         boolean doesRefreshNeeded = sharedPreferences.getBoolean("scorecardPageUpdateNeeded", false);
@@ -51,7 +48,10 @@ public class ScoreCardFragment extends Fragment {
             updateScorecard();
         }else Log.d(TAG, "checkAndRefreshIfNeeded: no refresh needed");
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("isScoreUpdated", false);
+        editor.putBoolean("scorecardPageUpdateNeeded", false);
         editor.apply();
+    }
+    public void updateScorecard(){
+        Log.d(TAG, "testMethod: inside the scorecard fragment test method");
     }
 }
