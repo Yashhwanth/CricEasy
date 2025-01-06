@@ -33,7 +33,6 @@ public class CommentaryFragment extends Fragment {
     private DatabaseHelper databaseHelper;
     private RecyclerView recyclerView;
     private BallDetailsViewModel ballDetailsViewModel;
-
     private BallDetailsAdapter commentaryAdapter;
     private List<BallDetails> ballDetailsList = new ArrayList<>();
     @Override
@@ -72,7 +71,7 @@ public class CommentaryFragment extends Fragment {
     }
 
     private void checkAndRefreshIfNeeded() {
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
+        sharedPreferences = requireContext().getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
         boolean doesRefreshNeeded = sharedPreferences.getBoolean("commentaryPageUpdateNeeded", false);
         if (doesRefreshNeeded) {
             Log.d(TAG, "checkAndRefreshIfNeeded: refresh needed and in the below method");
@@ -80,9 +79,7 @@ public class CommentaryFragment extends Fragment {
         } else {
             Log.d(TAG, "checkAndRefreshIfNeeded: no refresh needed");
         }
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("commentaryPageUpdateNeeded", false);
-        editor.apply();
+
     }
 
     public void updateCommentary() {
@@ -103,6 +100,9 @@ public class CommentaryFragment extends Fragment {
                 Log.e(TAG, "Ball details list is null");
             }
         });
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("commentaryPageUpdateNeeded", false);
+        editor.apply();
     }
 
 }

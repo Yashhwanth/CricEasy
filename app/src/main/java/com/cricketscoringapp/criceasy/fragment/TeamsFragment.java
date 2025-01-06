@@ -90,9 +90,6 @@ public class TeamsFragment extends Fragment {
         if(doesUpdateNeeded){
             refreshTeams();
         }else Log.d(TAG, "onResume: no new players added");
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("teamsPageUpdateNeeded", false);
-        editor.apply();
     }
     public void refreshTeams(){
         matchId = sharedPreferences.getLong("currentMatchId", -1);
@@ -116,5 +113,8 @@ public class TeamsFragment extends Fragment {
                 Log.e(TAG, "PlayerTeam object is null");
             }
         });
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("teamsPageUpdateNeeded", false);
+        editor.apply();
     }
 }

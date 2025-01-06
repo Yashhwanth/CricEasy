@@ -1,8 +1,9 @@
 package com.cricketscoringapp.criceasy.model;
 
 public class Bowler {
+    private int playerId;
     private int inningsId;
-    private int player;
+    private String playerName;
     private int maidens;
     private int ballsPlayed;
     private int runs;
@@ -21,7 +22,21 @@ public class Bowler {
     private int nb;
     private int db;
 
+    public Bowler(int playerId, String playerName, int inningsId, int ballsPlayed, int maidens, int runs, int wickets) {
+        this.playerId = playerId;
+        this.playerName = playerName;
+        this.inningsId = inningsId;
+        this.ballsPlayed = ballsPlayed;
+        this.maidens = maidens;
+        this.runs = runs;
+        this.wk = wickets;
+    }
     // Getters and Setters
+
+    public int getPlayerId() {
+        return playerId;
+    }
+
     public int getInningsId() {
         return inningsId;
     }
@@ -30,12 +45,12 @@ public class Bowler {
         this.inningsId = inningsId;
     }
 
-    public int getPlayer() {
-        return player;
+    public String getPlayerName() {
+        return playerName;
     }
 
-    public void setPlayer(int player) {
-        this.player = player;
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
     }
 
     public int getMaidens() {

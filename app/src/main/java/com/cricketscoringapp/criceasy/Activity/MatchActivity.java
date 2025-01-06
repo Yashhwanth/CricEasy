@@ -189,28 +189,37 @@ public class MatchActivity extends AppCompatActivity {
         scoringPopupDialog.setOnDismissListener(dialog -> {
             sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
             SharedPreferences.Editor editor= sharedPreferences.edit();
-            Log.d(TAG, "openScoringPopup: dialog is about to close");
+            Log.d(TAG, "openScoringPopup: dialog is about to close in");
             Fragment currShowingFragment = fragmentManager.findFragmentByTag(sharedPreferences.getString("currentShowingFragment",null));
+            Log.d(TAG, "openScoringPopup: currently in this fragment:" + currShowingFragment);
             Log.d(TAG, "openScoringPopup:current fragment is " + currShowingFragment);
-            if (currShowingFragment instanceof LiveFragment) {
-                Log.d(TAG, "openScoringPopup: urgent refresh needed");
+            if (currShowingFragment instanceof InfoFragment) {
+                editor.putBoolean("livePageUpdateNeeded", true);
                 editor.putBoolean("scorecardPageUpdateNeeded", true);
                 editor.putBoolean("commentaryPageUpdateNeeded", true);
                 editor.apply();
+                Log.d(TAG, "openScoringPopup: in " + currShowingFragment + "no urgent refresh needed, need to cache the flags");
+            } else if (currShowingFragment instanceof LiveFragment) {
+                Log.d(TAG, "openScoringPopup: urgent refresh needed");
                 LiveFragment liveFragment = (LiveFragment) currShowingFragment;
                 liveFragment.refreshUI();  // Your method to update LiveFragment
+                editor.putBoolean("scorecardPageUpdateNeeded", true);
+                editor.putBoolean("commentaryPageUpdateNeeded", true);
+                editor.apply();
             } else if (currShowingFragment instanceof ScoreCardFragment) {
                 Log.d(TAG, "openScoringPopup: urgent refresh needed");
-                editor.putBoolean("livePageUpdateNeeded", true);
-                editor.putBoolean("commentaryPageUpdateNeeded", true);
                 ScoreCardFragment scorecardFragment = (ScoreCardFragment) currShowingFragment;
                 scorecardFragment.observePlayers();  // Your method to update ScorecardFragment
+                editor.putBoolean("livePageUpdateNeeded", true);
+                editor.putBoolean("commentaryPageUpdateNeeded", true);
+                editor.apply();
             } else if (currShowingFragment instanceof CommentaryFragment) {
                 Log.d(TAG, "openScoringPopup: urgent refresh needed");
-                editor.putBoolean("livePageUpdateNeeded", true);
-                editor.putBoolean("scorecardPageUpdateNeeded", true);
                 CommentaryFragment commentaryFragment = (CommentaryFragment) currShowingFragment;
                 commentaryFragment.updateCommentary();  // Your method to update CommentaryFragment
+                editor.putBoolean("livePageUpdateNeeded", true);
+                editor.putBoolean("scorecardPageUpdateNeeded", true);
+                editor.apply();
             } else {
                 editor.putBoolean("livePageUpdateNeeded", true);
                 editor.putBoolean("scorecardPageUpdateNeeded", true);

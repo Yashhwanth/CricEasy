@@ -17,6 +17,7 @@ import static android.content.ContentValues.TAG;
 
 import com.cricketscoringapp.criceasy.model.BallDetails;
 import com.cricketscoringapp.criceasy.model.Batsman;
+import com.cricketscoringapp.criceasy.model.Bowler;
 import com.cricketscoringapp.criceasy.model.Player;
 
 
@@ -2294,6 +2295,46 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return batterList;
     }
+
+    public List<Bowler> getAllBowlerStats(long inningsId) {
+        List<Bowler> bowlerList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Query to get all bowler stats for the given inningsId
+        String query = "SELECT " + COLUMN_PLAYER + ", " + COLUMN_MAIDENS + ", "
+                + COLUMN_BALLS_PLAYED + ", " + COLUMN_RUNS + ", " + COLUMN_WK
+                + " FROM " + TABLE_BOWLER + " WHERE " + COLUMN_INNINGS_ID + " = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(inningsId)});
+
+        // Check if there are results
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                // Extract data for each bowler
+                int playerId = cursor.getInt(cursor.getColumnIndex(COLUMN_PLAYER));
+                String playerName = getPlayerNameById(playerId); // Helper method for player name
+                int maidens = cursor.getInt(cursor.getColumnIndex(COLUMN_MAIDENS));
+                int ballsPlayed = cursor.getInt(cursor.getColumnIndex(COLUMN_BALLS_PLAYED));
+                int runs = cursor.getInt(cursor.getColumnIndex(COLUMN_RUNS));
+                int wickets = cursor.getInt(cursor.getColumnIndex(COLUMN_WK));
+
+                // Calculate overs (balls divided by 6, remainder as decimal part)
+                //double overs = (double) ballsPlayed / 6 + (ballsPlayed % 6) * 0.1;
+
+                // Add bowler data to the list
+                Bowler bowler = new Bowler(playerId, playerName, (int) inningsId, ballsPlayed, maidens, runs, wickets);
+                bowlerList.add(bowler);
+            } while (cursor.moveToNext());
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+        db.close();
+
+        return bowlerList;
+    }
+
 
 }
 

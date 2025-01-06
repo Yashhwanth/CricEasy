@@ -106,17 +106,17 @@ public class LiveFragment extends Fragment {
             refreshUI();
         }
         else Log.d(TAG, "checkAndRefreshIfNeeded: no refresh needed");
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("livePageUpdateNeeded", false);
-        editor.apply();
     }
     public void refreshUI(){
-        Log.d(TAG, "testMethod: inside the live fragment test method");
+        Log.d(TAG, "testMethod: inside the live fragment test method, refreshing the live fragment");
         getTeamName();
         getTeamScore();
         getBatterStats();
         getPartnerShip();
         getBowlerStats();
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("livePageUpdateNeeded", false);
+        editor.apply();
     }
     public void getTeamName(){
         long teamId = sharedPreferences.getLong("battingTeamId", -1);

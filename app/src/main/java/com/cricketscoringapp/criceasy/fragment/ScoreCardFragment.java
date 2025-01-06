@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.cricketscoringapp.criceasy.R;
 import com.cricketscoringapp.criceasy.ViewModel.BatsmanDetailsViewModel;
+import com.cricketscoringapp.criceasy.ViewModel.BowlerDetailsViewModel;
 import com.cricketscoringapp.criceasy.adapter.Batter1Adapter;
 import com.cricketscoringapp.criceasy.adapter.Bowler1Adapter;
 import com.cricketscoringapp.criceasy.ViewModel.TeamViewModel;
@@ -31,8 +32,10 @@ public class ScoreCardFragment extends Fragment {
     private RecyclerView batterRecyclerView, bowlerRecyclerView;
     private Batter1Adapter batterAdapter;
     private Bowler1Adapter bowlerAdapter;
-
     private BatsmanDetailsViewModel batsmanDetailsViewModel;
+    private BowlerDetailsViewModel bowlerDetailsViewModel;
+    private SharedPreferences sharedPreferences;
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -48,16 +51,14 @@ public class ScoreCardFragment extends Fragment {
 
         // Initialize the ViewModel
         batsmanDetailsViewModel = new ViewModelProvider(requireActivity()).get(BatsmanDetailsViewModel.class);
+        bowlerDetailsViewModel = new ViewModelProvider(requireActivity()).get(BowlerDetailsViewModel.class);
 
         // Set up the adapters
         batterAdapter = new Batter1Adapter(requireContext(), new ArrayList<>());
-        //bowlerAdapter = new Bowler1Adapter();
+        bowlerAdapter = new Bowler1Adapter(requireContext(), new ArrayList<>());
 
         batterRecyclerView.setAdapter(batterAdapter);
-        //bowlerRecyclerView.setAdapter(bowlerAdapter);
-
-        // Observe players for the match
-        observePlayers();
+        bowlerRecyclerView.setAdapter(bowlerAdapter);
 
         return view;
     }
@@ -81,7 +82,7 @@ public class ScoreCardFragment extends Fragment {
     }
 
     private void checkAndRefreshIfNeeded() {
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
+        sharedPreferences = requireContext().getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
         boolean doesRefreshNeeded = sharedPreferences.getBoolean("scorecardPageUpdateNeeded", false);
         if (doesRefreshNeeded) {
             Log.d("TAG", "checkAndRefreshIfNeeded: refresh needed and in the below method");
@@ -89,15 +90,11 @@ public class ScoreCardFragment extends Fragment {
         } else {
             Log.d("TAG", "checkAndRefreshIfNeeded: no refresh needed");
         }
-        // Reset flag to prevent continuous refreshes
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("scorecardPageUpdateNeeded", false);
-        editor.apply();
     }
 
     public void observePlayers() {
         // Assuming matchId is fetched dynamically, replace this placeholder
-        long matchId = 1; // Replace with the actual matchId
+        long matchId = sharedPreferences.getLong("currentInningsId",-1);
         // Observe batter details for the given innings
         batsmanDetailsViewModel.getBatterDetailsForInnings(matchId)
                 .observe(getViewLifecycleOwner(), batterDetailsList -> {
@@ -105,10 +102,29 @@ public class ScoreCardFragment extends Fragment {
                         // Update the adapter with the fetched batter details
                         batterAdapter.updateBatterStats(batterDetailsList);
                     } else {
-                        // Pass an empty list if no data is found
                         batterAdapter.updateBatterStats(Collections.emptyList());
                     }
                 });
+        // Observe bowler details for the given innings
+        bowlerDetailsViewModel.getBowlerDetailsForInnings(matchId)
+                .observe(getViewLifecycleOwner(), bowlerDetailsList -> {
+                    if (bowlerDetailsList != null && !bowlerDetailsList.isEmpty()) {
+                        // Update the adapter with the fetched bowler details
+                        bowlerAdapter.updateBowlerStats(bowlerDetailsList);
+                    } else {
+                        // Update adapter with empty list if no data
+                        bowlerAdapter.updateBowlerStats(Collections.emptyList());
+                    }
+                });
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("scorecardPageUpdateNeeded", false);
+        editor.apply();
+    }
+    public void observeBowlers(){
+
+    }
+    public void observeBatters(){
+
     }
 
 
