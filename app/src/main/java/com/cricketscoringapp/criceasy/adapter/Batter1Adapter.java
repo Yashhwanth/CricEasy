@@ -1,6 +1,7 @@
 package com.cricketscoringapp.criceasy.adapter;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ public class Batter1Adapter extends RecyclerView.Adapter<Batter1Adapter.BatterVi
 
     private Context context;
     private List<Batsman> batterStatsList;
+    private SharedPreferences sharedPreferences;
 
     public Batter1Adapter(Context context, List<Batsman> batterStatsList) {
         this.context = context;

@@ -109,7 +109,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_batter_stats_team1"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
                 tools:listitem="@layout/item_batter_stats" />
 
@@ -179,7 +179,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_bowler_stats_team1"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
                 tools:listitem="@layout/item_bowler_stats" />
         </LinearLayout>
@@ -288,7 +288,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_batter_stats_team2"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
                 tools:listitem="@layout/item_batter_stats" />
 
@@ -359,7 +359,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_bowler_stats_team2"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
                 tools:listitem="@layout/item_bowler_stats" />
         </LinearLayout>

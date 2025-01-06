@@ -41,10 +41,16 @@ public class ScoreCardFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate the layout for the fragment
         View view = inflater.inflate(R.layout.activity_scorecard, container, false);
-
+        sharedPreferences = requireContext().getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
+        String currentInnings = sharedPreferences.getString("currentInningsNumber", null);
         // Initialize RecyclerViews
-        batterRecyclerView = view.findViewById(R.id.rv_batter_stats_team1);
-        bowlerRecyclerView = view.findViewById(R.id.rv_bowler_stats_team1);
+        if(currentInnings != null && currentInnings.equals("first")){
+            batterRecyclerView = view.findViewById(R.id.rv_batter_stats_team1);
+            bowlerRecyclerView = view.findViewById(R.id.rv_bowler_stats_team1);
+        }else{
+            batterRecyclerView = view.findViewById(R.id.rv_batter_stats_team2);
+            bowlerRecyclerView = view.findViewById(R.id.rv_bowler_stats_team2);
+        }
 
         batterRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         bowlerRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
