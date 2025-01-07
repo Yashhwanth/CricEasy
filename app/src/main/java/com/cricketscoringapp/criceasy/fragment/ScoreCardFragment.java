@@ -1,5 +1,7 @@
 package com.cricketscoringapp.criceasy.fragment;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -20,52 +22,55 @@ import com.cricketscoringapp.criceasy.ViewModel.BatsmanDetailsViewModel;
 import com.cricketscoringapp.criceasy.ViewModel.BowlerDetailsViewModel;
 import com.cricketscoringapp.criceasy.adapter.Batter1Adapter;
 import com.cricketscoringapp.criceasy.adapter.Bowler1Adapter;
-import com.cricketscoringapp.criceasy.ViewModel.TeamViewModel;
-import com.cricketscoringapp.criceasy.model.Batsman;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 public class ScoreCardFragment extends Fragment {
 
-    private RecyclerView batterRecyclerView, bowlerRecyclerView;
-    private Batter1Adapter batterAdapter;
-    private Bowler1Adapter bowlerAdapter;
-    private BatsmanDetailsViewModel batsmanDetailsViewModel;
-    private BowlerDetailsViewModel bowlerDetailsViewModel;
+    private RecyclerView batter1RecyclerView, bowler1RecyclerView, batter2RecyclerView, bowler2RecyclerView;
+    private Batter1Adapter batterAdapter, batter2Adapter;
+    private Bowler1Adapter bowlerAdapter, bowler2Adapter;
+    private BatsmanDetailsViewModel batsmanDetailsViewModel, batsmanDetailsViewModel2;
+    private BowlerDetailsViewModel bowlerDetailsViewModel, bowlerDetailsViewModel2;
     private SharedPreferences sharedPreferences;
-
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate the layout for the fragment
         View view = inflater.inflate(R.layout.activity_scorecard, container, false);
+
+        // Initialize SharedPreferences
         sharedPreferences = requireContext().getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
-        String currentInnings = sharedPreferences.getString("currentInningsNumber", null);
-        // Initialize RecyclerViews
-        if(currentInnings != null && currentInnings.equals("first")){
-            batterRecyclerView = view.findViewById(R.id.rv_batter_stats_team1);
-            bowlerRecyclerView = view.findViewById(R.id.rv_bowler_stats_team1);
-        }else{
-            batterRecyclerView = view.findViewById(R.id.rv_batter_stats_team2);
-            bowlerRecyclerView = view.findViewById(R.id.rv_bowler_stats_team2);
-        }
 
-        batterRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        bowlerRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
+        // Initialize RecyclerViews and set default for Team 1
+        batter1RecyclerView = view.findViewById(R.id.rv_batter_stats_team1);
+        bowler1RecyclerView = view.findViewById(R.id.rv_bowler_stats_team1);
+        batter1RecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        bowler1RecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         // Initialize the ViewModel
         batsmanDetailsViewModel = new ViewModelProvider(requireActivity()).get(BatsmanDetailsViewModel.class);
         bowlerDetailsViewModel = new ViewModelProvider(requireActivity()).get(BowlerDetailsViewModel.class);
-
-        // Set up the adapters
+        // Set up the adapters for Team 1 initially
         batterAdapter = new Batter1Adapter(requireContext(), new ArrayList<>());
         bowlerAdapter = new Bowler1Adapter(requireContext(), new ArrayList<>());
+        batter1RecyclerView.setAdapter(batterAdapter);
+        bowler1RecyclerView.setAdapter(bowlerAdapter);
 
-        batterRecyclerView.setAdapter(batterAdapter);
-        bowlerRecyclerView.setAdapter(bowlerAdapter);
+        batter2RecyclerView = view.findViewById(R.id.rv_batter_stats_team2);
+        bowler2RecyclerView = view.findViewById(R.id.rv_bowler_stats_team2);
+        batter2RecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        bowler2RecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        batsmanDetailsViewModel2 = new ViewModelProvider(requireActivity()).get(BatsmanDetailsViewModel.class);
+        bowlerDetailsViewModel2 = new ViewModelProvider(requireActivity()).get(BowlerDetailsViewModel.class);
+        batter2Adapter = new Batter1Adapter(requireContext(), new ArrayList<>());
+        bowler2Adapter = new Bowler1Adapter(requireContext(), new ArrayList<>());
 
+        batter2RecyclerView.setAdapter(batter2Adapter);
+        bowler2RecyclerView.setAdapter(bowler2Adapter);
+
+
+        // Return the view
         return view;
     }
 
@@ -73,7 +78,14 @@ public class ScoreCardFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.d("TAG", "scorecard onResume called");
-        checkAndRefreshIfNeeded();
+        long currentInningsId = sharedPreferences.getLong("currentInningsId", -1);
+        String currentInnings = sharedPreferences.getString("currentInningsNumber", null);
+        if (currentInnings != null && currentInnings.equals("first")) {
+            populateDataForFirstInnings(currentInningsId);
+        } else {
+            populateDataForFirstInnings(currentInningsId - 1);
+            populateDataForSecondInnings(currentInningsId);
+        }
     }
 
     @Override
@@ -98,40 +110,100 @@ public class ScoreCardFragment extends Fragment {
         }
     }
 
-    public void observePlayers() {
-        // Assuming matchId is fetched dynamically, replace this placeholder
-        long matchId = sharedPreferences.getLong("currentInningsId",-1);
-        // Observe batter details for the given innings
-        batsmanDetailsViewModel.getBatterDetailsForInnings(matchId)
+    public void populateDataForFirstInnings(long inningsId) {
+        Log.d(TAG, "populateDataForFirstInnings: popu;ating first innings data with innings id" + inningsId);
+        // Observe batter details for the first innings
+        batsmanDetailsViewModel.getBatterDetailsForTeam1(inningsId)
                 .observe(getViewLifecycleOwner(), batterDetailsList -> {
                     if (batterDetailsList != null && !batterDetailsList.isEmpty()) {
-                        // Update the adapter with the fetched batter details
                         batterAdapter.updateBatterStats(batterDetailsList);
                     } else {
                         batterAdapter.updateBatterStats(Collections.emptyList());
                     }
                 });
-        // Observe bowler details for the given innings
-        bowlerDetailsViewModel.getBowlerDetailsForInnings(matchId)
+
+        // Observe bowler details for the first innings
+        bowlerDetailsViewModel.getBowlerDetailsForTeam1(inningsId)
                 .observe(getViewLifecycleOwner(), bowlerDetailsList -> {
                     if (bowlerDetailsList != null && !bowlerDetailsList.isEmpty()) {
-                        // Update the adapter with the fetched bowler details
                         bowlerAdapter.updateBowlerStats(bowlerDetailsList);
                     } else {
-                        // Update adapter with empty list if no data
                         bowlerAdapter.updateBowlerStats(Collections.emptyList());
                     }
                 });
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("scorecardPageUpdateNeeded", false);
-        editor.apply();
-    }
-    public void observeBowlers(){
-
-    }
-    public void observeBatters(){
-
     }
 
+    public void populateDataForSecondInnings(long inningsId) {
+        Log.d(TAG, "populateDataForFirstInnings: popu;ating second innings data with innings id" + inningsId);
+        // First, update the stats for Team 1 (First Innings)
+        //populateDataForFirstInnings(inningsId - 1);
+
+        // Observe batter details for the second innings
+        batsmanDetailsViewModel2.getBatterDetailsForTeam2(inningsId)
+                .observe(getViewLifecycleOwner(), batterDetailsList -> {
+                    if (batterDetailsList != null && !batterDetailsList.isEmpty()) {
+                        batter2Adapter.updateBatterStats(batterDetailsList);
+                    } else {
+                        batter2Adapter.updateBatterStats(Collections.emptyList());
+                    }
+                });
+
+        // Observe bowler details for the second innings
+        bowlerDetailsViewModel2.getBowlerDetailsForTeam2(inningsId)
+                .observe(getViewLifecycleOwner(), bowlerDetailsList -> {
+                    if (bowlerDetailsList != null && !bowlerDetailsList.isEmpty()) {
+                        bowler2Adapter.updateBowlerStats(bowlerDetailsList);
+                    } else {
+                        bowler2Adapter.updateBowlerStats(Collections.emptyList());
+                    }
+                });
+    }
+    public void observePlayers() {
+        // Get the current innings ID and the innings number (first or second)
+        long inningsId = sharedPreferences.getLong("currentInningsId", -1);
+        String currentInnings = sharedPreferences.getString("currentInningsNumber", "first"); // Default to "first" if null
+        if("first".equals(currentInnings)){
+            Log.d(TAG, "observePlayers: jiifirst");
+            populateDataForFirstInnings(inningsId);
+        }else {
+            Log.d(TAG, "observePlayers: jiisecond");
+            populateDataForSecondInnings(inningsId);
+        }
+        // Observe batter details based on the current innings
+//        batsmanDetailsViewModel.getBatterDetailsForInnings(inningsId)
+//                .observe(getViewLifecycleOwner(), batterDetailsList -> {
+//                    if (batterDetailsList != null && !batterDetailsList.isEmpty()) {
+//                        if (currentInnings.equals("first")) {
+//                            batterAdapter.updateBatterStats(batterDetailsList);
+//                        } else {
+//                            batter2Adapter.updateBatterStats(batterDetailsList);
+//                        }
+//                    } else {
+//                        if (currentInnings.equals("first")) {
+//                            batterAdapter.updateBatterStats(Collections.emptyList());
+//                        } else {
+//                            batter2Adapter.updateBatterStats(Collections.emptyList());
+//                        }
+//                    }
+//                });
+//
+//        // Observe bowler details based on the current innings
+//        bowlerDetailsViewModel.getBowlerDetailsForInnings(inningsId)
+//                .observe(getViewLifecycleOwner(), bowlerDetailsList -> {
+//                    if (bowlerDetailsList != null && !bowlerDetailsList.isEmpty()) {
+//                        if (currentInnings.equals("first")) {
+//                            bowlerAdapter.updateBowlerStats(bowlerDetailsList);
+//                        } else {
+//                            bowler2Adapter.updateBowlerStats(bowlerDetailsList);
+//                        }
+//                    } else {
+//                        if (currentInnings.equals("first")) {
+//                            bowlerAdapter.updateBowlerStats(Collections.emptyList());
+//                        } else {
+//                            bowler2Adapter.updateBowlerStats(Collections.emptyList());
+//                        }
+//                    }
+//                });
+    }
 
 }

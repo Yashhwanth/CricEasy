@@ -2114,11 +2114,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String query = "SELECT " + COLUMN_PLAYER_NAME +
                 " FROM " + TABLE_PLAYERS +
                 " WHERE " + COLUMN_PLAYER_ID + " = ?";
-        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(playerId)});
-        if (cursor.moveToFirst()) {
-            playerName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PLAYER_NAME));
+        Cursor nameCursor = db.rawQuery(query, new String[]{String.valueOf(playerId)});
+        if (nameCursor.moveToFirst()) {
+            playerName = nameCursor.getString(nameCursor.getColumnIndexOrThrow(COLUMN_PLAYER_NAME));
         }
-        cursor.close(); // Close the cursor to avoid memory leaks
+        nameCursor.close(); // Close the cursor to avoid memory leaks
         return playerName;
     }
     public HashMap<String, String> getPartnershipStats(long partnershipId) {
@@ -2275,7 +2275,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             do {
                 // Create a new Batter object from the query result
                 int playerId = cursor.getInt(cursor.getColumnIndex(COLUMN_PLAYER));
-                String playerName = getPlayerNameById(playerId);
                 int score = cursor.getInt(cursor.getColumnIndex(COLUMN_SCORE));
                 int ballsPlayed = cursor.getInt(cursor.getColumnIndex(COLUMN_BALLS_PLAYED));
                 int zeroes = cursor.getInt(cursor.getColumnIndex(COLUMN_ZEROES));
@@ -2285,6 +2284,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 int fours = cursor.getInt(cursor.getColumnIndex(COLUMN_FOURS));
                 int fives = cursor.getInt(cursor.getColumnIndex(COLUMN_FIVES));
                 int sixes = cursor.getInt(cursor.getColumnIndex(COLUMN_SIXES));
+                String playerName = getPlayerNameById(playerId);
                 // Add the Batter object to the list
                 Batsman batsman = new Batsman(playerId, playerName, (int) inningsId, score, ballsPlayed, zeroes, ones, twos,
                         threes, fours, fives, sixes);
@@ -2292,7 +2292,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
         cursor.close();
-        db.close();
+        //db.close();
         return batterList;
     }
 
@@ -2330,12 +2330,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (cursor != null) {
             cursor.close();
         }
-        db.close();
-
+        //db.close();
         return bowlerList;
     }
-
-
 }
 
 

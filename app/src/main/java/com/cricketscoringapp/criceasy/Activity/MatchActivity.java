@@ -76,6 +76,7 @@ public class MatchActivity extends AppCompatActivity {
     private static final String STUMPED = "Stumped";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate: match activity onCreate called");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_match);
         databaseHelper = new DatabaseHelper(this);
@@ -84,11 +85,32 @@ public class MatchActivity extends AppCompatActivity {
     }
     @Override
     protected void onResume() {
+        Log.d(TAG, "onCreate: match activity onResume called");
         super.onResume();
         updateCurrentActivityInPreferences();
         inningsEndButton.setVisibility(GONE);
         floatingButton.setVisibility(View.VISIBLE);
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+    }
+    @Override
+    protected void onStop() {
+        Log.d(TAG, "onCreate: match activity onStop called");
+        super.onStop();
+    }
+    @Override
+    protected void onPause() {
+        Log.d(TAG, "onCreate: match activity onPause called");
+        super.onPause();
+    }
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "onCreate: match activity onDestroy called");
+        super.onDestroy();
+    }
+    @Override
+    protected void onRestart() {
+        Log.d(TAG, "onCreate: match activity onRestart called");
+        super.onRestart();
     }
     @Override
     public void onBackPressed() {
@@ -650,10 +672,16 @@ public class MatchActivity extends AppCompatActivity {
                 Log.d(TAG, "setNewPlayer: urgent refresh needed for teams");
                 TeamsFragment teamsFragment = (TeamsFragment) currShowingFragment;
                 teamsFragment.refreshTeams();
-            } else {
+            }else if(currShowingFragment instanceof ScoreCardFragment){
+                Log.d(TAG, "setNewPlayer: urgent refresh needed for score card");
+                ScoreCardFragment scoreCardFragment = (ScoreCardFragment) currShowingFragment;
+                scoreCardFragment.observePlayers();
+            }
+            else {
                 Log.d(TAG, "setNewPlayer: no urgent need to cache the update");
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean("teamsPageUpdateNeeded", true);
+                editor.putBoolean("scorecardPageUpdateNeeded", true);
                 editor.apply();
             }
             if (onDialogDismissed != null) {

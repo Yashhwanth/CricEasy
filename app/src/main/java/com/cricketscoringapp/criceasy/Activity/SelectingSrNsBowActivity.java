@@ -8,6 +8,8 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
+import static android.content.ContentValues.TAG;
+
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -93,6 +95,13 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
         super.onResume();
         updateCurrentActivityInPreferences();
     }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "onDestroy: selecting s ns bow destroyed");
+        super.onDestroy();
+    }
+
     public void selectingPlayersActivity() {
         Intent intent = new Intent(this, SelectingPlayersActivity.class);
         startActivity(intent);

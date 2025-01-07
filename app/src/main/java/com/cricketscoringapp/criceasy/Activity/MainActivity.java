@@ -74,6 +74,13 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         updateCurrentActivityInPreferences();
     }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "onDestroy: main activity destroyed");
+        super.onDestroy();
+    }
+
     private long handleNewMatch() {
         Log.d(TAG, "handleNewMatch: checking a match is present or not");
         long currentMatchId = -1;
