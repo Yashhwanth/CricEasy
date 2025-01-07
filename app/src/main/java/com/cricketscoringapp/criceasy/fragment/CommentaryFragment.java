@@ -34,13 +34,20 @@ public class CommentaryFragment extends Fragment {
     private RecyclerView recyclerView;
     private BallDetailsViewModel ballDetailsViewModel;
     private BallDetailsAdapter commentaryAdapter;
+    private long currentInningsId;
+    private String currentInningsNumber;
     private List<BallDetails> ballDetailsList = new ArrayList<>();
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         sharedPreferences = requireActivity().getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
         databaseHelper = new DatabaseHelper(requireContext());
+
         // Inflate the view
         View view = inflater.inflate(R.layout.activity_mp_commentary, container, false);
+        currentInningsId = sharedPreferences.getLong("currentInningsId", -1);
+        currentInningsNumber = sharedPreferences.getString("currentInningsNumber", null);
+
         // Initialize the RecyclerView and Adapter
         recyclerView = view.findViewById(R.id.ballDetailsRecyclerView); // Replace with actual RecyclerView ID
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -49,6 +56,24 @@ public class CommentaryFragment extends Fragment {
 
         ballDetailsViewModel = new ViewModelProvider(this).get(BallDetailsViewModel.class);
 
+        Button firstInningsCommButton = view.findViewById(R.id.firstInningsCommentaryButton);
+        Button secondInningsCommButton = view.findViewById(R.id.secondInningsCommentaryButton);
+
+        firstInningsCommButton.setOnClickListener(v -> {
+            if ("first".equals(currentInningsNumber)) {
+                loadCommentaryForFirstInnings(currentInningsId); // First innings, load first innings commentary
+            } else {
+                loadCommentaryForFirstInnings(currentInningsId - 1); // Second innings, load first innings commentary by reducing inningsId by 1
+            }
+        });
+        secondInningsCommButton.setOnClickListener(v -> {
+            if ("first".equals(currentInningsNumber)) {
+                loadCommentaryForSecondInnings(currentInningsId + 1); // First innings, load second innings commentary by increasing inningsId by 1
+            } else {
+                loadCommentaryForSecondInnings(currentInningsId); // Second innings, load second innings commentary
+            }
+        });
+
         return view;
     }
 
@@ -56,7 +81,7 @@ public class CommentaryFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.d(TAG, "commentary onResume called");
-        checkAndRefreshIfNeeded();
+        //checkAndRefreshIfNeeded();
     }
 
     @Override
@@ -81,13 +106,22 @@ public class CommentaryFragment extends Fragment {
         }
 
     }
-
     public void updateCommentary() {
         Log.d(TAG, "updateCommentary: inside the commentary fragment test method");
-        // Get the current innings ID
         long inningsId = sharedPreferences.getLong("currentInningsId", -1);
-        // Observe LiveData from ViewModel to get the ball details for the innings
-        ballDetailsViewModel.getBallDetailsForInnings(inningsId).observe(getViewLifecycleOwner(), ballDetailsList -> {
+        currentInningsNumber = sharedPreferences.getString("currentInningsNumber", "first");
+        if("first".equals(currentInningsNumber)){
+            loadCommentaryForFirstInnings(inningsId);
+        }
+        else{
+            loadCommentaryForSecondInnings(inningsId);
+        }
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("commentaryPageUpdateNeeded", false);
+        editor.apply();
+    }
+    public void loadCommentaryForFirstInnings(long inningsId){
+        ballDetailsViewModel.getBallDetailsForTeam1(inningsId).observe(getViewLifecycleOwner(), ballDetailsList -> {
             Log.d(TAG, "LiveData observed, updating UI");
             if (ballDetailsList != null) {
                 commentaryAdapter.updateBallDetailsList(ballDetailsList);  // Assuming your adapter has a method for updating the list
@@ -100,9 +134,21 @@ public class CommentaryFragment extends Fragment {
                 Log.e(TAG, "Ball details list is null");
             }
         });
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("commentaryPageUpdateNeeded", false);
-        editor.apply();
+    }
+    public void loadCommentaryForSecondInnings(long inningsId){
+        ballDetailsViewModel.getBallDetailsForTeam2(inningsId).observe(getViewLifecycleOwner(), ballDetailsList -> {
+            Log.d(TAG, "LiveData observed, updating UI");
+            if (ballDetailsList != null) {
+                commentaryAdapter.updateBallDetailsList(ballDetailsList);  // Assuming your adapter has a method for updating the list
+                // Log the ball details for debugging
+                Log.d(TAG, "Ball Details Count: " + ballDetailsList.size());
+                for (BallDetails ballDetails : ballDetailsList) {
+                    Log.d(TAG, "Ball Details: " + ballDetails.toString());
+                }
+            } else {
+                Log.e(TAG, "Ball details list is null");
+            }
+        });
     }
 
 }

@@ -73,7 +73,6 @@ public class ScoreCardFragment extends Fragment {
         // Return the view
         return view;
     }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -87,7 +86,6 @@ public class ScoreCardFragment extends Fragment {
             populateDataForSecondInnings(currentInningsId);
         }
     }
-
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
@@ -98,7 +96,6 @@ public class ScoreCardFragment extends Fragment {
             Log.d("TAG", "onHiddenChanged: scorecard Fragment is now hidden");
         }
     }
-
     private void checkAndRefreshIfNeeded() {
         sharedPreferences = requireContext().getSharedPreferences("match_prefs", Context.MODE_PRIVATE);
         boolean doesRefreshNeeded = sharedPreferences.getBoolean("scorecardPageUpdateNeeded", false);
@@ -109,7 +106,6 @@ public class ScoreCardFragment extends Fragment {
             Log.d("TAG", "checkAndRefreshIfNeeded: no refresh needed");
         }
     }
-
     public void populateDataForFirstInnings(long inningsId) {
         Log.d(TAG, "populateDataForFirstInnings: popu;ating first innings data with innings id" + inningsId);
         // Observe batter details for the first innings
@@ -132,7 +128,6 @@ public class ScoreCardFragment extends Fragment {
                     }
                 });
     }
-
     public void populateDataForSecondInnings(long inningsId) {
         Log.d(TAG, "populateDataForFirstInnings: popu;ating second innings data with innings id" + inningsId);
         // First, update the stats for Team 1 (First Innings)
@@ -169,41 +164,9 @@ public class ScoreCardFragment extends Fragment {
             Log.d(TAG, "observePlayers: jiisecond");
             populateDataForSecondInnings(inningsId);
         }
-        // Observe batter details based on the current innings
-//        batsmanDetailsViewModel.getBatterDetailsForInnings(inningsId)
-//                .observe(getViewLifecycleOwner(), batterDetailsList -> {
-//                    if (batterDetailsList != null && !batterDetailsList.isEmpty()) {
-//                        if (currentInnings.equals("first")) {
-//                            batterAdapter.updateBatterStats(batterDetailsList);
-//                        } else {
-//                            batter2Adapter.updateBatterStats(batterDetailsList);
-//                        }
-//                    } else {
-//                        if (currentInnings.equals("first")) {
-//                            batterAdapter.updateBatterStats(Collections.emptyList());
-//                        } else {
-//                            batter2Adapter.updateBatterStats(Collections.emptyList());
-//                        }
-//                    }
-//                });
-//
-//        // Observe bowler details based on the current innings
-//        bowlerDetailsViewModel.getBowlerDetailsForInnings(inningsId)
-//                .observe(getViewLifecycleOwner(), bowlerDetailsList -> {
-//                    if (bowlerDetailsList != null && !bowlerDetailsList.isEmpty()) {
-//                        if (currentInnings.equals("first")) {
-//                            bowlerAdapter.updateBowlerStats(bowlerDetailsList);
-//                        } else {
-//                            bowler2Adapter.updateBowlerStats(bowlerDetailsList);
-//                        }
-//                    } else {
-//                        if (currentInnings.equals("first")) {
-//                            bowlerAdapter.updateBowlerStats(Collections.emptyList());
-//                        } else {
-//                            bowler2Adapter.updateBowlerStats(Collections.emptyList());
-//                        }
-//                    }
-//                });
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("scorecardPageUpdateNeeded", false);
+        editor.apply();
     }
 
 }

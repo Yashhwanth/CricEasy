@@ -12,24 +12,45 @@ import com.cricketscoringapp.criceasy.model.BallDetails;
 import com.cricketscoringapp.criceasy.repository.BallDetailsRepository;
 
 import java.util.List;
+
 public class BallDetailsViewModel extends AndroidViewModel {
     private static final String TAG = "BallDetailsViewModel";
     private BallDetailsRepository ballDetailsRepository;
-    private MutableLiveData<List<BallDetails>> ballDetailsLiveData;
+
+    // Separate LiveData for Team 1 and Team 2
+    private final MutableLiveData<List<BallDetails>> ballDetailsLiveDataTeam1 = new MutableLiveData<>();
+    private final MutableLiveData<List<BallDetails>> ballDetailsLiveDataTeam2 = new MutableLiveData<>();
+
     public BallDetailsViewModel(Application application) {
         super(application);
         Log.d(TAG, "Initializing BallDetailsViewModel");
+
         // Initialize repository and LiveData
         ballDetailsRepository = new BallDetailsRepository(new DatabaseHelper(application));
-        ballDetailsLiveData = new MutableLiveData<>();
         Log.d(TAG, "BallDetailsViewModel initialized successfully");
     }
-    public LiveData<List<BallDetails>> getBallDetailsForInnings(long inningsId) {
-        Log.d(TAG, "getBallDetailsForInnings called with inningsId: " + inningsId);
+
+    // Fetch ball details for Team 1
+    public LiveData<List<BallDetails>> getBallDetailsForTeam1(long inningsId) {
+        Log.d(TAG, "getBallDetailsForTeam1 called with inningsId: " + inningsId);
+        fetchBallDetails(inningsId, ballDetailsLiveDataTeam1);
+        return ballDetailsLiveDataTeam1;
+    }
+
+    // Fetch ball details for Team 2
+    public LiveData<List<BallDetails>> getBallDetailsForTeam2(long inningsId) {
+        Log.d(TAG, "getBallDetailsForTeam2 called with inningsId: " + inningsId);
+        fetchBallDetails(inningsId, ballDetailsLiveDataTeam2);
+        return ballDetailsLiveDataTeam2;
+    }
+
+    // Common method to fetch ball details and update respective LiveData
+    private void fetchBallDetails(long inningsId, MutableLiveData<List<BallDetails>> liveData) {
         new Thread(() -> {
             try {
                 Log.d(TAG, "Fetching ball details from repository for inningsId: " + inningsId);
                 List<BallDetails> ballDetailsList = ballDetailsRepository.getBallDetailsForInnings(inningsId);
+
                 if (ballDetailsList == null || ballDetailsList.isEmpty()) {
                     Log.e(TAG, "No ball details found for inningsId: " + inningsId);
                 } else {
@@ -39,12 +60,12 @@ public class BallDetailsViewModel extends AndroidViewModel {
                         Log.d(TAG, "Ball Details: " + ballDetails.toString());
                     }
                 }
-                ballDetailsLiveData.postValue(ballDetailsList);
+
+                // Post the fetched ball details to the respective LiveData
+                liveData.postValue(ballDetailsList);
             } catch (Exception e) {
                 Log.e(TAG, "Error while fetching ball details for inningsId: " + inningsId, e);
             }
         }).start();
-        Log.d(TAG, "Returning ballDetailsLiveData for inningsId: " + inningsId);
-        return ballDetailsLiveData;
     }
 }
