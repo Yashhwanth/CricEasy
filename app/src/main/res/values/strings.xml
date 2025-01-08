@@ -144,6 +144,9 @@
     <string name="bowlerRuns">R</string>
     <string name="bowlerWickets">W</string>
     <string name="bowlerEconomy">ECO</string>
+    commentary fragment
+    <string name = "teamACommentaryContentDes" >Team 1 commentary</string>
+    <string name = "teamBCommentaryContentDes" >Team 2 commentary</string>
 
 
 

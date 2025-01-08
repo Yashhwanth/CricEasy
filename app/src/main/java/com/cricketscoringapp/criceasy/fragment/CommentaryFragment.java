@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,7 +37,7 @@ public class CommentaryFragment extends Fragment {
     private BallDetailsAdapter commentaryAdapter;
     private long currentInningsId;
     private String currentInningsNumber;
-    private List<BallDetails> ballDetailsList = new ArrayList<>();
+    private final List<BallDetails> ballDetailsList = new ArrayList<>();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -51,13 +52,16 @@ public class CommentaryFragment extends Fragment {
         // Initialize the RecyclerView and Adapter
         recyclerView = view.findViewById(R.id.ballDetailsRecyclerView); // Replace with actual RecyclerView ID
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        //layoutManager.setReverseLayout(true);
         commentaryAdapter = new BallDetailsAdapter(ballDetailsList, sharedPreferences);
         recyclerView.setAdapter(commentaryAdapter);
 
         ballDetailsViewModel = new ViewModelProvider(this).get(BallDetailsViewModel.class);
 
         Button firstInningsCommButton = view.findViewById(R.id.firstInningsCommentaryButton);
+        firstInningsCommButton.setText(sharedPreferences.getString("teamAName", "1st Innings"));
         Button secondInningsCommButton = view.findViewById(R.id.secondInningsCommentaryButton);
+        secondInningsCommButton.setText(sharedPreferences.getString("teamBName", "2nd Innings"));
 
         firstInningsCommButton.setOnClickListener(v -> {
             if ("first".equals(currentInningsNumber)) {
@@ -81,7 +85,7 @@ public class CommentaryFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.d(TAG, "commentary onResume called");
-        //checkAndRefreshIfNeeded();
+        loadCommentaryForFirstInnings(currentInningsId);
     }
 
     @Override

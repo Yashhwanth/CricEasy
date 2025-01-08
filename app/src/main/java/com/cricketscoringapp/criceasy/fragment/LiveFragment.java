@@ -124,14 +124,23 @@ public class LiveFragment extends Fragment {
         String teamName = databaseHelper.getTeamNameFromId(teamId);
         currentBattingTeamName.setText(teamName);
     }
-    public void getTeamScore(){
+    public void getTeamScore() {
+        // Retrieve the current innings ID from shared preferences
         long inningsId = sharedPreferences.getLong("currentInningsId", -1);
         HashMap<String, String> map = databaseHelper.getTeamStats(inningsId);
-        String score = map.get("runs") + " / " + map.get("wickets") +  " ( " + map.get("overs") + " ) ";
+        int ballsPlayed = Integer.parseInt(map.get("balls")); // Total balls faced
+        int overs = ballsPlayed / 6; // Full overs completed
+        int balls = ballsPlayed % 6; // Remaining balls in the current over
+        String overFormat = overs + "." + balls;
+        String score = map.get("runs") + " / " + map.get("wickets") + " (" + overFormat + ")";
         currentBattingScore.setText(score);
-        float teamRunRate = Float.parseFloat(map.get("runs")) / Float.parseFloat(map.get("balls"));
+        float runs = Float.parseFloat(map.get("runs")); // Total runs scored
+        float oversBowled = overs + (balls / 6.0f);     // Overs in decimal format
+        float teamRunRate = runs / oversBowled;         // Run rate calculation
+        teamRunRate = Math.round(teamRunRate * 100.0f) / 100.0f;
         runRate.setText(String.valueOf(teamRunRate));
     }
+
     public void getBatterStats(){
         long inningsId = sharedPreferences.getLong("currentInningsId", -1);
         long batter1Id = sharedPreferences.getLong("strikerId", -1);
@@ -141,7 +150,10 @@ public class LiveFragment extends Fragment {
 
         String batter1Runs = map1.get("runs");
         String batter1Balls = map1.get("balls");
-        float batter1Sr = Float.parseFloat(batter1Runs) / Float.parseFloat(batter1Balls);
+        float runsBatter1 = Float.parseFloat(batter1Runs);
+        float ballsBatter1 = Float.parseFloat(batter1Balls);
+        float batter1Sr = (runsBatter1 / ballsBatter1) * 100;
+        batter1Sr = Math.round(batter1Sr * 100.0f) / 100.0f;
 
         batter1Name.setText(map1.get("name"));
         batter1R.setText(batter1Runs);
@@ -152,7 +164,10 @@ public class LiveFragment extends Fragment {
 
         String batter2Runs = map2.get("runs");
         String batter2Balls = map2.get("balls");
-        float batter2Sr = Float.parseFloat(batter2Runs) / Float.parseFloat(batter2Balls);
+        float runsBatter2 = Float.parseFloat(batter2Runs);
+        float ballsBatter2 = Float.parseFloat(batter2Balls);
+        float batter2Sr = (runsBatter2 / ballsBatter2) * 100;
+        batter2Sr = Math.round(batter2Sr * 100.0f) / 100.0f;
 
         batter2Name.setText(map2.get("name"));
         batter2R.setText(batter2Runs);
@@ -171,12 +186,19 @@ public class LiveFragment extends Fragment {
         long inningsId = sharedPreferences.getLong("currentInningsId", -1);
         long bowlerId = sharedPreferences.getLong("bowlerId", -1);
         HashMap<String,String> bowlerMap = databaseHelper.getCurrentBowlerStats(inningsId, bowlerId);
-        //float bowlerEconomy = Float.parseFloat(bowlerMap.get("runs")) / Float.parseFloat(bowlerMap.get("overs"));
+        String oversText = bowlerMap.get("overs"); // Format: "X.Y"
+        String[] oversParts = oversText.split("\\."); // Split into full overs and balls
+        int fullOvers = Integer.parseInt(oversParts[0]);
+        int ballsInCurrentOver = oversParts.length > 1 ? Integer.parseInt(oversParts[1]) : 0;
+        float oversBowled = fullOvers + (ballsInCurrentOver / 6.0f); // Convert to decimal overs
+        float runsConceded = Float.parseFloat(bowlerMap.get("runs"));
+        float bowlerEconomy = oversBowled > 0 ? runsConceded / oversBowled : 0.0f; // Calculate economy
+        bowlerEconomy = Math.round(bowlerEconomy * 100.0f) / 100.0f; // Round to 2 decimals
         bowlerName.setText(bowlerMap.get("name"));
         bowlerO.setText(bowlerMap.get("overs"));
         bowlerR.setText(bowlerMap.get("runs"));
         bowlerW.setText(bowlerMap.get("wickets"));
-        bowlerECO.setText(String.valueOf("0.00"));
+        bowlerECO.setText(String.valueOf(bowlerEconomy));
         bowlerM.setText(bowlerMap.get("maidens"));
     }
 }

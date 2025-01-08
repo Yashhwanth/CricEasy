@@ -26,26 +26,16 @@ import com.cricketscoringapp.criceasy.dao.MatchDao;
 
 public class MainActivity extends AppCompatActivity {
     private DatabaseHelper databaseHelper;
-    private static final String SHARED_PREFERENCES = "match_prefs"; // SharedPreferences name
-    private static final String MATCH_ID = "currentMatchId";  // Key to store match ID
-    private static final String CURRENT_ACTIVITY = "currentActivity"; // Key for current activity
-    private database appDatabase;
-    private MatchDao matchDao;
+    private static final String SHARED_PREFERENCES = "match_prefs";
+    private static final String MATCH_ID = "currentMatchId";
+    private static final String CURRENT_ACTIVITY = "currentActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate: Opened Main Activity" );
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        Log.d(TAG, "onCreate: Clearing all Shared Preferences");
-
         databaseHelper = new DatabaseHelper(this);
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
-        editor.apply();
-        Log.d(TAG, "onCreate: Cleared all SharedPreferences");
-
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.mainActivity), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -57,11 +47,9 @@ public class MainActivity extends AppCompatActivity {
 //            return; // Skip MainActivity logic if navigating to the last activity
 //        }
 //
-        Log.d(TAG, "onCreate: updating current activity in sp");
         updateCurrentActivityInPreferences();
         Button newMatchButton = findViewById(R.id.newMatchButton);
         newMatchButton.setOnClickListener(view ->{
-            Log.d(TAG, "onCreate: new match button clicked");
             long currentMatchId = handleNewMatch();
             saveMatchIdToPreferences(currentMatchId);
             Log.d(TAG, "onCreate: opening matchInfo activity");
@@ -79,6 +67,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         Log.d(TAG, "onDestroy: main activity destroyed");
         super.onDestroy();
+        if (databaseHelper != null) {
+            databaseHelper.close();
+        }
     }
 
     private long handleNewMatch() {

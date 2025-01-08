@@ -437,12 +437,13 @@ public class MatchActivity extends AppCompatActivity {
             long overId = sharedPreferences.getLong(OVER_ID, -1);
             long teamStatsId = sharedPreferences.getLong(TEAM_STATS_ID, -1);
             long partnershipId = sharedPreferences.getLong(PARTNERSHIP_ID, -1);
+            long ballNumber = sharedPreferences.getLong("playedBalls", -1) + 1;
             long wicketBallId;
             switch (dismissalType) {
                 case BOWLED:
                 case CAUGHT:
                 case LBW:
-                    wicketBallId = databaseHelper.insertBallDataForWicket(overId, NORMAL_BALL, runsInRunOut, strikerId, nonStrikerId);
+                    wicketBallId = databaseHelper.insertBallDataForWicket(overId, ballNumber, NORMAL_BALL, runsInRunOut, strikerId, nonStrikerId);
                     databaseHelper.updateWicketsTable(wicketBallId, dismissalType, strikerId, runsInRunOut);
                     databaseHelper.updateBatsmanStatsForWicket(inningsId, strikerId, runsInRunOut, null, null, dismissalType);
                     databaseHelper.updateBowlerStatsForWicket(inningsId, bowlerId, runsInRunOut, null, null, dismissalType);
@@ -491,7 +492,7 @@ public class MatchActivity extends AppCompatActivity {
                     long outBatsmanId = sharedPreferences.getLong(outBatsman + "Id", -1);
                     if(ballTypeInRo.equals(NORMAL_BALL))    incrementPlayedBallsInSharedPreferences();
                     updateScoreInSharedPreferences(ballTypeInRo ,runsInRunOut);
-                    wicketBallId = databaseHelper.insertBallDataForWicket(overId, ballTypeInRo, runsInRunOut, strikerId, nonStrikerId);
+                    wicketBallId = databaseHelper.insertBallDataForWicket(overId, ballNumber, ballTypeInRo, runsInRunOut, strikerId, nonStrikerId);
                     databaseHelper.updateWicketsTable(wicketBallId, dismissalType, outBatsmanId,runsInRunOut);
                     databaseHelper.updateBatsmanStatsForWicket(inningsId, strikerId, runsInRunOut, ballTypeInRo, runsSourceInRunOut, dismissalType);
                     databaseHelper.updateBowlerStatsForWicket(inningsId, bowlerId, runsInRunOut, ballTypeInRo, runsSourceInRunOut, dismissalType);
@@ -510,7 +511,7 @@ public class MatchActivity extends AppCompatActivity {
                     String ballType = ballTypeRadioButton.getText().toString();
                     if(ballType.equals(NORMAL_BALL))    incrementPlayedBallsInSharedPreferences();
                     updateScoreInSharedPreferences(ballType, runsInRunOut);
-                    databaseHelper.insertBallDataForWicket(overId, ballType, runsInRunOut, strikerId, nonStrikerId);
+                    databaseHelper.insertBallDataForWicket(overId, ballNumber, ballType, runsInRunOut, strikerId, nonStrikerId);
                     databaseHelper.updateBatsmanStatsForWicket(inningsId, strikerId, runsInRunOut, ballType, null, dismissalType);
                     databaseHelper.updateBowlerStatsForWicket(inningsId, bowlerId, runsInRunOut, ballType, null, dismissalType);
                     databaseHelper.updatePartnershipFor0to6(runsInRunOut, partnershipId);
@@ -532,7 +533,8 @@ public class MatchActivity extends AppCompatActivity {
     long nonStrikerId = sharedPreferences.getLong(NON_STRIKER_ID, -1);
     long partnershipId = sharedPreferences.getLong(PARTNERSHIP_ID, -1);
     long bowlerId = sharedPreferences.getLong(BOWLER_ID,-1);
-    long ballId = databaseHelper.insertBallDataFor0To6(overId, runs, strikerId, nonStrikerId);
+    long ballNumber = sharedPreferences.getLong("playedBalls", -1) + 1;
+    long ballId = databaseHelper.insertBallDataFor0To6(overId, ballNumber, runs, strikerId, nonStrikerId);
     databaseHelper.updateBatsmanStatsFor0To6(inningsId, strikerId, runs);
     databaseHelper.updateBowlerStatsFor0to6(inningsId, bowlerId, runs);
     databaseHelper.updatePartnershipFor0to6(runs, partnershipId);
@@ -551,7 +553,8 @@ public class MatchActivity extends AppCompatActivity {
      long nonStrikerId = sharedPreferences.getLong(NON_STRIKER_ID, -1);
      long bowlerId = sharedPreferences.getLong(BOWLER_ID, -1);
      long partnershipId = sharedPreferences.getLong(PARTNERSHIP_ID, -1);
-     long ballId = databaseHelper.insertBallDataForByLByes(overId, ballType, extraRuns, strikerId, nonStrikerId);
+     long ballNumber = sharedPreferences.getLong("playedBalls", -1) + 1;
+     long ballId = databaseHelper.insertBallDataForByLByes(overId, ballNumber, ballType, extraRuns, strikerId, nonStrikerId);
      databaseHelper.updateExtrasTable(ballId, ballType, extraRuns);
      databaseHelper.updateBatsmanForByLByes(inningsId, strikerId);
      databaseHelper.updateBowlerForByLBes(inningsId, bowlerId, ballType);
@@ -569,7 +572,8 @@ public class MatchActivity extends AppCompatActivity {
      long bowlerId = sharedPreferences.getLong(BOWLER_ID, -1);
      long strikerId = sharedPreferences.getLong(STRIKER_ID, -1);
      long nonStrikerId = sharedPreferences.getLong(NON_STRIKER_ID, -1);
-     long ballId = databaseHelper.insertBallDataForWide(overId, extraRuns, strikerId, nonStrikerId);
+     long ballNumber = sharedPreferences.getLong("playedBalls", -1) + 1;
+     long ballId = databaseHelper.insertBallDataForWide(overId, ballNumber, extraRuns, strikerId, nonStrikerId);
      databaseHelper.updateExtrasTable(ballId, ballType, extraRuns);
      databaseHelper.updateBowlerForWide(inningsId, bowlerId);
      updateTeamStatsForWide(extraRuns);
@@ -586,29 +590,12 @@ public class MatchActivity extends AppCompatActivity {
      long strikerId = sharedPreferences.getLong(STRIKER_ID, -1);
      long nonStrikerId = sharedPreferences.getLong(NON_STRIKER_ID, -1);
      long partnership_id = sharedPreferences.getLong(PARTNERSHIP_ID, -1);
-     //long ballId = 0;
-     long ballId = databaseHelper.insertBallDataForNb(overId, extraRuns, strikerId, nonStrikerId);
+     long ballNumber = sharedPreferences.getLong("playedBalls", -1) + 1;
+     long ballId = databaseHelper.insertBallDataForNb(overId, ballNumber, extraRuns, strikerId, nonStrikerId);
      databaseHelper.updateExtrasTable(ballId, ballType, extraRuns);
      databaseHelper.updateBatsmanStatsForNb(inningsId, strikerId, extraRuns, runsSourceInNoBall);
      databaseHelper.updateBowlerStatsForNb(inningsId, bowlerId, extraRuns, runsSourceInNoBall);
      databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, runsSourceInNoBall);
-    //         switch (runsSourceInNoBall){
-    //             case FROM_BAT:
-    //                 databaseHelper.updateBatsmanStatsForNb(inningsId, strikerId, extraRuns, "Bat");
-    //                 databaseHelper.updateBowlerStatsForNb(inningsId, bowlerId, extraRuns, "Bat");
-    //                 databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "Bat");
-    //                 break;
-    //             case BYE_BALL:
-    //                 databaseHelper.updateBatsmanStatsForNb(inningsId, strikerId, extraRuns, "Bye");
-    //                 databaseHelper.updateBowlerStatsForNb(inningsId, bowlerId, extraRuns, "Bye");
-    //                 databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "Bye");
-    //                 break;
-    //             case LEG_BYE_BALL:
-    //                 databaseHelper.updateBatsmanStatsForNb(inningsId, strikerId, extraRuns, "LegBye");
-    //                 databaseHelper.updateBowlerStatsForNb(inningsId, bowlerId, extraRuns, "LegBye");
-    //                 databaseHelper.updatePartnershipForNb(partnership_id, extraRuns, "LegBye");
-    //                 break;
-     //}
      updateTeamStatsForNoBall(extraRuns, runsSourceInNoBall);
      updateScoreInSharedPreferences(ballType, extraRuns);
      rotateStrike(extraRuns);

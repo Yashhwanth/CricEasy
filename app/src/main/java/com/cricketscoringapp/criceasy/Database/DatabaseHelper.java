@@ -22,7 +22,7 @@ import com.cricketscoringapp.criceasy.model.Player;
 
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 19; // Update version
+    private static final int DATABASE_VERSION = 21; // Update version
     private static final String DATABASE_NAME = "CricketDB";
     private static final String NORMAL_BALL = "Normal";
     private static final String BYE_BALL = "Bye";
@@ -187,6 +187,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Balls Table
     private static final String TABLE_BALLS = "Ball";
     private static final String COLUMN_BALL_ID = "ballId";
+    private static final String COLUMN_BALL_NUMBER = "ballNumber";
     private static final String COLUMN_TYPE_OF_BALL = "ballType";
     private static final String COLUMN_IS_WICKET = "isWicket";
     private static final String COLUMN_STRIKER = "striker";
@@ -197,6 +198,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_BALLS_TABLE = "CREATE TABLE " + TABLE_BALLS + " (" +
             COLUMN_BALL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COLUMN_OVER_ID + " INTEGER, " +
+            COLUMN_BALL_NUMBER + " INTEGER, " +
             COLUMN_TYPE_OF_BALL + " TEXT, " +
             COLUMN_RUNS + " INTEGER, " +
             COLUMN_IS_WICKET + " INTEGER, " + // 1 for true (wicket), 0 for false (no wicket)
@@ -371,32 +373,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
 // -----------------------------------------------Main Activity------------------------------------------------------
-    // Check if there is an ongoing match
     public Cursor getOngoingMatch() {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(" SELECT " + COLUMN_MATCH_ID + " FROM " + TABLE_MATCH + " WHERE " + COLUMN_IS_MATCH_COMPLETED + "=0", null);
         Log.d(TAG, "getOngoingMatch: " + cursor);
         return cursor;
     }
-
-    // Insert a new match if no ongoing match exists
     public long insertNewMatch() {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_IS_MATCH_COMPLETED, 0); // Match is not completed initially
-        long matchId = db.insert(TABLE_MATCH, null, values);
-        db.close();
-        return matchId;
+        return db.insert(TABLE_MATCH, null, values);
     }
-
     public static String getColumnId() {
         return COLUMN_MATCH_ID;
     }
 
 // -----------------------------------------------MatchInfo Activity------------------------------------------------------
-    public boolean insertMatchBasicInfo1(long matchId, String matchType,
-                                         String overs, String ballType, String place, String time,
-                                         int isCompleted) {
+    public boolean insertMatchBasicInfo(long matchId, String matchType,
+                                        String overs, String ballType, String place, String time,
+                                        int isCompleted) {
 
         SQLiteDatabase db = this.getWritableDatabase();
         long placeId = getOrInsertPlaceId(place);
@@ -408,12 +404,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_PLACE_NAME, placeId);
         values.put(COLUMN_DATE_TIME, time);
         values.put(COLUMN_IS_MATCH_COMPLETED, isCompleted);
-        // Check if the row exists
         int rowsUpdated = db.update(TABLE_MATCH, values, COLUMN_MATCH_ID + "=?", new String[]{String.valueOf(matchId)});
         db.close();
         return rowsUpdated != 0;
     }
-
 
     public long getOrInsertPlaceId(String place) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -430,11 +424,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // If the place is not found, insert a new place and return the new place_id
         ContentValues values = new ContentValues();
         values.put(COLUMN_PLACE_NAME, place);
-        // Insert the new place and get the place_id
-        // Return the place_id (newly inserted)
         return db.insert(TABLE_PLACES, null, values);
     }
-
 
     //----------------------------------***TEAM CREATION PAGE ****---------------------------------
     public Pair<Long, Long> addTeamNames(long matchId, String teamAName, String teamBName) {
@@ -463,8 +454,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return new Pair<>(teamAId, teamBId);
     }
-
-    // Helper method to check if a team exists or insert it and return the team ID
     private long getOrInsertTeam(SQLiteDatabase db, String teamName) {
         // Query to check if the team exists
         String query = "SELECT " + COLUMN_TEAM_ID + " FROM " + TABLE_TEAMS + " WHERE " + COLUMN_TEAM_NAME + " = ?";
@@ -493,7 +482,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return teamId;
     }
-
     // Helper method to reset Matches_Teams table for the given match ID
     private void resetMatchTeams(SQLiteDatabase db, long matchId) {
         // Delete all records for the current match ID in Matches_Teams
@@ -855,11 +843,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     //---------------------------------------------ball table------------------------------
-    public long insertBallDataFor0To6(long overId, int runs, long strikerId, long nonStrikerId) {
+    public long insertBallDataFor0To6(long overId, long ballNumber, int runs, long strikerId, long nonStrikerId) {
         String typeofBall = "Normal";
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_OVER_ID, overId);
+        contentValues.put(COLUMN_BALL_NUMBER, ballNumber);
         contentValues.put(COLUMN_TYPE_OF_BALL, typeofBall);
         contentValues.put(COLUMN_RUNS, runs);
         contentValues.put(COLUMN_IS_WICKET, 0);
@@ -869,10 +858,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return ballId;
     }
-    public long insertBallDataForByLByes(long overId, String typeOfBall, int runs, long strikerId, long nonStrikerId) {
+    public long insertBallDataForByLByes(long overId, long ballNumber, String typeOfBall, int runs, long strikerId, long nonStrikerId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_OVER_ID, overId); // Get overId from SharedPreferences
+        contentValues.put(COLUMN_BALL_NUMBER, ballNumber);
         contentValues.put(COLUMN_TYPE_OF_BALL, typeOfBall); // Set type of ball (all legal for now)
         contentValues.put(COLUMN_RUNS, runs); // Runs scored on the ball
         contentValues.put(COLUMN_IS_WICKET, 0);
@@ -882,10 +872,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close(); // Close the database connection
         return ballId;
     }
-    public long insertBallDataForWide(long overId, int runs, long strikerId, long nonStrikerId) {
+    public long insertBallDataForWide(long overId,  long ballNumber, int runs, long strikerId, long nonStrikerId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_OVER_ID, overId); // Get overId from SharedPreferences
+        contentValues.put(COLUMN_BALL_NUMBER, ballNumber);
         contentValues.put(COLUMN_TYPE_OF_BALL, WIDE_BALL); // Set type of ball (all legal for now)
         contentValues.put(COLUMN_RUNS, runs + 1); // Runs scored on the ball
         contentValues.put(COLUMN_IS_WICKET, 0);
@@ -895,11 +886,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close(); // Close the database connection
         return ballId;
     }
-    public long insertBallDataForNb(long overId, int extraRuns, long strikerId, long nonStrikerId) {
+    public long insertBallDataForNb(long overId,  long ballNumber, int extraRuns, long strikerId, long nonStrikerId) {
         try (SQLiteDatabase db = this.getWritableDatabase()) {
             int totalRuns = extraRuns + 1;
             ContentValues contentValues = new ContentValues();
             contentValues.put(COLUMN_OVER_ID, overId); // Over ID
+            contentValues.put(COLUMN_BALL_NUMBER, ballNumber);
             contentValues.put(COLUMN_TYPE_OF_BALL, NO_BALL); // Type of ball set to "No Ball"
             contentValues.put(COLUMN_RUNS, totalRuns); // Total runs for the no-ball
             contentValues.put(COLUMN_IS_WICKET, 0); // No wicket for no-ball
@@ -914,7 +906,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         // Close the database connection
     }
-    public long insertBallDataForWicket(long overId, String typeOfBall, int runs, long strikerId, long nonStrikerId) {
+    public long insertBallDataForWicket(long overId, long ballNumber, String typeOfBall, int runs, long strikerId, long nonStrikerId) {
         try (SQLiteDatabase db = this.getWritableDatabase()) {
             int totalRuns = runs;
             if (typeOfBall.equals(WIDE_BALL) || typeOfBall.equals(NO_BALL)) {
@@ -922,6 +914,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
             ContentValues contentValues = new ContentValues();
             contentValues.put(COLUMN_OVER_ID, overId); // Over ID
+            contentValues.put(COLUMN_BALL_NUMBER, ballNumber);
             contentValues.put(COLUMN_TYPE_OF_BALL, typeOfBall); // Type of ball (Wide/No Ball/Normal)
             contentValues.put(COLUMN_RUNS, totalRuns); // Total runs for the ball
             contentValues.put(COLUMN_IS_WICKET, 1); // No wicket for this ball type (unless it's a wicket)
@@ -2207,9 +2200,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     long overId = overCursor.getLong(overIdIndex);
                     long bowlerId = overCursor.getLong(bowlerIdIndex);
 
-                    // Query to get balls for the current over
-                    String ballQuery = "SELECT " + COLUMN_BALL_ID + ", " + COLUMN_TYPE_OF_BALL + ", " + COLUMN_RUNS + ", " +
-                            COLUMN_IS_WICKET + ", " + COLUMN_STRIKER + ", " + COLUMN_NON_STRIKER +
+                    // Query to get balls for the current over (fetch only required columns)
+                    String ballQuery = "SELECT " + COLUMN_BALL_ID + ", " + COLUMN_BALL_NUMBER + ", " +
+                            COLUMN_TYPE_OF_BALL + ", " + COLUMN_RUNS + ", " + COLUMN_IS_WICKET + ", " +
+                            COLUMN_STRIKER + ", " + COLUMN_NON_STRIKER +
                             " FROM " + TABLE_BALLS +
                             " WHERE " + COLUMN_OVER_ID + " = ?";
                     Cursor ballCursor = db.rawQuery(ballQuery, new String[]{String.valueOf(overId)});
@@ -2217,7 +2211,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     if (ballCursor != null && ballCursor.moveToFirst()) {
                         do {
                             // Fetch ball details
-                            int ballIdIndex = ballCursor.getColumnIndex(COLUMN_BALL_ID);  // Fetch the ball ID
+                            int ballIdIndex = ballCursor.getColumnIndex(COLUMN_BALL_ID);
+                            int ballNumberIndex = ballCursor.getColumnIndex(COLUMN_BALL_NUMBER);
                             int ballTypeIndex = ballCursor.getColumnIndex(COLUMN_TYPE_OF_BALL);
                             int runsIndex = ballCursor.getColumnIndex(COLUMN_RUNS);
                             int isWicketIndex = ballCursor.getColumnIndex(COLUMN_IS_WICKET);
@@ -2227,8 +2222,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                             // Check if the indices are valid
                             if (ballIdIndex != -1 && ballTypeIndex != -1 && runsIndex != -1 &&
                                     isWicketIndex != -1 && strikerIndex != -1 && nonStrikerIndex != -1) {
-
-                                long ballId = ballCursor.getLong(ballIdIndex);  // Get ball ID
+                                long ballId = ballCursor.getLong(ballIdIndex);
+                                long ballNumber = ballCursor.getLong(ballNumberIndex);
                                 String ballType = ballCursor.getString(ballTypeIndex);
                                 int runs = ballCursor.getInt(runsIndex);
                                 int isWicket = ballCursor.getInt(isWicketIndex);
@@ -2240,9 +2235,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                 String nonStrikerName = getPlayerNameById(nonStrikerId);
                                 String bowlerName = getPlayerNameById(bowlerId);
 
-                                // Create BallDetails object with ballId
-                                BallDetails ballDetails = new BallDetails((int) ballId, ballType, runs, isWicket == 1,
-                                        strikerName, nonStrikerName, bowlerName);
+                                // Create BallDetails object with ballId and other info
+                                BallDetails ballDetails = new BallDetails((int) ballId, (int) ballNumber, ballType,
+                                        runs, isWicket == 1, strikerName,
+                                        nonStrikerName, bowlerName);
                                 ballDetailsList.add(ballDetails);
                             }
                         } while (ballCursor.moveToNext());
@@ -2256,6 +2252,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } else {
             Log.e(TAG, "No overs found for inningsId: " + inningsId);
         }
+
         db.close();
         Log.d(TAG, "getBallDetailsForInnings: " + ballDetailsList.size());
         return ballDetailsList;

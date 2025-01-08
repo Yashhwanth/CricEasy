@@ -38,13 +38,13 @@ public class MatchInfoActivity extends AppCompatActivity {
     private AutoCompleteTextView placeAutoComplete;
     private EditText dateTimeEditText;
     private Calendar calendar;
-    private EditText noOfOversEditText; // Added to get number of overs input
-    private RadioGroup oversTypeRadioGroup; // Added to get match type selection
-    private RadioGroup ballTypeRadioGroup; // Added to get ball type selection
-    private DatabaseHelper databaseHelper; // Added DatabaseHelper instance
-    private static final String SHARED_PREFERENCES = "match_prefs"; // SharedPreferences name
-    private static final String CURRENT_ACTIVITY = "currentActivity"; // Key for current activity
-    private static final String MATCH_ID = "currentMatchId"; // Key for current activity
+    private EditText noOfOversEditText;
+    private RadioGroup oversTypeRadioGroup;
+    private RadioGroup ballTypeRadioGroup;
+    private DatabaseHelper databaseHelper;
+    private static final String SHARED_PREFERENCES = "match_prefs";
+    private static final String CURRENT_ACTIVITY = "currentActivity";
+    private static final String MATCH_ID = "currentMatchId";
 
 
     @Override
@@ -55,14 +55,10 @@ public class MatchInfoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_match_info);
         updateCurrentActivityInPreferences();
 
-
-        // Initialize DatabaseHelper
         databaseHelper = new DatabaseHelper(this);
 
-        // Retrieve match_id from Sharedpref
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
-        final long matchId = sharedPreferences.getLong(MATCH_ID, -1L); // -1 is the default value if match_id is not found
-
+        final long matchId = sharedPreferences.getLong(MATCH_ID, -1L);
 
         Button backButton = findViewById(R.id.needHelpButton);
         Button nextButton = findViewById(R.id.nextButton);
@@ -209,7 +205,7 @@ public class MatchInfoActivity extends AppCompatActivity {
         String dateTime = dateTimeEditText.getText().toString().trim();
         int isCompleted = 0;
         Log.d(TAG, "saveMatchInfoToDatabase: " + currentMatchId);
-        boolean isInserted = databaseHelper.insertMatchBasicInfo1(currentMatchId, matchType, noOfOvers, ballType, place, dateTime, isCompleted);
+        boolean isInserted = databaseHelper.insertMatchBasicInfo(currentMatchId, matchType, noOfOvers, ballType, place, dateTime, isCompleted);
         updateBallsInSharedPreferences(noOfOvers);
         if (isInserted) {
             showToast("Match Info Saved Successfully!");

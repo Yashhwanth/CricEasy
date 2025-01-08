@@ -31,6 +31,10 @@ public class BallDetailsAdapter extends RecyclerView.Adapter<BallDetailsAdapter.
     public void onBindViewHolder(@NonNull BallDetailsViewHolder holder, int position) {
         BallDetails ballDetails = ballDetailsList.get(position);
         // Build the ball details string
+        int ballNumber = ballDetails.getBallNumber();
+        int overs = ballNumber / 6;
+        int balls = ballNumber % 6;
+        String oversFormat = overs + "." + balls;
         StringBuilder details = new StringBuilder();
         details.append(ballDetails.getBowlerName())
                 .append(" to ")
@@ -46,6 +50,7 @@ public class BallDetailsAdapter extends RecyclerView.Adapter<BallDetailsAdapter.
             details.append(", Out");
         }
         holder.ballDetailTextView.setText(details.toString());
+        holder.overDetailTextView.setText(oversFormat);
     }
 
     @Override

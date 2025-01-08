@@ -2,6 +2,7 @@ package com.cricketscoringapp.criceasy.model;
 
 public class BallDetails {
     private int ballId;
+    private int ballNumber;
     private String ballType;
     private int runs;
     private boolean isWicket;
@@ -9,8 +10,9 @@ public class BallDetails {
     private String nonStrikerName;
     private String bowlerName;
 
-    public BallDetails(int ballId, String ballType, int runs, boolean isWicket, String strikerName, String nonStrikerName, String bowlerName) {
+    public BallDetails(int ballId, int ballNumber, String ballType, int runs, boolean isWicket, String strikerName, String nonStrikerName, String bowlerName) {
         this.ballId = ballId;
+        this.ballNumber = ballNumber;
         this.ballType = ballType;
         this.runs = runs;
         this.isWicket = isWicket;
@@ -26,6 +28,13 @@ public class BallDetails {
 
     public void setBallId(int ballId) {
         this.ballId = ballId;
+    }
+    public int getBallNumber() {
+        return ballNumber;
+    }
+
+    public void setBallNumber(int ballNumber) {
+        this.ballNumber = ballNumber;
     }
     public String getBallType() {
         return ballType;

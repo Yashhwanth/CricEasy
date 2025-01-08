@@ -53,7 +53,7 @@
 
     <RadioGroup
         android:id="@+id/teamCallingTossRadioGroup"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -101,7 +101,7 @@
 
     <RadioGroup
         android:id="@+id/tossWinnerGroup"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -152,7 +152,7 @@
 
     <RadioGroup
         android:id="@+id/tossDecisionGroup"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -215,7 +215,6 @@
         android:id="@+id/needHelpButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:onClick="previousActivity"
         android:text="@string/needHelpButton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

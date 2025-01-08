@@ -177,34 +177,34 @@
 
     <LinearLayout
         android:id="@+id/navigationButtonsLayout"
-        android:layout_width="409dp"
+        style="?android:attr/buttonBarStyle"
+        android:layout_width="0dp"
         android:layout_height="60dp"
+        android:divider="?android:attr/dividerVertical"
         android:orientation="horizontal"
         android:showDividers="middle"
-        android:divider="?android:attr/dividerVertical"
-        style="?android:attr/buttonBarStyle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.995">
+        app:layout_constraintVertical_bias="0.97">
 
         <Button
             android:id="@+id/needHelpButton"
+            style="@style/CommonButtonStyle"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="1"
-            android:text="@string/backButton"
-            style="@style/CommonButtonStyle" />
+            android:text="@string/backButton" />
 
         <Button
             android:id="@+id/nextButton"
+            style="@style/CommonButtonStyle"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="1"
-            android:text="@string/nextButton"
-            style="@style/CommonButtonStyle" />
+            android:text="@string/nextButton" />
     </LinearLayout>
 
 
