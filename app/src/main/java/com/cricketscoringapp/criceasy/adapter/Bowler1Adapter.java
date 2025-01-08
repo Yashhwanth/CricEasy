@@ -33,24 +33,22 @@ public class Bowler1Adapter extends RecyclerView.Adapter<Bowler1Adapter.BowlerVi
         View view = LayoutInflater.from(context).inflate(R.layout.item_bowler_stats, parent, false);
         return new BowlerViewHolder(view);
     }
-
     @Override
     public void onBindViewHolder(@NonNull BowlerViewHolder holder, int position) {
-        // Get the current bowler stats
         Bowler bowlerStats = bowlerStatsList.get(position);
-
-        // Set the data into views
         holder.bowlerName.setText(bowlerStats.getPlayerName());
-        holder.bowlerOvers.setText(String.valueOf(bowlerStats.getBallsPlayed()));
+        int balls = bowlerStats.getBallsPlayed();
+        int overs = balls / 6; // Calculate the number of full overs
+        int remainingBalls = balls % 6; // Calculate the remaining balls
+        String oversFormatted = overs + "." + remainingBalls; // Display format "overs.balls"
+        holder.bowlerOvers.setText(oversFormatted);
+        holder.bowlerMaidens.setText(String.valueOf(bowlerStats.getMaidens()));
         holder.bowlerRuns.setText(String.valueOf(bowlerStats.getRuns()));
         holder.bowlerWickets.setText(String.valueOf(bowlerStats.getWk()));
-
-        // Calculate economy rate
-//        double economyRate = bowlerStats.getBallsPlayed() > 0
-//                ? (double) bowlerStats.getRuns() / bowlerStats.getBallsPlayed()
-//                : 0.0;
-//        holder.bowlerEconomy.setText(String.format("%.2f", economyRate));
+        double economyRate = balls > 0 ? (double) bowlerStats.getRuns() / (balls / 6.0) : 0.0;
+        holder.bowlerEconomy.setText(String.format("%.2f", economyRate));
     }
+
 
     @Override
     public int getItemCount() {
@@ -92,12 +90,13 @@ public class Bowler1Adapter extends RecyclerView.Adapter<Bowler1Adapter.BowlerVi
 
     // ViewHolder class to hold the views
     public static class BowlerViewHolder extends RecyclerView.ViewHolder {
-        TextView bowlerName, bowlerOvers, bowlerRuns, bowlerWickets, bowlerEconomy;
+        TextView bowlerName, bowlerOvers, bowlerMaidens, bowlerRuns, bowlerWickets, bowlerEconomy;
 
         public BowlerViewHolder(View itemView) {
             super(itemView);
             bowlerName = itemView.findViewById(R.id.tv_bowler_name);
             bowlerOvers = itemView.findViewById(R.id.tv_bowler_overs);
+            bowlerMaidens = itemView.findViewById(R.id.tv_bowler_maidens);
             bowlerRuns = itemView.findViewById(R.id.tv_bowler_runs);
             bowlerWickets = itemView.findViewById(R.id.tv_bowler_wickets);
             bowlerEconomy = itemView.findViewById(R.id.tv_bowler_economy);

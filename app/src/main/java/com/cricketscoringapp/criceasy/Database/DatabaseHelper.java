@@ -2315,10 +2315,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 int runs = cursor.getInt(cursor.getColumnIndex(COLUMN_RUNS));
                 int wickets = cursor.getInt(cursor.getColumnIndex(COLUMN_WK));
 
-                // Calculate overs (balls divided by 6, remainder as decimal part)
-                //double overs = (double) ballsPlayed / 6 + (ballsPlayed % 6) * 0.1;
-
-                // Add bowler data to the list
                 Bowler bowler = new Bowler(playerId, playerName, (int) inningsId, ballsPlayed, maidens, runs, wickets);
                 bowlerList.add(bowler);
             } while (cursor.moveToNext());

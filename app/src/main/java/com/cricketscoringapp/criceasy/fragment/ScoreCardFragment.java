@@ -130,9 +130,6 @@ public class ScoreCardFragment extends Fragment {
     }
     public void populateDataForSecondInnings(long inningsId) {
         Log.d(TAG, "populateDataForFirstInnings: popu;ating second innings data with innings id" + inningsId);
-        // First, update the stats for Team 1 (First Innings)
-        //populateDataForFirstInnings(inningsId - 1);
-
         // Observe batter details for the second innings
         batsmanDetailsViewModel2.getBatterDetailsForTeam2(inningsId)
                 .observe(getViewLifecycleOwner(), batterDetailsList -> {
