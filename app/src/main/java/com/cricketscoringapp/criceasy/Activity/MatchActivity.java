@@ -42,6 +42,7 @@ import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class MatchActivity extends AppCompatActivity {
@@ -157,7 +158,7 @@ public class MatchActivity extends AppCompatActivity {
             openScoringPopup();
         });
         shareFloatingButton.setOnClickListener(view ->{
-            shareMatch();
+            exportCombinedData();
         });
 
         if (savedInstanceState == null) {
@@ -862,45 +863,55 @@ public class MatchActivity extends AppCompatActivity {
         editor.apply();
         finishAffinity();
     }
-    private void shareMatch() {
-        // Get match and innings IDs
+    private void exportCombinedData() {
+        // Fetch data from shared preferences
+        Map<String, ?> sharedPrefsData = sharedPreferences.getAll();
+        Log.d(TAG, "Shared Preferences Data: " + sharedPrefsData.toString());
+
+        // Fetch data from database
         int matchId = (int) sharedPreferences.getLong("currentMatchId", -1);
         int inningsId = (int) sharedPreferences.getLong("currentInningsId", -1);
-        Log.d(TAG, "Match ID: " + matchId);
-        Log.d(TAG, "Innings ID: " + inningsId);
+        Map<String, Object> databaseData = databaseHelper.shareMatchData(matchId, inningsId);
+        Log.d(TAG, "Database Data: " + databaseData);
 
-        // Fetch match data
-        Map<String, Object> shareData = databaseHelper.shareMatchData(matchId, inningsId);
+        // Combine both data sources
+        Map<String, Object> combinedData = new HashMap<>();
+        combinedData.put("sharedPreferences", sharedPrefsData);
+        combinedData.put("database", databaseData);
+
+        // Convert combined data to JSON
         Gson gson = new Gson();
-        String matchJson = gson.toJson(shareData);
-        Log.d(TAG, "Match Data JSON: " + matchJson);
+        String combinedJson = gson.toJson(combinedData);
+        Log.d(TAG, "Combined JSON Data: " + combinedJson);
 
-        // Save JSON data to file
-        File dir = new File(getExternalFilesDir("json_file"), "json_files");
+        // Save JSON data to a file
+        File dir = new File(getExternalFilesDir(null), "json_files");
         if (!dir.exists() && !dir.mkdirs()) {
             Log.e(TAG, "Failed to create directory 'json_files'.");
             return;
         }
-
-        File sharedFile = new File(dir, "match_data.json");
-        try (FileOutputStream fos = new FileOutputStream(sharedFile)) {
-            fos.write(matchJson.getBytes());
+        File combinedFile = new File(dir, "combined_data.json");
+        try (FileOutputStream fos = new FileOutputStream(combinedFile)) {
+            fos.write(combinedJson.getBytes());
             fos.flush();
-            Log.d(TAG, "JSON data written to file.");
+            Log.d(TAG, "Combined JSON data written to file.");
         } catch (IOException e) {
-            Log.e(TAG, "Error writing JSON file: " + e.getMessage());
+            Log.e(TAG, "Error writing combined JSON file: " + e.getMessage());
             return;
         }
 
-        // Create sharing intent
+        // Share the file
+        shareFile(combinedFile);
+    }
+
+    private void shareFile(File file) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("application/json");
-        Uri fileUri = FileProvider.getUriForFile(this, "com.cricketscoringapp.criceasy.fileprovider", sharedFile);
+        Uri fileUri = FileProvider.getUriForFile(this, "com.cricketscoringapp.criceasy.fileprovider", file);
         intent.putExtra(Intent.EXTRA_STREAM, fileUri);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
         try {
-            startActivity(Intent.createChooser(intent, "Share Match Data"));
+            startActivity(Intent.createChooser(intent, "Share Combined Data"));
             Log.d(TAG, "Share intent started.");
         } catch (Exception e) {
             Log.e(TAG, "Error starting share intent: " + e.getMessage());
