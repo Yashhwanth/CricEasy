@@ -6,8 +6,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -34,29 +36,54 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        databaseHelper = new DatabaseHelper(this);
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.mainActivity), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
 
-//        // Check if there's a current activity saved and navigate accordingly
-//        if (navigateToLastActivityIfOngoingMatch()) {
-//            return; // Skip MainActivity logic if navigating to the last activity
-//        }
-//
-        updateCurrentActivityInPreferences();
+        databaseHelper = new DatabaseHelper(this);
+
+        // Initialize UI elements
         Button newMatchButton = findViewById(R.id.newMatchButton);
-        newMatchButton.setOnClickListener(view ->{
+        Button resumeMatchButton = findViewById(R.id.pastMatchesButton);
+
+        // Hide the "Resume Match" button by default
+        resumeMatchButton.setVisibility(View.GONE);
+
+        // Check if the app was launched through a file
+        Intent intent = getIntent();
+        if (intent != null && intent.getData() != null) {
+            Uri fileUri = intent.getData();
+            Log.d(TAG, "App opened via file URI: " + fileUri);
+            Intent resumeIntent = new Intent(MainActivity.this, MatchInfoActivity.class);
+            startActivity(resumeIntent);
+
+            // Attempt to read and parse the file
+//            try {
+//                String jsonData = readJsonFile(fileUri);
+//                if (restoreMatchStateFromJson(jsonData)) {
+//                    Log.d(TAG, "Match state successfully restored.");
+//                    resumeMatchButton.setVisibility(View.VISIBLE); // Show the "Resume Match" button
+//                    resumeMatchButton.setOnClickListener(view -> {
+//                        Log.d(TAG, "Resuming match.");
+//                        Intent resumeIntent = new Intent(MainActivity.this, MatchInfoActivity.class);
+//                        startActivity(resumeIntent);
+//                    });
+//                    return; // Skip other logic since we are resuming the match
+//                } else {
+//                    Log.e(TAG, "Failed to restore match state. Falling back to new match.");
+//                }
+//            } catch (Exception e) {
+//                Log.e(TAG, "Error reading or parsing JSON file: " + e.getMessage());
+//            }
+        }
+
+        // Handle the "New Match" button
+        newMatchButton.setOnClickListener(view -> {
             long currentMatchId = handleNewMatch();
             saveMatchIdToPreferences(currentMatchId);
-            Log.d(TAG, "onCreate: opening matchInfo activity");
-            Intent intent = new Intent(MainActivity.this, MatchInfoActivity.class);
-            startActivity(intent);
+            Log.d(TAG, "onCreate: opening MatchInfo activity");
+            Intent matchIntent = new Intent(MainActivity.this, MatchInfoActivity.class);
+            startActivity(matchIntent);
         });
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -144,5 +171,9 @@ public class MainActivity extends AppCompatActivity {
 
         return false; // No navigation occurred
     }
+    // Check if there's a current activity saved and navigate accordingly
+//        if (navigateToLastActivityIfOngoingMatch()) {
+//            return; // Skip MainActivity logic if navigating to the last activity
+//        }
 
 }
