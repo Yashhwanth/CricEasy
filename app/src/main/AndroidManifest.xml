@@ -50,8 +50,8 @@
             <data android:scheme="file" />
             <!-- MIME types for JSON -->
             <data android:mimeType="application/json" />
-<!--            <data android:mimeType="text/plain" />-->
-<!--            <data android:mimeType="application/octet-stream" />-->
+            <data android:mimeType="text/plain" />
+            <data android:mimeType="application/octet-stream" />
             </intent-filter>
         </activity>
 
