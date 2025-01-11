@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 
@@ -19,7 +20,10 @@ import com.cricketscoringapp.criceasy.model.BallDetails;
 import com.cricketscoringapp.criceasy.model.Batsman;
 import com.cricketscoringapp.criceasy.model.Bowler;
 import com.cricketscoringapp.criceasy.model.Player;
+import com.google.android.datatransport.cct.internal.LogEvent;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 21; // Update version
@@ -2292,7 +2296,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //db.close();
         return batterList;
     }
-
     public List<Bowler> getAllBowlerStats(long inningsId) {
         List<Bowler> bowlerList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -2326,6 +2329,656 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //db.close();
         return bowlerList;
     }
+    //----------------------------sharing json data--------------------------------------
+    public JSONObject getMatchDataById(int matchId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        JSONObject matchData = new JSONObject();
+        Cursor cursor = null;
+        try {
+            String query = "SELECT * FROM " + TABLE_MATCH + " WHERE " + COLUMN_MATCH_ID + " = ?";
+            cursor = db.rawQuery(query, new String[]{String.valueOf(matchId)});
+            if (cursor != null && cursor.moveToFirst()) {
+                int matchIdIndex = cursor.getColumnIndex(COLUMN_MATCH_ID);
+                int matchTypeIndex = cursor.getColumnIndex(COLUMN_MATCH_TYPE);
+                int noOfOversIndex = cursor.getColumnIndex(COLUMN_NO_OF_OVERS);
+                int ballTypeIndex = cursor.getColumnIndex(COLUMN_BALL_TYPE);
+                int placeNameIndex = cursor.getColumnIndex(COLUMN_PLACE_NAME);
+                int dateTimeIndex = cursor.getColumnIndex(COLUMN_DATE_TIME);
+                int tossIndex = cursor.getColumnIndex(COLUMN_TOSS);
+                int isMatchCompletedIndex = cursor.getColumnIndex(COLUMN_IS_MATCH_COMPLETED);
+                int matchWonByIndex = cursor.getColumnIndex(COLUMN_MATCH_WON_BY);
+                int matchResultIndex = cursor.getColumnIndex(COLUMN_MATCH_RESULT);
+                // Ensure each column index is valid (not -1)
+                if (matchIdIndex >= 0) matchData.put(COLUMN_MATCH_ID, cursor.getInt(matchIdIndex));
+                if (matchTypeIndex >= 0) matchData.put(COLUMN_MATCH_TYPE, cursor.getString(matchTypeIndex));
+                if (noOfOversIndex >= 0) matchData.put(COLUMN_NO_OF_OVERS, cursor.getInt(noOfOversIndex));
+                if (ballTypeIndex >= 0) matchData.put(COLUMN_BALL_TYPE, cursor.getString(ballTypeIndex));
+                if (placeNameIndex >= 0) matchData.put(COLUMN_PLACE_NAME, cursor.getInt(placeNameIndex));
+                if (dateTimeIndex >= 0) matchData.put(COLUMN_DATE_TIME, cursor.getString(dateTimeIndex));
+                if (tossIndex >= 0) matchData.put(COLUMN_TOSS, cursor.getInt(tossIndex));
+                if (isMatchCompletedIndex >= 0) matchData.put(COLUMN_IS_MATCH_COMPLETED, cursor.getInt(isMatchCompletedIndex));
+                if (matchWonByIndex >= 0) matchData.put(COLUMN_MATCH_WON_BY, cursor.getInt(matchWonByIndex));
+                if (matchResultIndex >= 0) matchData.put(COLUMN_MATCH_RESULT, cursor.getString(matchResultIndex));
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "getMatchDataById: error getting match data");
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return matchData;
+    }
+    public JSONArray getAllTeamsData() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        JSONArray teamsDataArray = new JSONArray();
+        Cursor cursor = null;
+        try {
+            String query = "SELECT * FROM " + TABLE_TEAMS;
+            cursor = db.rawQuery(query, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    JSONObject teamData = new JSONObject();
+                    int teamIdIndex = cursor.getColumnIndex(COLUMN_TEAM_ID);
+                    int teamNameIndex = cursor.getColumnIndex(COLUMN_TEAM_NAME);
+                    if (teamIdIndex >= 0) teamData.put(COLUMN_TEAM_ID, cursor.getInt(teamIdIndex));
+                    if (teamNameIndex >= 0) teamData.put(COLUMN_TEAM_NAME, cursor.getString(teamNameIndex));
+                    teamsDataArray.put(teamData);
+                } while (cursor.moveToNext()); // Move to the next row
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "getAllTeamsData: error getting teams data");
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return teamsDataArray; // Return the JSON array containing all teams data
+    }
+    public JSONArray getAllPlaces() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        JSONArray placesDataArray = new JSONArray();
+        Cursor cursor = null;
+        try {
+            // Query to select all data from the PLACES table
+            String query = "SELECT * FROM " + TABLE_PLACES;
+            cursor = db.rawQuery(query, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    JSONObject placeData = new JSONObject();
+                    int placeIdIndex = cursor.getColumnIndex(COLUMN_PLACE_ID);
+                    int placeNameIndex = cursor.getColumnIndex(COLUMN_PLACE_NAME);
+                    // Check if the columns exist and populate the JSON object
+                    if (placeIdIndex >= 0) placeData.put(COLUMN_PLACE_ID, cursor.getInt(placeIdIndex));
+                    if (placeNameIndex >= 0) placeData.put(COLUMN_PLACE_NAME, cursor.getString(placeNameIndex));
+                    placesDataArray.put(placeData);
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "getAllPlaces: error getting all places");
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return placesDataArray;
+    }
+    public JSONObject getTossDataById(int tossId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        JSONObject tossData = new JSONObject();
+        Cursor cursor = null;
+        try {
+            String query = "SELECT * FROM " + TABLE_TOSS + " WHERE " + COLUMN_TOSS_ID + " = ?";
+            cursor = db.rawQuery(query, new String[]{String.valueOf(tossId)});
+            if (cursor != null && cursor.moveToFirst()) {
+                int tossIdIndex = cursor.getColumnIndex(COLUMN_TOSS_ID);
+                int tossCallByIndex = cursor.getColumnIndex(COLUMN_TOSS_CALL_BY);
+                int tossWonByIndex = cursor.getColumnIndex(COLUMN_TOSS_WON_BY);
+                int tossWonTeamChooseToIndex = cursor.getColumnIndex(COLUMN_TOSS_WON_TEAM_CHOOSE_TO);
+                // Check if the columns exist and populate the JSON object
+                if (tossIdIndex >= 0) tossData.put(COLUMN_TOSS_ID, cursor.getInt(tossIdIndex));
+                if (tossCallByIndex >= 0) tossData.put(COLUMN_TOSS_CALL_BY, cursor.getInt(tossCallByIndex));
+                if (tossWonByIndex >= 0) tossData.put(COLUMN_TOSS_WON_BY, cursor.getInt(tossWonByIndex));
+                if (tossWonTeamChooseToIndex >= 0) tossData.put(COLUMN_TOSS_WON_TEAM_CHOOSE_TO, cursor.getString(tossWonTeamChooseToIndex));
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "getTossDataById: error in getting toss");
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return tossData;
+    }
+    public JSONArray getAllPlayers() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        JSONArray playersData = new JSONArray();
+        Cursor cursor = null;
+        try {
+            // Query to select all players
+            String query = "SELECT * FROM " + TABLE_PLAYERS;
+            cursor = db.rawQuery(query, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    JSONObject player = new JSONObject();
+                    int playerIdIndex = cursor.getColumnIndex(COLUMN_PLAYER_ID);
+                    int playerNameIndex = cursor.getColumnIndex(COLUMN_PLAYER_NAME);
+                    // Check if the columns exist and populate the JSON object
+                    if (playerIdIndex >= 0) player.put(COLUMN_PLAYER_ID, cursor.getInt(playerIdIndex));
+                    if (playerNameIndex >= 0) player.put(COLUMN_PLAYER_NAME, cursor.getString(playerNameIndex));
+                    playersData.put(player);
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting corresponding data: " + e.getMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return playersData;
+    }
+    public JSONArray getPlayersTeamsByInningsId(int inningsId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        JSONArray playersTeamsData = new JSONArray();
+        Cursor cursor = null;
+        try {
+            // Query to select data based on Innings ID
+            String query = "SELECT * FROM " + TABLE_PLAYERS_TEAMS + " WHERE " + COLUMN_INNINGS_ID + " = ?";
+            cursor = db.rawQuery(query, new String[]{String.valueOf(inningsId)});
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    JSONObject playerTeam = new JSONObject();
+                    int teamIdIndex = cursor.getColumnIndex(COLUMN_TEAM_ID);
+                    int playerIdIndex = cursor.getColumnIndex(COLUMN_PLAYER_ID);
+                    int inningsIdIndex = cursor.getColumnIndex(COLUMN_INNINGS_ID);
+                    // Check if the columns exist and populate the JSON object
+                    if (teamIdIndex >= 0) playerTeam.put(COLUMN_TEAM_ID, cursor.getInt(teamIdIndex));
+                    if (playerIdIndex >= 0) playerTeam.put(COLUMN_PLAYER_ID, cursor.getInt(playerIdIndex));
+                    if (inningsIdIndex >= 0) playerTeam.put(COLUMN_INNINGS_ID, cursor.getInt(inningsIdIndex));
+                    playersTeamsData.put(playerTeam);
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting corresponding data: " + e.getMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return playersTeamsData;
+    }
+    public JSONArray getPartnershipsByInningsId(int inningsId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        JSONArray partnershipsData = new JSONArray();
+        Cursor cursor = null;
+        try {
+            String query = "SELECT * FROM " + TABLE_PARTNERSHIPS + " WHERE " + COLUMN_INNINGS_ID + " = ?";
+            cursor = db.rawQuery(query, new String[]{String.valueOf(inningsId)});
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    JSONObject partnership = new JSONObject();
+                    int partnershipIdIndex = cursor.getColumnIndex(COLUMN_PARTNERSHIP_ID);
+                    int inningsIdIndex = cursor.getColumnIndex(COLUMN_INNINGS_ID);
+                    int batsman1IdIndex = cursor.getColumnIndex(COLUMN_BATSMAN1_ID);
+                    int batsman2IdIndex = cursor.getColumnIndex(COLUMN_BATSMAN2_ID);
+                    int runsIndex = cursor.getColumnIndex(COLUMN_RUNS);
+                    int ballsIndex = cursor.getColumnIndex(COLUMN_BALLS);
+                    // Check if the columns exist and populate the JSON object
+                    if (partnershipIdIndex >= 0) partnership.put(COLUMN_PARTNERSHIP_ID, cursor.getInt(partnershipIdIndex));
+                    if (inningsIdIndex >= 0) partnership.put(COLUMN_INNINGS_ID, cursor.getInt(inningsIdIndex));
+                    if (batsman1IdIndex >= 0) partnership.put(COLUMN_BATSMAN1_ID, cursor.getInt(batsman1IdIndex));
+                    if (batsman2IdIndex >= 0) partnership.put(COLUMN_BATSMAN2_ID, cursor.getInt(batsman2IdIndex));
+                    if (runsIndex >= 0) partnership.put(COLUMN_RUNS, cursor.getInt(runsIndex));
+                    if (ballsIndex >= 0) partnership.put(COLUMN_BALLS, cursor.getInt(ballsIndex));
+                    partnershipsData.put(partnership);
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting corresponding data: " + e.getMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return partnershipsData;
+    }
+    public JSONArray getInningsByMatchId(int matchId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        JSONArray inningsData = new JSONArray();
+        Cursor cursor = null;
+        try {
+            // Query to select data based on Match ID
+            String query = "SELECT * FROM " + TABLE_INNINGS + " WHERE " + COLUMN_MATCH_ID + " = ?";
+            cursor = db.rawQuery(query, new String[]{String.valueOf(matchId)});
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    JSONObject innings = new JSONObject();
+                    int inningsIdIndex = cursor.getColumnIndex(COLUMN_INNINGS_ID);
+                    int inningsNumberIndex = cursor.getColumnIndex(COLUMN_INNINGS_NUMBER);
+                    int matchIdIndex = cursor.getColumnIndex(COLUMN_MATCH_ID);
+                    int teamBattingIndex = cursor.getColumnIndex(COLUMN_TEAM_BATTING);
+                    int isCompletedIndex = cursor.getColumnIndex(COLUMN_IS_COMPLETED);
+                    // Check if the columns exist and populate the JSON object
+                    if (inningsIdIndex >= 0) innings.put(COLUMN_INNINGS_ID, cursor.getInt(inningsIdIndex));
+                    if (inningsNumberIndex >= 0) innings.put(COLUMN_INNINGS_NUMBER, cursor.getInt(inningsNumberIndex));
+                    if (matchIdIndex >= 0) innings.put(COLUMN_MATCH_ID, cursor.getInt(matchIdIndex));
+                    if (teamBattingIndex >= 0) innings.put(COLUMN_TEAM_BATTING, cursor.getInt(teamBattingIndex));
+                    if (isCompletedIndex >= 0) innings.put(COLUMN_IS_COMPLETED, cursor.getInt(isCompletedIndex));
+                    inningsData.put(innings);
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting corresponding data: " + e.getMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return inningsData;
+    }
+    public JSONArray getOversByInningsId(int inningsId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        JSONArray oversData = new JSONArray();
+        Cursor cursor = null;
+
+        try {
+            // Query to select data based on Innings ID
+            String query = "SELECT * FROM " + TABLE_OVERS + " WHERE " + COLUMN_INNINGS_ID + " = ?";
+            cursor = db.rawQuery(query, new String[]{String.valueOf(inningsId)});
+
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    JSONObject over = new JSONObject();
+
+                    // Get the column indexes
+                    int overIdIndex = cursor.getColumnIndex(COLUMN_OVER_ID);
+                    int inningsIdIndex = cursor.getColumnIndex(COLUMN_INNINGS_ID);
+                    int overNumberIndex = cursor.getColumnIndex(COLUMN_OVER_NUMBER);
+                    int playerIdIndex = cursor.getColumnIndex(COLUMN_PLAYER_ID);
+                    int isMaidenIndex = cursor.getColumnIndex(COLUMN_IS_MAIDEN);
+
+                    // Check if the columns exist and populate the JSON object
+                    if (overIdIndex >= 0) over.put(COLUMN_OVER_ID, cursor.getInt(overIdIndex));
+                    if (inningsIdIndex >= 0) over.put(COLUMN_INNINGS_ID, cursor.getInt(inningsIdIndex));
+                    if (overNumberIndex >= 0) over.put(COLUMN_OVER_NUMBER, cursor.getInt(overNumberIndex));
+                    if (playerIdIndex >= 0) over.put(COLUMN_PLAYER_ID, cursor.getInt(playerIdIndex));
+                    if (isMaidenIndex >= 0) over.put(COLUMN_IS_MAIDEN, cursor.getInt(isMaidenIndex));
+
+                    // Add the over data to the JSON array
+                    oversData.put(over);
+
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting corresponding data: " + e.getMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return oversData;
+    }
+    public JSONArray getBallsByMatchId(int matchId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        JSONArray ballsData = new JSONArray();
+        Cursor cursor = null;
+
+        try {
+            // First, get all INNINGS_IDs for the given MATCH_ID
+            String inningsQuery = "SELECT " + COLUMN_INNINGS_ID + " FROM " + TABLE_INNINGS +
+                    " WHERE " + COLUMN_MATCH_ID + " = ?";
+            cursor = db.rawQuery(inningsQuery, new String[]{String.valueOf(matchId)});
+
+            // Collect all INNINGS_IDs
+            List<Integer> inningsIds = new ArrayList<>();
+            while (cursor != null && cursor.moveToNext()) {
+                int inningsIdIndex = cursor.getColumnIndex(COLUMN_INNINGS_ID);
+                int inningsId = 0;
+                if(inningsIdIndex >= 0) inningsId = cursor.getInt(inningsIdIndex);
+                inningsIds.add(inningsId);
+            }
+
+            // Close the cursor for the INNINGS query
+            if (cursor != null) cursor.close();
+
+            // Now, get the OVER_IDs for both innings
+            List<Integer> overIds = new ArrayList<>();
+            if (!inningsIds.isEmpty()) {
+                String oversQuery = "SELECT " + COLUMN_OVER_ID + " FROM " + TABLE_OVERS +
+                        " WHERE " + COLUMN_INNINGS_ID + " IN (" + TextUtils.join(",", inningsIds) + ")";
+                cursor = db.rawQuery(oversQuery, null);
+                while (cursor != null && cursor.moveToNext()) {
+                    int overIdIndex = cursor.getColumnIndex(COLUMN_OVER_ID);
+                    int overId = 0;
+                    if(overIdIndex >= 0) overId = cursor.getInt(overIdIndex);
+                    //int overId = cursor.getInt(cursor.getColumnIndex(COLUMN_OVER_ID));
+                    overIds.add(overId);
+                }
+            }
+
+            // Close the cursor for the OVERS query
+            if (cursor != null) cursor.close();
+
+            // Now, get the BALLS data for those OVER_IDs
+            if (!overIds.isEmpty()) {
+                String ballsQuery = "SELECT * FROM " + TABLE_BALLS +
+                        " WHERE " + COLUMN_OVER_ID + " IN (" + TextUtils.join(",", overIds) + ")";
+                cursor = db.rawQuery(ballsQuery, null);
+
+                if (cursor != null && cursor.moveToFirst()) {
+                    do {
+                        JSONObject ball = new JSONObject();
+
+                        // Get the column indexes
+                        int ballIdIndex = cursor.getColumnIndex(COLUMN_BALL_ID);
+                        int overIdIndex = cursor.getColumnIndex(COLUMN_OVER_ID);
+                        int ballNumberIndex = cursor.getColumnIndex(COLUMN_BALL_NUMBER);
+                        int typeOfBallIndex = cursor.getColumnIndex(COLUMN_TYPE_OF_BALL);
+                        int runsIndex = cursor.getColumnIndex(COLUMN_RUNS);
+                        int isWicketIndex = cursor.getColumnIndex(COLUMN_IS_WICKET);
+                        int strikerIndex = cursor.getColumnIndex(COLUMN_STRIKER);
+                        int nonStrikerIndex = cursor.getColumnIndex(COLUMN_NON_STRIKER);
+                        int isSyncedIndex = cursor.getColumnIndex(COLUMN_IS_SYNCED);
+
+                        // Check if the columns exist and populate the JSON object
+                        if (ballIdIndex >= 0) ball.put(COLUMN_BALL_ID, cursor.getInt(ballIdIndex));
+                        if (overIdIndex >= 0) ball.put(COLUMN_OVER_ID, cursor.getInt(overIdIndex));
+                        if (ballNumberIndex >= 0) ball.put(COLUMN_BALL_NUMBER, cursor.getInt(ballNumberIndex));
+                        if (typeOfBallIndex >= 0) ball.put(COLUMN_TYPE_OF_BALL, cursor.getString(typeOfBallIndex));
+                        if (runsIndex >= 0) ball.put(COLUMN_RUNS, cursor.getInt(runsIndex));
+                        if (isWicketIndex >= 0) ball.put(COLUMN_IS_WICKET, cursor.getInt(isWicketIndex));
+                        if (strikerIndex >= 0) ball.put(COLUMN_STRIKER, cursor.getInt(strikerIndex));
+                        if (nonStrikerIndex >= 0) ball.put(COLUMN_NON_STRIKER, cursor.getInt(nonStrikerIndex));
+                        if (isSyncedIndex >= 0) ball.put(COLUMN_IS_SYNCED, cursor.getInt(isSyncedIndex));
+
+                        // Add the ball data to the JSON array
+                        ballsData.put(ball);
+
+                    } while (cursor.moveToNext());
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting corresponding data: " + e.getMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return ballsData;
+    }
+    public JSONArray getBatsmanDataByInningsId(int inningsId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        JSONArray batsmanData = new JSONArray();
+        try {
+            // Define the query to retrieve batsman data for a particular inningsId
+            String query = "SELECT * FROM " + TABLE_BATSMAN +
+                    " WHERE " + COLUMN_INNINGS_ID + " = ?";
+
+            // Execute the query
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(inningsId)});
+
+            // Check if cursor is valid
+            if (cursor != null && cursor.getCount() > 0) {
+                // Get column indexes
+                int playerIndex = cursor.getColumnIndex(COLUMN_PLAYER);
+                int scoreIndex = cursor.getColumnIndex(COLUMN_SCORE);
+                int ballsPlayedIndex = cursor.getColumnIndex(COLUMN_BALLS_PLAYED);
+                int zerosIndex = cursor.getColumnIndex(COLUMN_ZEROES);
+                int onesIndex = cursor.getColumnIndex(COLUMN_ONES);
+                int twosIndex = cursor.getColumnIndex(COLUMN_TWOS);
+                int threesIndex = cursor.getColumnIndex(COLUMN_THREES);
+                int foursIndex = cursor.getColumnIndex(COLUMN_FOURS);
+                int fivesIndex = cursor.getColumnIndex(COLUMN_FIVES);
+                int sixesIndex = cursor.getColumnIndex(COLUMN_SIXES);
+
+                // Check if all indexes are valid (>= 0)
+                if (playerIndex >= 0 && scoreIndex >= 0 && ballsPlayedIndex >= 0 &&
+                        zerosIndex >= 0 && onesIndex >= 0 && twosIndex >= 0 &&
+                        threesIndex >= 0 && foursIndex >= 0 && fivesIndex >= 0 &&
+                        sixesIndex >= 0) {
+
+                    // Move to the first row of results
+                    while (cursor.moveToNext()) {
+                        // Extract each column value
+                        int playerId = cursor.getInt(playerIndex);
+                        int score = cursor.getInt(scoreIndex);
+                        int ballsPlayed = cursor.getInt(ballsPlayedIndex);
+                        int zeros = cursor.getInt(zerosIndex);
+                        int ones = cursor.getInt(onesIndex);
+                        int twos = cursor.getInt(twosIndex);
+                        int threes = cursor.getInt(threesIndex);
+                        int fours = cursor.getInt(foursIndex);
+                        int fives = cursor.getInt(fivesIndex);
+                        int sixes = cursor.getInt(sixesIndex);
+
+                        // Create a JSONObject for the current row
+                        JSONObject batsman = new JSONObject();
+                        batsman.put("playerId", playerId);
+                        batsman.put("score", score);
+                        batsman.put("ballsPlayed", ballsPlayed);
+                        batsman.put("zeros", zeros);
+                        batsman.put("ones", ones);
+                        batsman.put("twos", twos);
+                        batsman.put("threes", threes);
+                        batsman.put("fours", fours);
+                        batsman.put("fives", fives);
+                        batsman.put("sixes", sixes);
+
+                        // Add the batsman data to the JSONArray
+                        batsmanData.put(batsman);
+                    }
+                } else {
+                    Log.e("Database Error", "Invalid column indexes.");
+                }
+
+                // Close the cursor after processing
+                cursor.close();
+            }
+        } catch (Exception e) {
+            // Log error
+            Log.e("Error getting batsman data", "Error: " + e.getMessage());
+        }
+
+        return batsmanData;
+    }
+    public JSONArray getBowlerDataByInningsId(int inningsId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        JSONArray bowlerData = new JSONArray();
+        try {
+            // Define the query to retrieve bowler data for a particular inningsId
+            String query = "SELECT * FROM " + TABLE_BOWLER +
+                    " WHERE " + COLUMN_INNINGS_ID + " = ?";
+
+            // Execute the query
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(inningsId)});
+
+            // Check if cursor is valid and has data
+            if (cursor != null && cursor.getCount() > 0) {
+                // Get column indexes
+                int playerIndex = cursor.getColumnIndex(COLUMN_PLAYER);
+                int maidensIndex = cursor.getColumnIndex(COLUMN_MAIDENS);
+                int ballsPlayedIndex = cursor.getColumnIndex(COLUMN_BALLS_PLAYED);
+                int runsIndex = cursor.getColumnIndex(COLUMN_RUNS);
+                int economyIndex = cursor.getColumnIndex(COLUMN_ECONOMY);
+                int zerosIndex = cursor.getColumnIndex(COLUMN_ZEROES);
+                int onesIndex = cursor.getColumnIndex(COLUMN_ONES);
+                int twosIndex = cursor.getColumnIndex(COLUMN_TWOS);
+                int threesIndex = cursor.getColumnIndex(COLUMN_THREES);
+                int foursIndex = cursor.getColumnIndex(COLUMN_FOURS);
+                int fivesIndex = cursor.getColumnIndex(COLUMN_FIVES);
+                int sixesIndex = cursor.getColumnIndex(COLUMN_SIXES);
+                int wkIndex = cursor.getColumnIndex(COLUMN_WK);
+                int byIndex = cursor.getColumnIndex(COLUMN_BY);
+                int lbIndex = cursor.getColumnIndex(COLUMN_LB);
+                int wbIndex = cursor.getColumnIndex(COLUMN_WB);
+                int nbIndex = cursor.getColumnIndex(COLUMN_NB);
+                int dbIndex = cursor.getColumnIndex(COLUMN_DB);
+
+                // Check if all indexes are valid
+                if (playerIndex >= 0 && maidensIndex >= 0 && ballsPlayedIndex >= 0 &&
+                        runsIndex >= 0 && economyIndex >= 0 && zerosIndex >= 0 && onesIndex >= 0 &&
+                        twosIndex >= 0 && threesIndex >= 0 && foursIndex >= 0 && fivesIndex >= 0 &&
+                        sixesIndex >= 0 && wkIndex >= 0 && byIndex >= 0 && lbIndex >= 0 && wbIndex >= 0 &&
+                        nbIndex >= 0 && dbIndex >= 0) {
+
+                    // Move to the first row of results
+                    while (cursor.moveToNext()) {
+                        // Extract each column value
+                        int playerId = cursor.getInt(playerIndex);
+                        int maidens = cursor.getInt(maidensIndex);
+                        int ballsPlayed = cursor.getInt(ballsPlayedIndex);
+                        int runs = cursor.getInt(runsIndex);
+                        float economy = cursor.getFloat(economyIndex);
+                        int zeros = cursor.getInt(zerosIndex);
+                        int ones = cursor.getInt(onesIndex);
+                        int twos = cursor.getInt(twosIndex);
+                        int threes = cursor.getInt(threesIndex);
+                        int fours = cursor.getInt(foursIndex);
+                        int fives = cursor.getInt(fivesIndex);
+                        int sixes = cursor.getInt(sixesIndex);
+                        int wk = cursor.getInt(wkIndex);
+                        int by = cursor.getInt(byIndex);
+                        int lb = cursor.getInt(lbIndex);
+                        int wb = cursor.getInt(wbIndex);
+                        int nb = cursor.getInt(nbIndex);
+                        int dBall = cursor.getInt(dbIndex);
+
+                        // Create a JSONObject for the current row
+                        JSONObject bowler = new JSONObject();
+                        bowler.put("playerId", playerId);
+                        bowler.put("maidens", maidens);
+                        bowler.put("ballsPlayed", ballsPlayed);
+                        bowler.put("runs", runs);
+                        bowler.put("economy", economy);
+                        bowler.put("zeros", zeros);
+                        bowler.put("ones", ones);
+                        bowler.put("twos", twos);
+                        bowler.put("threes", threes);
+                        bowler.put("fours", fours);
+                        bowler.put("fives", fives);
+                        bowler.put("sixes", sixes);
+                        bowler.put("wk", wk);
+                        bowler.put("by", by);
+                        bowler.put("lb", lb);
+                        bowler.put("wb", wb);
+                        bowler.put("nb", nb);
+                        bowler.put("db", dBall);
+
+                        // Add the bowler data to the JSONArray
+                        bowlerData.put(bowler);
+                    }
+                } else {
+                    Log.e("Database Error", "Invalid column indexes.");
+                }
+
+                // Close the cursor after processing
+                cursor.close();
+            }
+        } catch (Exception e) {
+            // Log error if anything goes wrong
+            Log.e("Error getting bowler data", "Error: " + e.getMessage());
+        }
+
+        return bowlerData;
+    }
+    public JSONObject getTeamStatisticsByInningsId(int inningsId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        JSONObject teamStats = new JSONObject();
+        try {
+            // Define the query to retrieve team statistics based on inningsId
+            String query = "SELECT * FROM " + TABLE_TEAM_STATISTICS +
+                    " WHERE " + COLUMN_INNINGS_ID + " = ?";
+
+            // Execute the query
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(inningsId)});
+
+            // Check if cursor is valid and has data
+            if (cursor != null && cursor.moveToFirst()) {
+                // Get column indexes
+                int runsIndex = cursor.getColumnIndex(COLUMN_RUNS);
+                int wicketsIndex = cursor.getColumnIndex(COLUMN_WICKETS);
+                int ballsIndex = cursor.getColumnIndex(COLUMN_BALLS);
+                int extrasIndex = cursor.getColumnIndex(COLUMN_EXTRAS);
+
+                // Check if the indexes are valid
+                if (runsIndex >= 0 && wicketsIndex >= 0 && ballsIndex >= 0 && extrasIndex >= 0) {
+                    // Extract data for the team statistics
+                    int runs = cursor.getInt(runsIndex);
+                    int wickets = cursor.getInt(wicketsIndex);
+                    int balls = cursor.getInt(ballsIndex);
+                    int extras = cursor.getInt(extrasIndex);
+
+                    // Add the extracted data into the JSONObject
+                    teamStats.put("runs", runs);
+                    teamStats.put("wickets", wickets);
+                    teamStats.put("balls", balls);
+                    teamStats.put("extras", extras);
+                } else {
+                    Log.e("Database Error", "Invalid column indexes.");
+                }
+
+                // Close the cursor after processing
+                cursor.close();
+            }
+        } catch (Exception e) {
+            // Log any exceptions that occur
+            Log.e("Error getting team stats", "Error: " + e.getMessage());
+        }
+
+        return teamStats;
+    }
+    public Map<String, Object> shareMatchData(int matchId, int inningsId) {
+        // Initialize a structure to store all the data
+        Map<String, Object> matchData = new HashMap<>();
+
+        // Fetch Match Data
+        matchData.put("match", getMatchDataById(matchId));
+
+        // Fetch Team Data
+        matchData.put("teams", getAllTeamsData());
+
+        // Fetch Places Data
+        matchData.put("places", getAllPlaces());
+
+        // Fetch Toss Data
+        matchData.put("toss", getTossDataById(matchId));
+
+        // Fetch Players Data
+        matchData.put("players", getAllPlayers());
+
+        // Fetch Players-Teams Data
+        matchData.put("playersTeams", getPlayersTeamsByInningsId(inningsId));
+
+        // Fetch Partnerships Data
+        matchData.put("partnerships", getPartnershipsByInningsId(inningsId));
+
+        // Fetch Innings Data
+        matchData.put("innings", getInningsByMatchId(matchId));
+
+        // Fetch Overs Data
+        matchData.put("overs", getOversByInningsId(inningsId));
+
+        // Fetch Balls Data
+        matchData.put("balls", getBallsByMatchId(inningsId));
+
+        // Fetch Batsman Data
+        matchData.put("batsman", getBatsmanDataByInningsId(inningsId));
+
+        // Fetch Bowler Data
+        matchData.put("bowler", getBowlerDataByInningsId(inningsId));
+
+        // Fetch Team Statistics
+        matchData.put("teamStatistics", getTeamStatisticsByInningsId(inningsId));
+
+        // Return all the collected data as an aggregated object
+        return matchData;
+    }
+
 }
 
 

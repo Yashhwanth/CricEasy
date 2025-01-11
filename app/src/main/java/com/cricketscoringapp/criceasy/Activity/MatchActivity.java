@@ -5,6 +5,7 @@ import static android.view.View.GONE;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -22,11 +23,13 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
+import com.cricketscoringapp.criceasy.Database.SharedPrefsToJson;
 import com.cricketscoringapp.criceasy.R;
 import com.cricketscoringapp.criceasy.fragment.CommentaryFragment;
 import com.cricketscoringapp.criceasy.fragment.InfoFragment;
@@ -34,10 +37,16 @@ import com.cricketscoringapp.criceasy.fragment.ScoreCardFragment;
 import com.cricketscoringapp.criceasy.fragment.TeamsFragment;
 import com.cricketscoringapp.criceasy.fragment.LiveFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Map;
 
 public class MatchActivity extends AppCompatActivity {
     private Button infoFragmentButton, summaryFragmentButton, scorecardFragmentButton, commentaryFragmentButton, teamsFragmentButton;
-    private FloatingActionButton floatingButton;
+    private FloatingActionButton scoringFloatingButton, shareFloatingButton;
     private Button inningsEndButton;
     private DatabaseHelper databaseHelper;
     private SharedPreferences sharedPreferences;
@@ -89,7 +98,7 @@ public class MatchActivity extends AppCompatActivity {
         super.onResume();
         updateCurrentActivityInPreferences();
         inningsEndButton.setVisibility(GONE);
-        floatingButton.setVisibility(View.VISIBLE);
+        scoringFloatingButton.setVisibility(View.VISIBLE);
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
     }
     @Override
@@ -130,7 +139,8 @@ public class MatchActivity extends AppCompatActivity {
         scorecardFragmentButton = findViewById(R.id.scorecardFragmentButton);
         commentaryFragmentButton = findViewById(R.id.commentaryFragmentButton);
         teamsFragmentButton = findViewById(R.id.teamsFragmentButton);
-        floatingButton = findViewById(R.id.floatingButton);
+        scoringFloatingButton = findViewById(R.id.floatingButton);
+        shareFloatingButton = findViewById(R.id.shareFloatingActionButton);
         infoFragmentButton.setOnClickListener(view -> showFragment(InfoFragment.class, "INFO_FRAGMENT"));
         summaryFragmentButton.setOnClickListener(view -> showFragment(LiveFragment.class, "LIVE_FRAGMENT"));
         scorecardFragmentButton.setOnClickListener(view -> showFragment(ScoreCardFragment.class, "SCORE_CARD_FRAGMENT"));
@@ -143,9 +153,13 @@ public class MatchActivity extends AppCompatActivity {
             if(ongoingInnings != null && ongoingInnings.equals("first")) secondInnings();
             else  closeTheApp();
         });
-        floatingButton.setOnClickListener(view ->{
+        scoringFloatingButton.setOnClickListener(view ->{
             openScoringPopup();
         });
+        shareFloatingButton.setOnClickListener(view ->{
+            shareMatch();
+        });
+
         if (savedInstanceState == null) {
             showFragment(LiveFragment.class, "LIVE_FRAGMENT");
         }
@@ -762,8 +776,8 @@ public class MatchActivity extends AppCompatActivity {
             inningsEndButton.setVisibility(View.VISIBLE);
             inningsEndButton.setText(R.string.endInningsText);
         }
-        floatingButton.setEnabled(false);
-        floatingButton.setAlpha(0.5f);     // Optional: Change visual appearance
+        scoringFloatingButton.setEnabled(false);
+        scoringFloatingButton.setAlpha(0.5f);     // Optional: Change visual appearance
     }
     public void updateScoreInSharedPreferences(String ballType, int runs){
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES,MODE_PRIVATE);
@@ -848,5 +862,51 @@ public class MatchActivity extends AppCompatActivity {
         editor.apply();
         finishAffinity();
     }
+    private void shareMatch() {
+        // Get match and innings IDs
+        int matchId = (int) sharedPreferences.getLong("currentMatchId", -1);
+        int inningsId = (int) sharedPreferences.getLong("currentInningsId", -1);
+        Log.d(TAG, "Match ID: " + matchId);
+        Log.d(TAG, "Innings ID: " + inningsId);
+
+        // Fetch match data
+        Map<String, Object> shareData = databaseHelper.shareMatchData(matchId, inningsId);
+        Gson gson = new Gson();
+        String matchJson = gson.toJson(shareData);
+        Log.d(TAG, "Match Data JSON: " + matchJson);
+
+        // Save JSON data to file
+        File dir = new File(getExternalFilesDir("json_file"), "json_files");
+        if (!dir.exists() && !dir.mkdirs()) {
+            Log.e(TAG, "Failed to create directory 'json_files'.");
+            return;
+        }
+
+        File sharedFile = new File(dir, "match_data.json");
+        try (FileOutputStream fos = new FileOutputStream(sharedFile)) {
+            fos.write(matchJson.getBytes());
+            fos.flush();
+            Log.d(TAG, "JSON data written to file.");
+        } catch (IOException e) {
+            Log.e(TAG, "Error writing JSON file: " + e.getMessage());
+            return;
+        }
+
+        // Create sharing intent
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("application/json");
+        Uri fileUri = FileProvider.getUriForFile(this, "com.cricketscoringapp.criceasy.fileprovider", sharedFile);
+        intent.putExtra(Intent.EXTRA_STREAM, fileUri);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        try {
+            startActivity(Intent.createChooser(intent, "Share Match Data"));
+            Log.d(TAG, "Share intent started.");
+        } catch (Exception e) {
+            Log.e(TAG, "Error starting share intent: " + e.getMessage());
+        }
+    }
+
+
 
 }

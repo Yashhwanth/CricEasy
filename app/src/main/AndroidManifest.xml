@@ -1,10 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
 
+    <!-- Existing permissions -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:required="true" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" android:required="true" />
+    <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="32"
+        tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
 
     <application
         android:allowBackup="true"
@@ -17,6 +25,8 @@
         android:theme="@style/Theme.CricEasy"
         android:enableOnBackInvokedCallback="true"
         tools:targetApi="31">
+
+        <!-- Existing activities -->
         <activity
             android:name=".Activity.SplashActivity"
             android:exported="true">
@@ -25,50 +35,50 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Add intent filter to handle file opening -->
         <activity
             android:name=".Activity.MainActivity"
             android:launchMode="singleTask"
-            android:exported="true" />
+            android:exported="true">
+            <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <!-- Schemes to handle file URIs -->
+            <data android:scheme="content" />
+            <data android:scheme="file" />
+            <!-- MIME types for JSON -->
+            <data android:mimeType="application/json" />
+<!--            <data android:mimeType="text/plain" />-->
+<!--            <data android:mimeType="application/octet-stream" />-->
+            </intent-filter>
+        </activity>
 
-        <!-- Additional activities -->
-        <activity
-            android:name=".Activity.MatchInfoActivity"
-            android:launchMode="singleTask"
-            android:exported="true" />
+        <!-- Additional existing activities -->
+        <activity android:name=".Activity.MatchInfoActivity" android:launchMode="singleTask" android:exported="true" />
+        <activity android:name=".Activity.TeamCreationActivity" android:launchMode="singleTask" android:exported="true" />
+        <activity android:name=".Activity.TossActivity" android:launchMode="singleTask" android:exported="true" />
+        <activity android:name=".Activity.TeamSelectionActivity" android:launchMode="singleTask" android:exported="true" />
+        <activity android:name=".Activity.SelectingSrNsBowActivity" android:launchMode="singleTask" android:exported="true" />
+        <activity android:name=".Activity.SelectingPlayersActivity" android:launchMode="singleTask" android:exported="true" />
+        <activity android:name=".Activity.MatchActivity" android:launchMode="singleTask" android:exported="true" />
+        <activity android:name=".Activity.TypeofWicketActivity" android:launchMode="singleTask" android:exported="true" />
 
-        <activity android:name=".Activity.TeamCreationActivity"
-            android:launchMode="singleTask"
-            android:exported="true"  />
-
-        <activity android:name=".Activity.TossActivity"
-            android:launchMode="singleTask"
-            android:exported="true"  />
-
-        <activity android:name=".Activity.TeamSelectionActivity"
-            android:launchMode="singleTask"
-            android:exported="true"  />
-
-        <activity android:name=".Activity.SelectingSrNsBowActivity"
-            android:launchMode="singleTask"
-            android:exported="true"  />
-
-        <activity android:name=".Activity.SelectingPlayersActivity"
-            android:launchMode="singleTask"
-            android:exported="true"  />
-
-        <activity android:name=".Activity.MatchActivity"
-            android:launchMode="singleTask"
-            android:exported="true"  />
-
-        <activity android:name=".Activity.TypeofWicketActivity"
-            android:launchMode="singleTask"
-            android:exported="true"  />
-
+        <!-- FileProvider -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.cricketscoringapp.criceasy.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true"
+            android:permission="android.permission.MANAGE_DOCUMENTS">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCSmIkxI3RiSMTa9DtLKrHSza-JW_4OjX0"/>
-
+            android:value="AIzaSyCSmIkxI3RiSMTa9DtLKrHSza-JW_4OjX0" />
     </application>
-
 </manifest>

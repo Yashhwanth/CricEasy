@@ -183,6 +183,7 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
         String TARGET = "target";
         String SCORE = "score";
         if(currentInningsNumber == null) {
+            editor.putLong("firstInningsId", inningsId);
             editor.putLong(CURRENT_INNINGS_ID_KEY, inningsId);
             editor.putString(CURRENT_INNINGS_NUMBER, FIRST_INNINGS);
             editor.putInt(SCORE,0);
@@ -191,6 +192,7 @@ public class SelectingSrNsBowActivity extends AppCompatActivity {
             editor.apply();
         }else{
             int score = sharedPreferences.getInt(SCORE, -1);
+            editor.putLong("secondInningsId", inningsId);
             editor.putLong(CURRENT_INNINGS_ID_KEY, inningsId);
             editor.putString(CURRENT_INNINGS_NUMBER, SECOND_INNINGS);
             editor.putInt(SCORE, 0);
