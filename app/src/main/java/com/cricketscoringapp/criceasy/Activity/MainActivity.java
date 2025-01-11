@@ -26,11 +26,20 @@ import com.cricketscoringapp.criceasy.Database.*;
 import com.cricketscoringapp.criceasy.R;
 import com.cricketscoringapp.criceasy.dao.MatchDao;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Iterator;
+
 public class MainActivity extends AppCompatActivity {
     private DatabaseHelper databaseHelper;
     private static final String SHARED_PREFERENCES = "match_prefs";
     private static final String MATCH_ID = "currentMatchId";
     private static final String CURRENT_ACTIVITY = "currentActivity";
+    private SharedPreferences sharedPreferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         databaseHelper = new DatabaseHelper(this);
+        sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
 
         // Initialize UI elements
         Button newMatchButton = findViewById(R.id.newMatchButton);
@@ -51,31 +61,33 @@ public class MainActivity extends AppCompatActivity {
         if (intent != null && intent.getData() != null) {
             Uri fileUri = intent.getData();
             Log.d(TAG, "App opened via file URI: " + fileUri);
-            Intent resumeIntent = new Intent(MainActivity.this, MatchInfoActivity.class);
-            startActivity(resumeIntent);
 
             // Attempt to read and parse the file
-//            try {
-//                String jsonData = readJsonFile(fileUri);
-//                if (restoreMatchStateFromJson(jsonData)) {
-//                    Log.d(TAG, "Match state successfully restored.");
-//                    resumeMatchButton.setVisibility(View.VISIBLE); // Show the "Resume Match" button
-//                    resumeMatchButton.setOnClickListener(view -> {
-//                        Log.d(TAG, "Resuming match.");
-//                        Intent resumeIntent = new Intent(MainActivity.this, MatchInfoActivity.class);
-//                        startActivity(resumeIntent);
-//                    });
-//                    return; // Skip other logic since we are resuming the match
-//                } else {
-//                    Log.e(TAG, "Failed to restore match state. Falling back to new match.");
-//                }
-//            } catch (Exception e) {
-//                Log.e(TAG, "Error reading or parsing JSON file: " + e.getMessage());
-//            }
+            try {
+                Log.d(TAG, "onCreate: inside the try block");
+                String jsonData = readJsonFile(fileUri);
+                if (restoreMatchStateFromJson(jsonData)) {
+                    Log.d(TAG, "Match state successfully restored.");
+                    resumeMatchButton.setVisibility(View.VISIBLE); // Show the "Resume Match" button
+                    resumeMatchButton.setOnClickListener(view -> {
+                        Log.d(TAG, "Resuming match.");
+                        Intent resumeIntent = new Intent(MainActivity.this, MatchInfoActivity.class);
+                        startActivity(resumeIntent);
+                    });
+                    return; // Skip other logic since we are resuming the match
+                } else {
+                    Log.e(TAG, "Failed to restore match state. Falling back to new match.");
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error reading or parsing JSON file: " + e.getMessage());
+            }
         }
 
         // Handle the "New Match" button
         newMatchButton.setOnClickListener(view -> {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.clear();
+            editor.apply();
             long currentMatchId = handleNewMatch();
             saveMatchIdToPreferences(currentMatchId);
             Log.d(TAG, "onCreate: opening MatchInfo activity");
@@ -175,5 +187,64 @@ public class MainActivity extends AppCompatActivity {
 //        if (navigateToLastActivityIfOngoingMatch()) {
 //            return; // Skip MainActivity logic if navigating to the last activity
 //        }
+    private String readJsonFile(Uri fileUri) throws IOException {
+        // Open an InputStream for the file
+        InputStream inputStream = getContentResolver().openInputStream(fileUri);
+        StringBuilder stringBuilder = new StringBuilder();
+
+        if (inputStream != null) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            inputStream.close();
+        }
+
+        // Return the file content as a String (JSON data)
+        return stringBuilder.toString();
+    }
+
+    private boolean restoreMatchStateFromJson(String jsonData) {
+        try {
+            // Parse JSON into a JSONObject
+            JSONObject jsonObject = new JSONObject(jsonData);
+
+            // Extract the "sharedPreferences" section from the JSON
+            JSONObject sharedPrefsObject = jsonObject.getJSONObject("sharedPreferences");
+
+            // Create an editor to save the data into shared preferences
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+
+            // Iterate over the keys in the "sharedPreferences" section and save the data to shared preferences
+            Iterator<String> keys = sharedPrefsObject.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                Object value = sharedPrefsObject.get(key);
+
+                // Update shared preferences based on the value type
+                if (value instanceof String) {
+                    editor.putString(key, (String) value);
+                } else if (value instanceof Long) {
+                    editor.putLong(key, (Long) value);
+                } else if (value instanceof Integer) {
+                    editor.putInt(key, (Integer) value);
+                } else if (value instanceof Boolean) {
+                    editor.putBoolean(key, (Boolean) value);
+                }
+                // You can add more types here if necessary
+            }
+
+            // Commit the changes to shared preferences
+            editor.apply();
+            Log.d(TAG, "restoreMatchStateFromJson: successfully updatre shared prefs");
+            return true;
+        } catch (Exception e) {
+            Log.e(TAG, "Error parsing or saving JSON data: " + e.getMessage());
+            return false;
+        }
+    }
+
 
 }
