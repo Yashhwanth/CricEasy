@@ -23,6 +23,7 @@ import com.cricketscoringapp.criceasy.model.Player;
 import com.google.android.datatransport.cct.internal.LogEvent;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -2977,6 +2978,241 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Return all the collected data as an aggregated object
         return matchData;
+    }
+    public boolean restoreDatabaseData(JSONObject databaseJson) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        boolean isSuccessful = false; // Track transaction success
+        db.beginTransaction(); // Start transaction
+        try {
+            restoreBowlerData(db, databaseJson.getJSONObject("bowler"));
+            restoreTeamsData(db, databaseJson.getJSONObject("teams"));
+            restorePlayersData(db, databaseJson.getJSONObject("players"));
+            //restoreMatchData(db, databaseJson.getJSONObject("match"));
+            restoreOversData(db, databaseJson.getJSONObject("overs"));
+            restoreTossData(db, databaseJson.getJSONObject("toss"));
+            restorePlayersTeamsData(db, databaseJson.getJSONObject("playersTeams"));
+            restoreTeamStatisticsData(db, databaseJson.getJSONObject("teamStatistics"));
+            restorePlacesData(db, databaseJson.getJSONObject("places"));
+            restorePartnershipsData(db, databaseJson.getJSONObject("partnerships"));
+            restoreInningsData(db, databaseJson.getJSONObject("innings"));
+            restoreBatsmanData(db, databaseJson.getJSONObject("batsman"));
+            db.setTransactionSuccessful(); // Commit transaction
+            isSuccessful = true; // Indicate success
+        } catch (Exception e) {
+            Log.e(TAG, "restoreDatabaseData: error populating data to tables", e);
+        } finally {
+            db.endTransaction(); // End transaction
+        }
+        return isSuccessful;
+    }
+    public void restoreBowlerData(SQLiteDatabase db, JSONObject bowlerJson) throws JSONException {
+        //SQLiteDatabase db = this.getWritableDatabase();
+        Log.d(TAG, "restoreBowlerData: bowler map is" + bowlerJson);
+        JSONArray values = bowlerJson.getJSONArray("values");
+        Log.d(TAG, "restoreBowlerData: bowler data is" + values);
+        for (int i = 0; i < values.length(); i++) {
+            JSONObject bowler = values.getJSONObject(i).getJSONObject("nameValuePairs");
+            ContentValues contentValues = new ContentValues();
+
+            // Add values dynamically only if they exist in the JSON
+            if (bowler.has("playerId")) contentValues.put("player", bowler.getInt("playerId"));
+            if (bowler.has("maidens")) contentValues.put("maidens", bowler.getInt("maidens"));
+            if (bowler.has("ballsPlayed")) contentValues.put("balls", bowler.getInt("ballsPlayed"));
+            if (bowler.has("runs")) contentValues.put("runs", bowler.getInt("runs"));
+            if (bowler.has("economy")) contentValues.put("economy", bowler.getDouble("economy"));
+            if (bowler.has("zeros")) contentValues.put("zeroes", bowler.getInt("zeros"));
+            if (bowler.has("ones")) contentValues.put("ones", bowler.getInt("ones"));
+            if (bowler.has("twos")) contentValues.put("twos", bowler.getInt("twos"));
+            if (bowler.has("threes")) contentValues.put("threes", bowler.getInt("threes"));
+            if (bowler.has("fours")) contentValues.put("fours", bowler.getInt("fours"));
+            if (bowler.has("fives")) contentValues.put("fives", bowler.getInt("fives"));
+            if (bowler.has("sixes")) contentValues.put("sixes", bowler.getInt("sixes"));
+            if (bowler.has("wk")) contentValues.put("wickets", bowler.getInt("wk"));
+            if (bowler.has("by")) contentValues.put("byes", bowler.getInt("by"));
+            if (bowler.has("lb")) contentValues.put("legByes", bowler.getInt("lb"));
+            if (bowler.has("wb")) contentValues.put("wides", bowler.getInt("wb"));
+            if (bowler.has("nb")) contentValues.put("noBalls", bowler.getInt("nb"));
+            if (bowler.has("db")) contentValues.put("deadBalls", bowler.getInt("db"));
+
+            // Use INSERT OR REPLACE to handle duplicates
+            db.insertWithOnConflict(TABLE_BOWLER, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+        }
+    }
+    public void restoreTeamsData(SQLiteDatabase db, JSONObject teamsJson) throws JSONException {
+        JSONArray values = teamsJson.getJSONArray("values");
+        for (int i = 0; i < values.length(); i++) {
+            JSONObject team = values.getJSONObject(i).getJSONObject("nameValuePairs");
+            ContentValues contentValues = new ContentValues();
+            // Add values dynamically only if they exist in the JSON
+            if (team.has("teamId")) contentValues.put("teamId", team.getInt("teamId"));
+            if (team.has("teamName")) contentValues.put("teamName", team.getString("teamName"));
+            // Use INSERT OR REPLACE to handle duplicates
+            db.insertWithOnConflict(TABLE_TEAMS, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+        }
+    }
+    public void restorePlayersData(SQLiteDatabase db, JSONObject playersJson) throws JSONException {
+        JSONArray values = playersJson.getJSONArray("values");
+        for (int i = 0; i < values.length(); i++) {
+            JSONObject player = values.getJSONObject(i).getJSONObject("nameValuePairs");
+            ContentValues contentValues = new ContentValues();
+            // Add values dynamically only if they exist in the JSON
+            if (player.has("playerId")) contentValues.put("playerId", player.getInt("playerId"));
+            if (player.has("playerName")) contentValues.put("playerName", player.getString("playerName"));
+            // Use INSERT OR REPLACE to handle duplicates
+            db.insertWithOnConflict(TABLE_PLAYERS, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+        }
+    }
+    public void restoreMatchData(SQLiteDatabase db, JSONObject matchJson) throws JSONException {
+        // Extract the nameValuePairs object from the JSON
+        JSONObject match = matchJson.getJSONObject("match").getJSONObject("nameValuePairs");
+
+        // Prepare ContentValues to insert into the database
+        ContentValues contentValues = new ContentValues();
+
+        // Add values dynamically only if they exist in the JSON and match the columns you need
+        if (match.has("matchId")) contentValues.put("matchId", match.getInt("matchId"));
+        if (match.has("matchType")) contentValues.put("matchType", match.getString("matchType"));
+        if (match.has("numberOfOvers")) contentValues.put("numberOfOvers", match.getInt("numberOfOvers"));
+        if (match.has("ballType")) contentValues.put("ballType", match.getString("ballType"));
+        if (match.has("placeName")) contentValues.put("placeName", match.getInt("placeName"));
+        if (match.has("dateTime")) contentValues.put("dateTime", match.getString("dateTime"));
+        if (match.has("toss")) contentValues.put("toss", match.getInt("toss"));
+        if (match.has("isMatchCompleted")) contentValues.put("isMatchCompleted", match.getInt("isMatchCompleted"));
+        if (match.has("matchWonBy")) contentValues.put("matchWonBy", match.getInt("matchWonBy"));
+
+        // Use INSERT OR REPLACE to handle duplicates in the database
+        db.insertWithOnConflict(TABLE_MATCH, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+    }
+    public void restoreOversData(SQLiteDatabase db, JSONObject oversJson) throws JSONException {
+        // Extract the values array from the JSON
+        JSONArray values = oversJson.getJSONArray("values");
+
+        // Iterate through each value in the values array
+        for (int i = 0; i < values.length(); i++) {
+            // Extract nameValuePairs from each item
+            JSONObject over = values.getJSONObject(i).getJSONObject("nameValuePairs");
+
+            // Prepare ContentValues to insert into the database
+            ContentValues contentValues = new ContentValues();
+
+            // Add values dynamically only if they exist in the JSON and match the columns you need
+            if (over.has("overId")) contentValues.put("overId", over.getInt("overId"));
+            if (over.has("inningsId")) contentValues.put("inningsId", over.getInt("inningsId"));
+            if (over.has("overNumber")) contentValues.put("overNumber", over.getInt("overNumber"));
+            if (over.has("playerId")) contentValues.put("playerId", over.getInt("playerId"));
+            if (over.has("isMaiden")) contentValues.put("isMaiden", over.getInt("isMaiden"));
+
+            // Use INSERT OR REPLACE to handle duplicates in the database
+            db.insertWithOnConflict(TABLE_OVERS, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+        }
+    }
+    public void restoreTossData(SQLiteDatabase db, JSONObject tossJson) throws JSONException {
+        JSONObject toss = tossJson.getJSONObject("nameValuePairs");
+        ContentValues contentValues = new ContentValues();
+        // Add values dynamically only if they exist in the JSON
+        if (toss.has("tossId")) contentValues.put("tossId", toss.getInt("tossId"));
+        if (toss.has("tossCallingTeam")) contentValues.put("tossCallingTeam", toss.getInt("tossCallingTeam"));
+        if (toss.has("tossWinningTeam")) contentValues.put("tossWinningTeam", toss.getInt("tossWinningTeam"));
+        if (toss.has("tossWonTeamChooseTo")) contentValues.put("tossWonTeamChooseTo", toss.getString("tossWonTeamChooseTo"));
+        // Use INSERT OR REPLACE to handle duplicates
+        db.insertWithOnConflict(TABLE_TOSS, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+    }
+    public void restorePlayersTeamsData(SQLiteDatabase db, JSONObject playersTeamsJson) throws JSONException {
+        JSONArray values = playersTeamsJson.getJSONArray("values");
+        for (int i = 0; i < values.length(); i++) {
+            JSONObject playerTeam = values.getJSONObject(i).getJSONObject("nameValuePairs");
+            ContentValues contentValues = new ContentValues();
+            // Add values dynamically only if they exist in the JSON
+            if (playerTeam.has("teamId")) contentValues.put("teamId", playerTeam.getInt("teamId"));
+            if (playerTeam.has("playerId")) contentValues.put("playerId", playerTeam.getInt("playerId"));
+            if (playerTeam.has("inningsId")) contentValues.put("inningsId", playerTeam.getInt("inningsId"));
+            // Use INSERT OR REPLACE to handle duplicates
+            db.insertWithOnConflict(TABLE_PLAYERS_TEAMS, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+        }
+    }
+    public void restoreTeamStatisticsData(SQLiteDatabase db, JSONObject teamStatisticsJson) throws JSONException {
+        JSONObject teamStatistics = teamStatisticsJson.getJSONObject("nameValuePairs");
+        ContentValues contentValues = new ContentValues();
+
+        // Add values dynamically only if they exist in the JSON
+        if (teamStatistics.has("runs")) contentValues.put("runs", teamStatistics.getInt("runs"));
+        if (teamStatistics.has("wickets")) contentValues.put("wickets", teamStatistics.getInt("wickets"));
+        if (teamStatistics.has("balls")) contentValues.put("balls", teamStatistics.getInt("balls"));
+        if (teamStatistics.has("extras")) contentValues.put("extras", teamStatistics.getInt("extras"));
+
+        // Use INSERT OR REPLACE to handle duplicates
+        db.insertWithOnConflict(TABLE_TEAM_STATISTICS, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+    }
+    public void restorePlacesData(SQLiteDatabase db, JSONObject placesJson) throws JSONException {
+        JSONArray values = placesJson.getJSONArray("values");
+        for (int i = 0; i < values.length(); i++) {
+            JSONObject place = values.getJSONObject(i).getJSONObject("nameValuePairs");
+            ContentValues contentValues = new ContentValues();
+
+            // Add values dynamically only if they exist in the JSON
+            if (place.has("placeId")) contentValues.put("placeId", place.getInt("placeId"));
+            if (place.has("placeName")) contentValues.put("placeName", place.getString("placeName"));
+
+            // Use INSERT OR REPLACE to handle duplicates
+            db.insertWithOnConflict(TABLE_PLACES, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+        }
+    }
+    public void restorePartnershipsData(SQLiteDatabase db, JSONObject partnershipsJson) throws JSONException {
+        JSONArray values = partnershipsJson.getJSONArray("values");
+        for (int i = 0; i < values.length(); i++) {
+            JSONObject partnership = values.getJSONObject(i).getJSONObject("nameValuePairs");
+            ContentValues contentValues = new ContentValues();
+
+            // Add values dynamically only if they exist in the JSON
+            if (partnership.has("partnershipId")) contentValues.put("partnershipId", partnership.getInt("partnershipId"));
+            if (partnership.has("inningsId")) contentValues.put("inningsId", partnership.getInt("inningsId"));
+            if (partnership.has("batsman1Id")) contentValues.put("batsman1Id", partnership.getInt("batsman1Id"));
+            if (partnership.has("batsman2Id")) contentValues.put("batsman2Id", partnership.getInt("batsman2Id"));
+            if (partnership.has("runs")) contentValues.put("runs", partnership.getInt("runs"));
+            if (partnership.has("balls")) contentValues.put("balls", partnership.getInt("balls"));
+
+            // Use INSERT OR REPLACE to handle duplicates
+            db.insertWithOnConflict(TABLE_PARTNERSHIPS, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+        }
+    }
+    public void restoreInningsData(SQLiteDatabase db, JSONObject inningsJson) throws JSONException {
+        JSONArray values = inningsJson.getJSONArray("values");
+        for (int i = 0; i < values.length(); i++) {
+            JSONObject innings = values.getJSONObject(i).getJSONObject("nameValuePairs");
+            ContentValues contentValues = new ContentValues();
+
+            // Add values dynamically only if they exist in the JSON
+            if (innings.has("inningsId")) contentValues.put("inningsId", innings.getInt("inningsId"));
+            if (innings.has("inningsNumber")) contentValues.put("inningsNumber", innings.getInt("inningsNumber"));
+            if (innings.has("matchId")) contentValues.put("matchId", innings.getInt("matchId"));
+            if (innings.has("battingTeam")) contentValues.put("battingTeam", innings.getInt("battingTeam"));
+            if (innings.has("isCompleted")) contentValues.put("isCompleted", innings.getInt("isCompleted"));
+
+            // Use INSERT OR REPLACE to handle duplicates
+            db.insertWithOnConflict(TABLE_INNINGS, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+        }
+    }
+    public void restoreBatsmanData(SQLiteDatabase db, JSONObject batsmanJson) throws JSONException {
+        JSONArray values = batsmanJson.getJSONArray("values");
+        for (int i = 0; i < values.length(); i++) {
+            JSONObject batsman = values.getJSONObject(i).getJSONObject("nameValuePairs");
+            ContentValues contentValues = new ContentValues();
+
+            // Add values dynamically only if they exist in the JSON
+            if (batsman.has("playerId")) contentValues.put("player", batsman.getInt("playerId"));
+            if (batsman.has("score")) contentValues.put("score", batsman.getInt("score"));
+            if (batsman.has("ballsPlayed")) contentValues.put("balls", batsman.getInt("ballsPlayed"));
+            if (batsman.has("zeros")) contentValues.put("zeroes", batsman.getInt("zeros"));
+            if (batsman.has("ones")) contentValues.put("ones", batsman.getInt("ones"));
+            if (batsman.has("twos")) contentValues.put("twos", batsman.getInt("twos"));
+            if (batsman.has("threes")) contentValues.put("threes", batsman.getInt("threes"));
+            if (batsman.has("fours")) contentValues.put("fours", batsman.getInt("fours"));
+            if (batsman.has("fives")) contentValues.put("fives", batsman.getInt("fives"));
+            if (batsman.has("sixes")) contentValues.put("sixes", batsman.getInt("sixes"));
+
+            // Use INSERT OR REPLACE to handle duplicates
+            db.insertWithOnConflict(TABLE_BATSMAN, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+        }
     }
 
 }

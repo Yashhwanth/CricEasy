@@ -866,7 +866,21 @@ public class MatchActivity extends AppCompatActivity {
     private void exportCombinedData() {
         // Fetch data from shared preferences
         Map<String, ?> sharedPrefsData = sharedPreferences.getAll();
+        Log.d(TAG, "exportCombinedData: shared prefs are" + sharedPrefsData);
         Log.d(TAG, "Shared Preferences Data: " + sharedPrefsData.toString());
+
+        // Create a map to store shared preferences data with types
+        Map<String, Object[]> sharedPrefsWithTypes = new HashMap<>();
+        for (Map.Entry<String, ?> entry : sharedPrefsData.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            String dataType = getDataType(value);
+
+            // Store the key, value, and data type in the map
+            sharedPrefsWithTypes.put(key, new Object[]{value, dataType});
+        }
+
+        Log.d(TAG, "Shared Preferences with Types: " + sharedPrefsWithTypes);
 
         // Fetch data from database
         int matchId = (int) sharedPreferences.getLong("currentMatchId", -1);
@@ -876,7 +890,7 @@ public class MatchActivity extends AppCompatActivity {
 
         // Combine both data sources
         Map<String, Object> combinedData = new HashMap<>();
-        combinedData.put("sharedPreferences", sharedPrefsData);
+        combinedData.put("sharedPreferences", sharedPrefsWithTypes);
         combinedData.put("database", databaseData);
 
         // Convert combined data to JSON
@@ -903,7 +917,23 @@ public class MatchActivity extends AppCompatActivity {
         // Share the file
         shareFile(combinedFile);
     }
-
+    private String getDataType(Object value) {
+        if (value instanceof String) {
+            return "String";
+        } else if (value instanceof Integer) {
+            return "Integer";
+        } else if (value instanceof Boolean) {
+            return "Boolean";
+        } else if (value instanceof Long) {
+            return "Long";
+        } else if (value instanceof Float) {
+            return "Float";
+        } else if (value instanceof Double) {
+            return "Double";
+        } else {
+            return "Unknown";
+        }
+    }
     private void shareFile(File file) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("application/json");

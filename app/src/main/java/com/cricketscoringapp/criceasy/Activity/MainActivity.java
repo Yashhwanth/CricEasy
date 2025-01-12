@@ -2,10 +2,13 @@ package com.cricketscoringapp.criceasy.Activity;
 
 import static android.content.ContentValues.TAG;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +29,7 @@ import com.cricketscoringapp.criceasy.Database.*;
 import com.cricketscoringapp.criceasy.R;
 import com.cricketscoringapp.criceasy.dao.MatchDao;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -45,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-
         databaseHelper = new DatabaseHelper(this);
         sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
 
@@ -66,17 +69,19 @@ public class MainActivity extends AppCompatActivity {
             try {
                 Log.d(TAG, "onCreate: inside the try block");
                 String jsonData = readJsonFile(fileUri);
-                if (restoreMatchStateFromJson(jsonData)) {
-                    Log.d(TAG, "Match state successfully restored.");
-                    resumeMatchButton.setVisibility(View.VISIBLE); // Show the "Resume Match" button
-                    resumeMatchButton.setOnClickListener(view -> {
-                        Log.d(TAG, "Resuming match.");
-                        Intent resumeIntent = new Intent(MainActivity.this, MatchInfoActivity.class);
-                        startActivity(resumeIntent);
-                    });
-                    return; // Skip other logic since we are resuming the match
+                JSONObject databaseJson = new JSONObject(jsonData).getJSONObject("database");// Assuming your JSON data contains the relevant database information
+                Log.d(TAG, "onCreate: database extracted object is" + databaseJson);
+                // Restore match state and database data
+                if (restoreMatchStateFromJson(jsonData) && databaseHelper.restoreDatabaseData(databaseJson)) {
+                    Log.d(TAG, "Match state and database successfully restored.");
+
+                    // Proceed directly to MatchActivity once both shared preferences and database are populated
+                    Intent matchIntent = new Intent(MainActivity.this, MatchActivity.class);
+                    startActivity(matchIntent);
+
+                    return; // Skip other logic since we are moving to MatchActivity directly
                 } else {
-                    Log.e(TAG, "Failed to restore match state. Falling back to new match.");
+                    Log.e(TAG, "Failed to restore match state or database data. Falling back to new match.");
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Error reading or parsing JSON file: " + e.getMessage());
@@ -90,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
             long currentMatchId = handleNewMatch();
             saveMatchIdToPreferences(currentMatchId);
-            Log.d(TAG, "onCreate: opening MatchInfo activity");
+            Log.d(TAG, "onCreate: opening MatchActivity");
             Intent matchIntent = new Intent(MainActivity.this, MatchInfoActivity.class);
             startActivity(matchIntent);
         });
@@ -101,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         updateCurrentActivityInPreferences();
     }
-
     @Override
     protected void onDestroy() {
         Log.d(TAG, "onDestroy: main activity destroyed");
@@ -110,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
             databaseHelper.close();
         }
     }
-
     private long handleNewMatch() {
         Log.d(TAG, "handleNewMatch: checking a match is present or not");
         long currentMatchId = -1;
@@ -205,7 +208,6 @@ public class MainActivity extends AppCompatActivity {
         // Return the file content as a String (JSON data)
         return stringBuilder.toString();
     }
-
     private boolean restoreMatchStateFromJson(String jsonData) {
         try {
             // Parse JSON into a JSONObject
@@ -221,30 +223,81 @@ public class MainActivity extends AppCompatActivity {
             Iterator<String> keys = sharedPrefsObject.keys();
             while (keys.hasNext()) {
                 String key = keys.next();
-                Object value = sharedPrefsObject.get(key);
+
+                // Get the value array for each key: the first item is the value, the second is its type
+                JSONArray valueArray = sharedPrefsObject.getJSONArray(key);
+                Object value = valueArray.get(0);
+                String type = valueArray.getString(1);
+
+                Log.d(TAG, "restoreMatchStateFromJson: " + key);
+                Log.d(TAG, "restoreMatchStateFromJson: " + value);
+                Log.d(TAG, "restoreMatchStateFromJson: " + type);
 
                 // Update shared preferences based on the value type
-                if (value instanceof String) {
-                    editor.putString(key, (String) value);
-                } else if (value instanceof Long) {
-                    editor.putLong(key, (Long) value);
-                } else if (value instanceof Integer) {
-                    editor.putInt(key, (Integer) value);
-                } else if (value instanceof Boolean) {
-                    editor.putBoolean(key, (Boolean) value);
+                switch (type) {
+                    case "String":
+                        editor.putString(key, (String) value);
+                        break;
+
+                    case "Long":
+                        // Ensure value is castable to Long
+                        if (value instanceof Long) {
+                            editor.putLong(key, (Long) value);
+                        } else if (value instanceof Integer) {
+                            editor.putLong(key, ((Integer) value).longValue()); // Handle Integer to Long conversion
+                        } else {
+                            Log.e(TAG, "Invalid type for Long: " + value);
+                        }
+                        break;
+
+                    case "Integer":
+                        // Ensure value is castable to Integer
+                        if (value instanceof Integer) {
+                            editor.putInt(key, (Integer) value);
+                        } else {
+                            Log.e(TAG, "Invalid type for Integer: " + value);
+                        }
+                        break;
+
+                    case "Boolean":
+                        // Ensure value is castable to Boolean
+                        if (value instanceof Boolean) {
+                            editor.putBoolean(key, (Boolean) value);
+                        } else {
+                            Log.e(TAG, "Invalid type for Boolean: " + value);
+                        }
+                        break;
+
+                    case "Float":
+                        // Ensure value is castable to Float
+                        if (value instanceof Number) {
+                            editor.putFloat(key, ((Number) value).floatValue());
+                        } else {
+                            Log.e(TAG, "Invalid type for Float: " + value);
+                        }
+                        break;
+
+                    case "Double":
+                        // Since SharedPreferences doesn't support Double, convert it to String
+                        editor.putString(key, String.valueOf(value));
+                        break;
+
+                    default:
+                        Log.e(TAG, "Unsupported data type: " + type);
                 }
-                // You can add more types here if necessary
             }
 
             // Commit the changes to shared preferences
             editor.apply();
-            Log.d(TAG, "restoreMatchStateFromJson: successfully updatre shared prefs");
+            Log.d(TAG, "restoreMatchStateFromJson: successfully updated shared prefs");
             return true;
         } catch (Exception e) {
             Log.e(TAG, "Error parsing or saving JSON data: " + e.getMessage());
             return false;
         }
     }
+
+
 
 
 }
