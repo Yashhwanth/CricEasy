@@ -3094,7 +3094,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     public void restoreMatchData(SQLiteDatabase db, JSONObject matchJson) throws JSONException {
         // Extract the nameValuePairs object from the JSON
-        JSONObject match = matchJson.getJSONObject("match").getJSONObject("nameValuePairs");
+        JSONObject match = matchJson.getJSONObject("nameValuePairs");
 
         // Prepare ContentValues to insert into the database
         ContentValues contentValues = new ContentValues();
