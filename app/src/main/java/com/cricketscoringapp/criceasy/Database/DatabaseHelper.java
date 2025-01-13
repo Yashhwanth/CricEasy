@@ -2979,7 +2979,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         matchData.put("overs", getOversByInningsId(inningsId));
 
         // Fetch Balls Data
-        matchData.put("balls", getBallsByMatchId(inningsId));
+        matchData.put("balls", getBallsByMatchId(matchId));
 
         // Fetch Batsman Data
         matchData.put("batsman", getBatsmanDataByInningsId(inningsId));
@@ -3014,6 +3014,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.beginTransaction(); // Start transaction
         try {
             restoreBowlerData(db, databaseJson.getJSONObject("bowler"));
+            restoreBallsData(db, databaseJson.getJSONObject("balls"));
             restoreTeamsData(db, databaseJson.getJSONObject("teams"));
             restorePlayersData(db, databaseJson.getJSONObject("players"));
             restoreMatchData(db, databaseJson.getJSONObject("match"));
@@ -3035,7 +3036,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return isSuccessful;
     }
     public void restoreBowlerData(SQLiteDatabase db, JSONObject bowlerJson) throws JSONException {
-        //SQLiteDatabase db = this.getWritableDatabase();
         Log.d(TAG, "restoreBowlerData: bowler map is" + bowlerJson);
         JSONArray values = bowlerJson.getJSONArray("values");
         Log.d(TAG, "restoreBowlerData: bowler data is" + values);
@@ -3066,6 +3066,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             // Use INSERT OR REPLACE to handle duplicates
             db.insertWithOnConflict(TABLE_BOWLER, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+        }
+    }
+    public void restoreBallsData(SQLiteDatabase db, JSONObject ballsJson) throws JSONException {
+        Log.d(TAG, "restoreBallsData: balls map is" + ballsJson);
+        JSONArray values = ballsJson.getJSONArray("values");
+        Log.d(TAG, "restoreBallsData: balls data is" + values);
+
+        for (int i = 0; i < values.length(); i++) {
+            JSONObject ball = values.getJSONObject(i).getJSONObject("nameValuePairs");
+            ContentValues contentValues = new ContentValues();
+
+            // Add values dynamically only if they exist in the JSON
+            if (ball.has("ballId")) contentValues.put("ballId", ball.getInt("ballId"));
+            if (ball.has("overId")) contentValues.put("overId", ball.getInt("overId"));
+            if (ball.has("ballNumber")) contentValues.put("ballNumber", ball.getInt("ballNumber"));
+            if (ball.has("ballType")) contentValues.put("ballType", ball.getString("ballType"));
+            if (ball.has("runs")) contentValues.put("runs", ball.getInt("runs"));
+            if (ball.has("isWicket")) contentValues.put("isWicket", ball.getInt("isWicket"));
+            if (ball.has("striker")) contentValues.put("striker", ball.getInt("striker"));
+            if (ball.has("nonStriker")) contentValues.put("nonStriker", ball.getInt("nonStriker"));
+
+            // Use INSERT OR REPLACE to handle duplicates
+            db.insertWithOnConflict(TABLE_BALLS, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
         }
     }
     public void restoreTeamsData(SQLiteDatabase db, JSONObject teamsJson) throws JSONException {
