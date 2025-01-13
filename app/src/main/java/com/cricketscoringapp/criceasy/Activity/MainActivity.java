@@ -62,6 +62,21 @@ public class MainActivity extends AppCompatActivity {
         // Check if the app was launched through a file
         Intent intent = getIntent();
         if (intent != null && intent.getData() != null) {
+            // Check if the app was already opened via a file previously
+            boolean isAppOpenedThroughFile = sharedPreferences.getBoolean("isAppOpenedThroughFile", false);
+            if (isAppOpenedThroughFile) {
+                // Skip file processing and directly open MatchActivity
+                Log.d(TAG, "App already opened via file previously. Skipping file processing.");
+                Intent matchIntent = new Intent(MainActivity.this, MatchActivity.class);
+                startActivity(matchIntent);
+                return;
+            }
+
+            // Mark the app as opened through a file
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("isAppOpenedThroughFile", true);
+            editor.apply();
+
             Uri fileUri = intent.getData();
             Log.d(TAG, "App opened via file URI: " + fileUri);
 
@@ -69,16 +84,15 @@ public class MainActivity extends AppCompatActivity {
             try {
                 Log.d(TAG, "onCreate: inside the try block");
                 String jsonData = readJsonFile(fileUri);
-                JSONObject databaseJson = new JSONObject(jsonData).getJSONObject("database");// Assuming your JSON data contains the relevant database information
+                JSONObject databaseJson = new JSONObject(jsonData).getJSONObject("database");
                 Log.d(TAG, "onCreate: database extracted object is" + databaseJson);
+
                 // Restore match state and database data
                 if (restoreMatchStateFromJson(jsonData) && databaseHelper.restoreDatabaseData(databaseJson)) {
                     Log.d(TAG, "Match state and database successfully restored.");
-
                     // Proceed directly to MatchActivity once both shared preferences and database are populated
                     Intent matchIntent = new Intent(MainActivity.this, MatchActivity.class);
                     startActivity(matchIntent);
-
                     return; // Skip other logic since we are moving to MatchActivity directly
                 } else {
                     Log.e(TAG, "Failed to restore match state or database data. Falling back to new match.");
@@ -100,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(matchIntent);
         });
     }
-
     @Override
     protected void onResume() {
         super.onResume();
