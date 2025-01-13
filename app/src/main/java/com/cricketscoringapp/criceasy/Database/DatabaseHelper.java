@@ -2330,6 +2330,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //db.close();
         return bowlerList;
     }
+
+
     //----------------------------sharing json data--------------------------------------
     public JSONObject getMatchDataById(int matchId) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -2727,6 +2729,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (cursor != null && cursor.getCount() > 0) {
                 // Get column indexes
                 int playerIndex = cursor.getColumnIndex(COLUMN_PLAYER);
+                int inningsIdIndex = cursor.getColumnIndex(COLUMN_INNINGS_ID);
                 int scoreIndex = cursor.getColumnIndex(COLUMN_SCORE);
                 int ballsPlayedIndex = cursor.getColumnIndex(COLUMN_BALLS_PLAYED);
                 int zerosIndex = cursor.getColumnIndex(COLUMN_ZEROES);
@@ -2747,6 +2750,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     while (cursor.moveToNext()) {
                         // Extract each column value
                         int playerId = cursor.getInt(playerIndex);
+                        int inningsIdValue = cursor.getInt(inningsIdIndex);
                         int score = cursor.getInt(scoreIndex);
                         int ballsPlayed = cursor.getInt(ballsPlayedIndex);
                         int zeros = cursor.getInt(zerosIndex);
@@ -2760,6 +2764,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         // Create a JSONObject for the current row
                         JSONObject batsman = new JSONObject();
                         batsman.put("playerId", playerId);
+                        batsman.put("inningsId", inningsIdValue);
                         batsman.put("score", score);
                         batsman.put("ballsPlayed", ballsPlayed);
                         batsman.put("zeros", zeros);
@@ -2802,6 +2807,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (cursor != null && cursor.getCount() > 0) {
                 // Get column indexes
                 int playerIndex = cursor.getColumnIndex(COLUMN_PLAYER);
+                int inningsIndex = cursor.getColumnIndex(COLUMN_INNINGS_ID);
                 int maidensIndex = cursor.getColumnIndex(COLUMN_MAIDENS);
                 int ballsPlayedIndex = cursor.getColumnIndex(COLUMN_BALLS_PLAYED);
                 int runsIndex = cursor.getColumnIndex(COLUMN_RUNS);
@@ -2831,6 +2837,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     while (cursor.moveToNext()) {
                         // Extract each column value
                         int playerId = cursor.getInt(playerIndex);
+                        int inningsIdValue = cursor.getInt(inningsIndex);
                         int maidens = cursor.getInt(maidensIndex);
                         int ballsPlayed = cursor.getInt(ballsPlayedIndex);
                         int runs = cursor.getInt(runsIndex);
@@ -2852,6 +2859,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         // Create a JSONObject for the current row
                         JSONObject bowler = new JSONObject();
                         bowler.put("playerId", playerId);
+                        bowler.put("inningsId", inningsIdValue);
                         bowler.put("maidens", maidens);
                         bowler.put("ballsPlayed", ballsPlayed);
                         bowler.put("runs", runs);
@@ -2901,6 +2909,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // Check if cursor is valid and has data
             if (cursor != null && cursor.moveToFirst()) {
                 // Get column indexes
+                int teamStatsIndex = cursor.getColumnIndex(COLUMN_TEAM_STATS_ID);
+                int inningsIdIndex = cursor.getColumnIndex(COLUMN_INNINGS_ID);
                 int runsIndex = cursor.getColumnIndex(COLUMN_RUNS);
                 int wicketsIndex = cursor.getColumnIndex(COLUMN_WICKETS);
                 int ballsIndex = cursor.getColumnIndex(COLUMN_BALLS);
@@ -2909,12 +2919,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 // Check if the indexes are valid
                 if (runsIndex >= 0 && wicketsIndex >= 0 && ballsIndex >= 0 && extrasIndex >= 0) {
                     // Extract data for the team statistics
+                    int teamStatsId = cursor.getInt(teamStatsIndex);
+                    int inningsIdValue = cursor.getInt(inningsIdIndex);
                     int runs = cursor.getInt(runsIndex);
                     int wickets = cursor.getInt(wicketsIndex);
                     int balls = cursor.getInt(ballsIndex);
                     int extras = cursor.getInt(extrasIndex);
 
                     // Add the extracted data into the JSONObject
+                    teamStats.put("teamStatsId", teamStatsId);
+                    teamStats.put("inningsId", inningsIdValue);
                     teamStats.put("runs", runs);
                     teamStats.put("wickets", wickets);
                     teamStats.put("balls", balls);
@@ -2979,6 +2993,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Return all the collected data as an aggregated object
         return matchData;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public boolean restoreDatabaseData(JSONObject databaseJson) {
         SQLiteDatabase db = this.getWritableDatabase();
         boolean isSuccessful = false; // Track transaction success
@@ -2987,7 +3016,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             restoreBowlerData(db, databaseJson.getJSONObject("bowler"));
             restoreTeamsData(db, databaseJson.getJSONObject("teams"));
             restorePlayersData(db, databaseJson.getJSONObject("players"));
-            //restoreMatchData(db, databaseJson.getJSONObject("match"));
+            restoreMatchData(db, databaseJson.getJSONObject("match"));
             restoreOversData(db, databaseJson.getJSONObject("overs"));
             restoreTossData(db, databaseJson.getJSONObject("toss"));
             restorePlayersTeamsData(db, databaseJson.getJSONObject("playersTeams"));
@@ -3016,6 +3045,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             // Add values dynamically only if they exist in the JSON
             if (bowler.has("playerId")) contentValues.put("player", bowler.getInt("playerId"));
+            if (bowler.has("inningsId")) contentValues.put("inningsId", bowler.getInt("inningsId"));
             if (bowler.has("maidens")) contentValues.put("maidens", bowler.getInt("maidens"));
             if (bowler.has("ballsPlayed")) contentValues.put("balls", bowler.getInt("ballsPlayed"));
             if (bowler.has("runs")) contentValues.put("runs", bowler.getInt("runs"));
@@ -3135,6 +3165,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
 
         // Add values dynamically only if they exist in the JSON
+        if (teamStatistics.has("teamStatsId")) contentValues.put("teamStatsId", teamStatistics.getInt("teamStatsId"));
+        if (teamStatistics.has("inningsId")) contentValues.put("inningsId", teamStatistics.getInt("inningsId"));
         if (teamStatistics.has("runs")) contentValues.put("runs", teamStatistics.getInt("runs"));
         if (teamStatistics.has("wickets")) contentValues.put("wickets", teamStatistics.getInt("wickets"));
         if (teamStatistics.has("balls")) contentValues.put("balls", teamStatistics.getInt("balls"));
@@ -3200,6 +3232,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             // Add values dynamically only if they exist in the JSON
             if (batsman.has("playerId")) contentValues.put("player", batsman.getInt("playerId"));
+            if (batsman.has("inningsId")) contentValues.put("inningsId", batsman.getInt("inningsId"));
             if (batsman.has("score")) contentValues.put("score", batsman.getInt("score"));
             if (batsman.has("ballsPlayed")) contentValues.put("balls", batsman.getInt("ballsPlayed"));
             if (batsman.has("zeros")) contentValues.put("zeroes", batsman.getInt("zeros"));
