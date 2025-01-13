@@ -97,9 +97,10 @@ public class MatchActivity extends AppCompatActivity {
     protected void onResume() {
         Log.d(TAG, "onCreate: match activity onResume called");
         super.onResume();
-        updateCurrentActivityInPreferences();
         inningsEndButton.setVisibility(GONE);
+        scoringFloatingButton.setEnabled(true);
         scoringFloatingButton.setVisibility(View.VISIBLE);
+        updateCurrentActivityInPreferences();
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
     }
     @Override
@@ -120,6 +121,9 @@ public class MatchActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         Log.d(TAG, "onCreate: match activity onRestart called");
+        inningsEndButton.setVisibility(GONE);
+        scoringFloatingButton.setEnabled(true);
+        scoringFloatingButton.setVisibility(View.VISIBLE);
         super.onRestart();
     }
     @Override
@@ -157,6 +161,8 @@ public class MatchActivity extends AppCompatActivity {
         scoringFloatingButton.setOnClickListener(view ->{
             openScoringPopup();
         });
+        inningsEndButton.setVisibility(GONE);
+        scoringFloatingButton.setVisibility(View.VISIBLE);
         shareFloatingButton.setOnClickListener(view ->{
             exportCombinedData();
         });
@@ -754,6 +760,7 @@ public class MatchActivity extends AppCompatActivity {
         }
     }
     public void handleInningsEnd(String currentInnings){
+        Log.d(TAG, "handleInningsEnd: inside the handke innings end method");
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         long inningsId = sharedPreferences.getLong(INNINGS_ID, -1);
         long matchId = sharedPreferences.getLong("currentMatchId", -1);
