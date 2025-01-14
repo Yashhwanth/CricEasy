@@ -42,7 +42,7 @@ public class TossActivity extends AppCompatActivity {
         updateCurrentActivityInPreferences();
 
         Button playButton = findViewById(R.id.letsPlayButton);
-        Button needHelpButton = findViewById(R.id.needHelpButton);
+        Button needHelpButton = findViewById(R.id.backButton);
         // Initialize RadioGroups
         tossCallingTeamRadioGroup = findViewById(R.id.teamCallingTossRadioGroup);
         tossWinningTeamRadioGroup = findViewById(R.id.tossWinnerGroup);

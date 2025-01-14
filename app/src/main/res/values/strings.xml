@@ -32,7 +32,7 @@
     Team Selection Activity
     <string name="teamNameTextView">Team Name</string>
     <string name="teamNameAutofillHint">Enter Team Name</string>
-    <string name="okayButton">OK</string>
+    <string name="okayButton">Submitg</string>
     Toss Activity
     <string name = "tossHeadingTextView">Toss</string>
     <string name = "tossCallingTeamTextView">Toss Call By :</string>

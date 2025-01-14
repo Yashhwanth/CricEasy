@@ -41,7 +41,7 @@ public class TeamCreationActivity extends AppCompatActivity {
         Button teamBButton = findViewById(R.id.team2Button);
         team1TextView = findViewById(R.id.team1TextView);
         team2TextView = findViewById(R.id.team2TextView);
-        Button backButton = findViewById(R.id.needHelpButton);
+        Button backButton = findViewById(R.id.backButton);
         Button nextButton = findViewById(R.id.nextButton);
 
 

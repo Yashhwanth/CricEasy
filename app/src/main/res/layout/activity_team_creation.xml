@@ -110,9 +110,7 @@
         android:id="@+id/navigationButtonsLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:divider="@android:drawable/divider_horizontal_bright"
         android:orientation="horizontal"
-        android:showDividers="middle"
         style="?android:attr/buttonBarStyle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -121,7 +119,7 @@
         app:layout_constraintVertical_bias="0.975">
 
         <Button
-            android:id="@+id/needHelpButton"
+            android:id="@+id/backButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

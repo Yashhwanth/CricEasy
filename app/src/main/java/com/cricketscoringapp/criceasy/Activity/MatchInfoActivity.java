@@ -60,7 +60,7 @@ public class MatchInfoActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         final long matchId = sharedPreferences.getLong(MATCH_ID, -1L);
 
-        Button backButton = findViewById(R.id.needHelpButton);
+        Button backButton = findViewById(R.id.backButton);
         Button nextButton = findViewById(R.id.nextButton);
         backButton.setOnClickListener(v -> {
             Intent intent = new Intent(MatchInfoActivity.this, MainActivity.class);
