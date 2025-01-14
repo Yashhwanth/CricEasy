@@ -6,6 +6,7 @@
     <string name="pastMatches">Past Matches</string>
     Match Info Activity
     <string name="matchType">Match Type : </string>
+    <string name = "matchInfoPageHeading"> Enter Match Details</string>
     <string name="limitedOversRadioButton">Limited Overs</string>
     <string name="boxCricketRadioGroup">Box Cricket</string>
     <string name="noOfOversTextView">Overs : </string>
