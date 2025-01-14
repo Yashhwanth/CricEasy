@@ -19,25 +19,24 @@
 
     <!-- Decision Section -->
 
-    <TextView
-        android:id="@+id/tossHeadingTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/tossHeadingTextView"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.467"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.029" />
-
     <!-- Bat/Bowl Buttons -->
 
     <!-- Coin Image for Toss -->
 
     <!-- Bottom Buttons -->
+
+    <TextView
+        android:id="@+id/tossHeadingTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/HeaderTextView"
+        android:text="@string/tossHeadingTextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.461"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.066" />
 
     <TextView
         android:id="@+id/tossCallingTeamTextView"
@@ -72,7 +71,10 @@
             android:background="@drawable/radio_button_selector"
             android:button="@null"
             android:gravity="center"
-            android:tag="A" />
+            android:tag="A"
+            android:textColor="@color/white"
+            android:textSize="17sp"
+            android:layout_marginEnd="10dp"/>
 
         <RadioButton
             android:id="@+id/tossCallTeamBRadioButton"
@@ -81,8 +83,10 @@
             android:layout_weight="1"
             android:background="@drawable/radio_button_selector"
             android:button="@null"
+            android:textColor="@color/white"
             android:gravity="center"
-            android:tag="B" />
+            android:tag="B"
+            android:textSize="17sp"/>
     </RadioGroup>
 
     <TextView
@@ -119,8 +123,10 @@
             android:background="@drawable/radio_button_selector"
             android:button="@null"
             android:gravity="center"
+            android:textColor="@color/white"
+            android:layout_marginEnd="10dp"
             android:tag="A"
-            android:textSize="20sp" />
+            android:textSize="17sp" />
 
         <RadioButton
             android:id="@+id/tossWinTeamBRadioButton"
@@ -130,8 +136,9 @@
             android:background="@drawable/radio_button_selector"
             android:button="@null"
             android:gravity="center"
+            android:textColor="@color/white"
             android:tag="B"
-            android:textSize="20sp" />
+            android:textSize="17sp" />
     </RadioGroup>
 
     <TextView
@@ -168,7 +175,9 @@
             android:button="@null"
             android:gravity="center"
             android:text="@string/batRadioButton"
-            android:textSize="20sp" />
+            android:textColor="@color/white"
+            android:layout_marginEnd="10dp"
+            android:textSize="17sp"/>
 
         <RadioButton
             android:id="@+id/tossWonTeamBRadioButton"
@@ -179,7 +188,8 @@
             android:button="@null"
             android:gravity="center"
             android:text="@string/bowlRadioButton"
-            android:textSize="20sp" />
+            android:textColor="@color/white"
+            android:textSize="17sp" />
     </RadioGroup>
 
     <TextView

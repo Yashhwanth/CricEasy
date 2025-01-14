@@ -10,7 +10,7 @@
     <!-- Default state when unchecked -->
     <item>
         <shape>
-            <solid android:color="#FFBB86FC"/> <!-- Unselected color -->
+            <solid android:color="#8A2BE2"/> <!-- Unselected color -->
             <corners android:radius="10dp"/>
         </shape>
     </item>
