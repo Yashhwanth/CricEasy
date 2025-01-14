@@ -54,7 +54,7 @@
     <string name = "selectNonStrikerTextView">Select Non Striker</string>
     <string name = "selectBowlerContentDescription">Select Bowler Image</string>
     <string name = "selectBowlerTextView">Select Bowler</string>
-    <string name = "startScoringButton">StartScoring</string>
+    <string name = "startScoringButton">Start Scoring</string>
     Selecting Player Activity
     <string name = "playerTypeTextView">Select New Player</string>
     <string name = "selectPlayerName">Select Player Name</string>
@@ -99,6 +99,7 @@
     <string name="commentaryButton">Commentary</string>
     <string name="teamsButton">Teams</string>
     <string name="floatingButtonContentDescription">Open the Scoring Popup</string>
+    <string name="shareButtonContentDescription">Share match button</string>
     activity scoring
     <string name="zeroScoringButton">0</string>
     <string name="oneScoringButton">1</string>

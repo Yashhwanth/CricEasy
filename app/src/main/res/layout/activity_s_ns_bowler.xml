@@ -11,6 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/selectSNsAndBowTextView"
+        style="@style/HeaderTextView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -20,15 +21,16 @@
 
     <TextView
         android:id="@+id/battingTextView"
+        style="@style/BaseTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/battingTextView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.044"
+        app:layout_constraintHorizontal_bias="0.064"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.085" />
+        app:layout_constraintVertical_bias="0.098" />
 
     <LinearLayout
         android:id="@+id/selectSrLayout"
@@ -40,7 +42,7 @@
         app:layout_constraintHorizontal_bias="0.084"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.16">
+        app:layout_constraintVertical_bias="0.19999999">
 
         <ImageView
             android:id="@+id/srImageView"
@@ -66,7 +68,7 @@
         app:layout_constraintHorizontal_bias="0.64"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.158">
+        app:layout_constraintVertical_bias="0.19999999">
 
         <ImageView
             android:id="@+id/nSrImageView"
@@ -84,6 +86,7 @@
 
     <TextView
         android:id="@+id/bowlingTextView"
+        style="@style/BaseTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/bowlingTextView"
@@ -92,7 +95,7 @@
         app:layout_constraintHorizontal_bias="0.063"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.407" />
+        app:layout_constraintVertical_bias="0.42000002" />
 
     <LinearLayout
         android:id="@+id/selectBowLayout"
@@ -104,7 +107,7 @@
         app:layout_constraintHorizontal_bias="0.082"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.56">
+        app:layout_constraintVertical_bias="0.6">
 
         <ImageView
             android:id="@+id/bowImageView"
@@ -120,28 +123,33 @@
             android:text="@string/selectBowlerTextView" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/backButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/backButton"
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:orientation="horizontal"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.229"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.996" />
+        app:layout_constraintVertical_bias="0.97">
 
-    <Button
-        android:id="@+id/startScoringButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/startScoringButton"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.708"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.996" />
+        <Button
+            android:id="@+id/backButton"
+            style="@style/CommonButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="@string/backButton" />
+
+        <Button
+            android:id="@+id/startScoringButton"
+            style="@style/CommonButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="@string/startScoringButton" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
