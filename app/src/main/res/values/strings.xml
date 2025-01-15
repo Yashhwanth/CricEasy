@@ -44,6 +44,8 @@
     <string name = "tossCoinContentDescription">Toss Coin</string>
     <string name = "needHelpButton">Need Help ?</string>
     <string name = "letsPlayButton">Let\'s Play</string>
+    <string name = "headTossOutcomeTextView">It\'s Heads</string>
+    <string name = "tailTossOutcomeTextView">It\'s Tails</string>
     Selecting S,Ns and Bow Activity
     <string name = "selectSNsAndBowTextView">Select S,Ns and Bowler</string>
     <string name = "battingTextView">Batting</string>

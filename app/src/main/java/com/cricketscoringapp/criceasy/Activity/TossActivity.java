@@ -7,12 +7,14 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -31,6 +33,7 @@ public class TossActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private RadioGroup tossCallingTeamRadioGroup, tossWinningTeamRadioGroup, tossWonTeamChooseToRadioGroup;
     private ImageView coinImage;
+    private TextView tossOutcomeTextView;
     private Random random;
     private boolean isFlipping = false;
     @SuppressLint("MissingInflatedId")
@@ -43,6 +46,7 @@ public class TossActivity extends AppCompatActivity {
 
         Button playButton = findViewById(R.id.letsPlayButton);
         Button needHelpButton = findViewById(R.id.backButton);
+        tossOutcomeTextView = findViewById(R.id.tossTextView);
         // Initialize RadioGroups
         tossCallingTeamRadioGroup = findViewById(R.id.teamCallingTossRadioGroup);
         tossWinningTeamRadioGroup = findViewById(R.id.tossWinnerGroup);
@@ -138,6 +142,7 @@ public class TossActivity extends AppCompatActivity {
     }
     private void flipCoin() {
         isFlipping = true;
+        tossOutcomeTextView.setText("");
         // Start the coin flip animation
         Animation flipAnimation = AnimationUtils.loadAnimation(this, R.anim.coin_flip_anim);
         coinImage.startAnimation(flipAnimation);
@@ -149,8 +154,10 @@ public class TossActivity extends AppCompatActivity {
             // Update the ImageView based on the result
             if (isHeads) {
                 coinImage.setImageResource(R.drawable.heads);
+                tossOutcomeTextView.setText(R.string.headTossOutcomeTextView);
             } else {
                 coinImage.setImageResource(R.drawable.tails);
+                tossOutcomeTextView.setText(R.string.tailTossOutcomeTextView);
             }
             isFlipping = false; // Reset flipping state
         }, 800); // Animation duration in milliseconds
