@@ -2,17 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/matchInfoLayout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
-
+    android:paddingStart="15dp"
+    android:paddingEnd="15dp">
     <!-- Teams Heading -->
     <TextView
         android:id="@+id/teamsHeadingTextView"
+        style="@style/BaseTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:layout_marginBottom="8dp"
         android:text="@string/teamsHeading"
         android:textSize="18sp"
         android:textStyle="bold" />
@@ -22,16 +22,14 @@
         android:id="@+id/teamAEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="6dp"
+        android:layout_marginTop="20dp"
         android:textSize="16sp" />
 
     <TextView
         android:id="@+id/teamBTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="6dp"
+        android:layout_marginTop="20dp"
         android:textSize="16sp" />
 
     <!-- Match Type -->
@@ -39,12 +37,12 @@
         android:id="@+id/matchTypeDetailsLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="6dp"
+        android:layout_marginTop="20dp"
         android:orientation="horizontal">
 
         <TextView
             android:id="@+id/matchTypeKeyTextView"
+            style="@style/BaseTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -53,8 +51,10 @@
 
         <TextView
             android:id="@+id/matchTypeValueTextView"
+            style="@style/BaseTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="3dp"
             android:textSize="16sp" />
     </LinearLayout>
 
@@ -63,11 +63,12 @@
         android:id="@+id/oversDetailsLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="6dp"
+        android:layout_marginTop="20dp"
         android:orientation="horizontal">
 
         <TextView
             android:id="@+id/oversKeyTextView"
+            style="@style/BaseTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -76,8 +77,10 @@
 
         <TextView
             android:id="@+id/oversValueTextView"
+            style="@style/BaseTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="3dp"
             android:textSize="16sp" />
     </LinearLayout>
 
@@ -86,11 +89,12 @@
         android:id="@+id/ballTypeDetailsLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="6dp"
+        android:layout_marginTop="20dp"
         android:orientation="horizontal">
 
         <TextView
             android:id="@+id/ballTypeKeyTextView"
+            style="@style/BaseTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -99,8 +103,10 @@
 
         <TextView
             android:id="@+id/ballTypeValueTextView"
+            style="@style/BaseTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="3dp"
             android:textSize="16sp" />
     </LinearLayout>
 
@@ -109,11 +115,12 @@
         android:id="@+id/venueDetailsLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="6dp"
+        android:layout_marginTop="20dp"
         android:orientation="horizontal">
 
         <TextView
             android:id="@+id/venueKeyTextView"
+            style="@style/BaseTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -122,8 +129,10 @@
 
         <TextView
             android:id="@+id/venueValueTextView"
+            style="@style/BaseTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="3dp"
             android:textSize="16sp" />
     </LinearLayout>
 
@@ -132,11 +141,12 @@
         android:id="@+id/dateDetailsLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="6dp"
+        android:layout_marginTop="20dp"
         android:orientation="horizontal">
 
         <TextView
             android:id="@+id/dateKeyTextView"
+            style="@style/BaseTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -145,8 +155,10 @@
 
         <TextView
             android:id="@+id/dateValueTextView"
+            style="@style/BaseTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="3dp"
             android:textSize="16sp" />
     </LinearLayout>
 
