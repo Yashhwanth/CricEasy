@@ -6,13 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:layout_marginTop="20dp">
+    android:layout_marginTop="70dp">
 
     <TextView
         android:id="@+id/playerTypeTextView"
-        android:layout_width="match_parent"
+        style="@style/HeaderTextView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
+        android:layout_gravity="center"
         android:layout_marginTop="20dp"
         android:text="@string/playerTypeTextView" />
 
@@ -20,21 +21,23 @@
         android:id="@+id/playerNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
         android:text="@string/selectPlayerName"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.116"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.103"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"/>
+        app:layout_constraintVertical_bias="0.103" />
 
     <EditText
         android:id="@+id/playerNameEditText"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:autofillHints="name"
+        android:layout_gravity="center"
         android:ems="10"
         android:hint="@string/selectPlayerEditText"
         android:textColorHint="#707070"
@@ -45,15 +48,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.158"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"/>
+        android:layout_marginTop="20dp" />
 
     <LinearLayout
         android:id="@+id/navigationButtonLayout"
         style="?android:attr/buttonBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
-        android:layout_marginStart="20dp"
+        android:layout_gravity="center"
         android:layout_marginTop="20dp"
         android:orientation="horizontal"
         android:showDividers="middle">

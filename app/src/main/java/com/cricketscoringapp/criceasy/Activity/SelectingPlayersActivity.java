@@ -26,7 +26,9 @@ public class SelectingPlayersActivity extends AppCompatActivity {
         String CURRENT_ACTIVITY = "currentActivity";
         String currentActivity = sharedPreferences.getString(CURRENT_ACTIVITY, null);
         String playerType = sharedPreferences.getString(PLAYER_TYPE_KEY, null);
-
+        if("striker".equals(playerType)) playerType = "Striker";
+        else if("nonStriker".equals(playerType)) playerType = "Non Striker";
+        else playerType = "Bowler";
 
         //UI
         EditText playerNameEditText = findViewById(R.id.playerNameEditText);
@@ -65,6 +67,10 @@ public class SelectingPlayersActivity extends AppCompatActivity {
         String playerType = sharedPreferences.getString(PLAYER_TYPE_KEY,null);
         editor.putString(playerType, playerName);
         editor.apply();
-        showToast(playerType + " Updated");
+        String playerToast;
+        if("striker".equals(playerType)) playerToast = "Striker";
+        else if("nonStriker".equals(playerType)) playerToast = "Non Striker";
+        else playerToast = "Bowler";
+        showToast(playerToast + " Updated");
     }
 }
