@@ -15,6 +15,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -29,7 +30,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.cricketscoringapp.criceasy.Database.DatabaseHelper;
-import com.cricketscoringapp.criceasy.Database.SharedPrefsToJson;
 import com.cricketscoringapp.criceasy.R;
 import com.cricketscoringapp.criceasy.fragment.CommentaryFragment;
 import com.cricketscoringapp.criceasy.fragment.InfoFragment;
@@ -47,7 +47,9 @@ import java.util.Map;
 
 public class MatchActivity extends AppCompatActivity {
     private Button infoFragmentButton, summaryFragmentButton, scorecardFragmentButton, commentaryFragmentButton, teamsFragmentButton;
-    private FloatingActionButton scoringFloatingButton, shareFloatingButton;
+    private FloatingActionButton scoringFloatingButton;
+    private ImageView shareMatchIcon;
+
     private Button inningsEndButton;
     private DatabaseHelper databaseHelper;
     private SharedPreferences sharedPreferences;
@@ -145,7 +147,7 @@ public class MatchActivity extends AppCompatActivity {
         commentaryFragmentButton = findViewById(R.id.commentaryFragmentButton);
         teamsFragmentButton = findViewById(R.id.teamsFragmentButton);
         scoringFloatingButton = findViewById(R.id.floatingButton);
-        shareFloatingButton = findViewById(R.id.shareFloatingActionButton);
+        shareMatchIcon = findViewById(R.id.shareFloatingActionButton);
         infoFragmentButton.setOnClickListener(view -> showFragment(InfoFragment.class, "INFO_FRAGMENT"));
         summaryFragmentButton.setOnClickListener(view -> showFragment(LiveFragment.class, "LIVE_FRAGMENT"));
         scorecardFragmentButton.setOnClickListener(view -> showFragment(ScoreCardFragment.class, "SCORE_CARD_FRAGMENT"));
@@ -163,7 +165,7 @@ public class MatchActivity extends AppCompatActivity {
         });
         inningsEndButton.setVisibility(GONE);
         scoringFloatingButton.setVisibility(View.VISIBLE);
-        shareFloatingButton.setOnClickListener(view ->{
+        shareMatchIcon.setOnClickListener(view ->{
             exportCombinedData();
         });
 

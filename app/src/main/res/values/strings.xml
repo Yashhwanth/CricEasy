@@ -101,7 +101,7 @@
     <string name="commentaryButton">Commentary</string>
     <string name="teamsButton">Teams</string>
     <string name="floatingButtonContentDescription">Open the Scoring Popup</string>
-    <string name="shareButtonContentDescription">Share match button</string>
+    <string name="shareButtonContentDescription">Share match</string>
     activity scoring
     <string name="zeroScoringButton">0</string>
     <string name="oneScoringButton">1</string>
