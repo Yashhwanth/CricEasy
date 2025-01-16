@@ -2041,6 +2041,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 teamStats.put("wickets", String.valueOf(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_WICKETS))));
                 teamStats.put("balls", String.valueOf(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_BALLS))));
             }
+            Log.d(TAG, "getTeamStats: maar saale" + teamStats);
         } catch (Exception e) {
             Log.e(TAG, "getTeamStats: error getting team stats");
         } finally {

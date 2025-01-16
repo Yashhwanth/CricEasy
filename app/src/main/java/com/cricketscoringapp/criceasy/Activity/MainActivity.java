@@ -55,16 +55,18 @@ public class MainActivity extends AppCompatActivity {
         editor1.clear();
         //editor1.apply();
 
-        if (navigateToLastActivityIfOngoingMatch()) {
-            return; // Skip MainActivity logic if navigating to the last activity
-       }
-
         // Initialize UI elements
         Button newMatchButton = findViewById(R.id.newMatchButton);
         Button resumeMatchButton = findViewById(R.id.pastMatchesButton);
 
         // Hide the "Resume Match" button by default
         resumeMatchButton.setVisibility(View.GONE);
+
+        if (navigateToLastActivityIfOngoingMatch()) {
+            Log.d(TAG, "onCreate: navigate to left off page");
+            Toast.makeText(this, "Resuming Existing Match", Toast.LENGTH_SHORT).show();
+            return; // Skip MainActivity logic if navigating to the last activity
+        }
 
         // Check if the app was launched through a file
         Intent intent = getIntent();
@@ -108,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "Error reading or parsing JSON file: " + e.getMessage());
             }
         }
+
 
         // Handle the "New Match" button
         newMatchButton.setOnClickListener(view -> {
@@ -208,10 +211,6 @@ public class MainActivity extends AppCompatActivity {
 
         return false; // No navigation occurred
     }
-    // Check if there's a current activity saved and navigate accordingly
-//        if (navigateToLastActivityIfOngoingMatch()) {
-//            return; // Skip MainActivity logic if navigating to the last activity
-//        }
     private String readJsonFile(Uri fileUri) throws IOException {
         // Open an InputStream for the file
         InputStream inputStream = getContentResolver().openInputStream(fileUri);

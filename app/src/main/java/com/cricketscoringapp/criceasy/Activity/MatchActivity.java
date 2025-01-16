@@ -22,6 +22,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
@@ -93,7 +94,28 @@ public class MatchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_match);
         databaseHelper = new DatabaseHelper(this);
         setupUI(savedInstanceState);
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                handleBackPress(); // Your custom method for back press
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this, callback);
+
         updateCurrentActivityInPreferences();
+    }
+    private void handleBackPress() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment currentFragment = fragmentManager.findFragmentById(R.id.fragmentLayout);
+
+        if (currentFragment instanceof LiveFragment) {
+            Log.d(TAG, "onBackPressed: live frag babu");
+            showExitDialog(); // Show dialog for LiveFragment
+        } else {
+            Log.d(TAG, "onBackPressed: vere frag babu");
+            showFragment(LiveFragment.class, "LIVE_FRAGMENT"); // Show LiveFragment
+            showExitDialog();
+        }
     }
     @Override
     protected void onResume() {
@@ -125,19 +147,11 @@ public class MatchActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate: match activity onRestart called");
         inningsEndButton.setVisibility(GONE);
         scoringFloatingButton.setEnabled(true);
+        scoringFloatingButton.setAlpha(1.0f);     // Optional: Change visual appearance
         scoringFloatingButton.setVisibility(View.VISIBLE);
         super.onRestart();
     }
-    @Override
-    public void onBackPressed() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        Fragment currentFragment = fragmentManager.findFragmentById(R.id.fragmentLayout);
-        if (currentFragment instanceof LiveFragment) {
-            super.onBackPressed(); // Exit the activity
-        } else {
-            showFragment(LiveFragment.class, "LIVE_FRAGMENT"); // Show the default fragment
-        }
-    }
+
     private void setupUI(Bundle savedInstanceState){
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         long matchId = sharedPreferences.getLong(MATCH_ID, -1);
@@ -955,6 +969,32 @@ public class MatchActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.e(TAG, "Error starting share intent: " + e.getMessage());
         }
+    }
+    private void showExitDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Do you want to exit the app?");
+        builder.setMessage("Please choose an option:");
+
+        // "Stop Match and Exit" button
+        builder.setNegativeButton("Stop Match and Exit", (dialog, which) -> {
+            // Logic to stop the match
+            closeTheApp(); // Exit the app
+        });
+
+        // "Save Match and Exit" button
+        builder.setPositiveButton("Save Match and Exit", (dialog, which) -> {
+            // Logic to save the match before exiting
+            finish(); // Exit the app
+        });
+
+        // Cancel button
+        builder.setNeutralButton("Cancel", (dialog, which) -> {
+            // Close the dialog without exiting
+            dialog.dismiss();
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
 
