@@ -53,7 +53,11 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
         SharedPreferences.Editor editor1 = sharedPreferences.edit();
         editor1.clear();
-        editor1.apply();
+        //editor1.apply();
+
+        if (navigateToLastActivityIfOngoingMatch()) {
+            return; // Skip MainActivity logic if navigating to the last activity
+       }
 
         // Initialize UI elements
         Button newMatchButton = findViewById(R.id.newMatchButton);
@@ -120,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        updateCurrentActivityInPreferences();
+        //updateCurrentActivityInPreferences();
     }
     @Override
     protected void onDestroy() {
@@ -186,7 +190,9 @@ public class MainActivity extends AppCompatActivity {
         if (lastActivity != null && matchId != -1) {
             try {
                 // Dynamically load the last activity class and navigate
-                Class<?> activityClass = Class.forName("com.cricketscoringapp.criceasy." + lastActivity);
+                Log.d(TAG, "navigateToLastActivityIfOngoingMatch: " + lastActivity);
+                Class<?> activityClass = Class.forName("com.cricketscoringapp.criceasy.Activity." + lastActivity);
+                Log.d(TAG, "navigateToLastActivityIfOngoingMatch: " + activityClass);
                 Intent intent = new Intent(this, activityClass);
                 startActivity(intent);
                 finish(); // Close MainActivity
