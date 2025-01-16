@@ -2,6 +2,7 @@
     android:id="@+id/teamsLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginStart="15dp"
     android:orientation="vertical">
     <!-- Team 1 Header -->
     <TextView
@@ -17,7 +18,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/team1PlayerRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="16dp" />
 
     <!-- Team 2 Header -->
@@ -33,7 +34,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/team2PlayerRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="16dp" /> <!-- 5 columns for players -->
 
 </LinearLayout>
