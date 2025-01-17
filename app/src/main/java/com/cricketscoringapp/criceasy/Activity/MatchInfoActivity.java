@@ -79,7 +79,7 @@ public class MatchInfoActivity extends AppCompatActivity {
 
         // Initialize the Places API
         if (!Places.isInitialized()) {
-            Places.initialize(getApplicationContext(), "AIzaSyCj9F32bLGwchttu-tdFnBfJkv9mzfPYSQ");
+            Places.initialize(getApplicationContext(), "api-key");
         }
 
         // Initialize AutoCompleteTextView for place selection
