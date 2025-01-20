@@ -14,20 +14,31 @@ This project is a fully offline, no-login-required cricket scoring application d
 ## Usage
 
 1. **Start a New Match**  
-   Enter the details of the teams, players, and the initial setup.  
-   ![Team Setup Screen](screenshots/team_setup.png)
+   Begin by setting up the match details, such as the match format, total overs, and team names.  
+   This page allows you to either **continue from where you left off** if the match was previously unfinished, or **start a new match** entirely.  
+   ![View Full Size](Screenshots/HomePage.jpg)
 
-2. **Track Balls and Runs**  
-   Input the outcome of each ball (e.g., runs, no-ball, wide, etc.) to update the stats for batsmen and bowlers.  
-   ![Scoring Screen](screenshots/scoring_screen.png)
+2. **Select Teams**  
+   Choose the teams participating in the match.  
+   This page enables you to select teams easily and proceed with match setup.  
+   ![View Full Size](Screenshots/TeamSelection.jpg)
 
-3. **Handle Wickets**  
-   Input the type of wicket when a batsman gets out, and the app will update the striker and stats accordingly.  
-   ![Wicket Handling Screen](screenshots/wicket_handling.png)
+3. **Selecting Players**  
+   This page takes player inputs and adds them to the squads.  
+   You don't need to add all the players at the start, offering the flexibility to modify squads dynamically.  
+   ![View Full Size](Screenshots/PlayerSelection.jpg)
 
-4. **Undo Last Action**  
-   Use the undo functionality to revert to the previous state after any ball.  
-   ![Undo Action Screen](screenshots/undo_action.png)
+4. **Live Scorecard**  
+   View real-time updates of the match, including runs, wickets, partnerships, and ball-by-ball breakdowns.  
+   This screen provides a detailed and interactive scorecard for seamless tracking of match progress.  
+   ![View Full Size](Screenshots/LiveScore.jpg)
+
+5. **Squads**  
+   Access the full squad details, including player names and their roles.  
+   This page gives a quick overview of the team composition for reference during the match.  
+   ![View Full Size](Screenshots/Squads.jpg)
+
+
 
 
 ## Technologies Used
@@ -37,11 +48,41 @@ This project is a fully offline, no-login-required cricket scoring application d
 -  SQLite
 
 ## Future Enhancements
-- Implementing a graphical user interface (GUI).
-- 
+
+- Enable cloud-based data storage to allow seamless synchronization of match progress and stats across multiple devices. This will ensure users can access and continue their match from any device without interruptions.
 - Support for multiple match formats (e.g., Test, ODI, T20).
+- Implementing a graphical user interface (GUI).
 - Integration with real-time match data.
 
-## Contributors
-- **Your Name** - Initial development
+## Contribution
+
+We welcome contributions to improve the Cricket Scoring App! If you'd like to contribute, please follow the steps below:
+
+### How to Contribute
+
+1. **Fork the Repository**  
+   Click the "Fork" button on the top right of this repository to create your own copy.
+
+2. **Clone Your Fork**  
+   Clone the repository to your local machine:
+   ```bash
+   git clone https://github.com/Yashhwanth/CricEasy.git
+## Acknowledgements
+
+I'd like to extend our sincere thanks to the following for their contributions to this project:
+
+- **Open Source Libraries**: Special thanks to all open-source libraries and resources that have helped in speeding up the development process.
+  - [Android SDK](https://developer.android.com/studio) for providing the necessary tools for Android development.
+  - [SQLite](https://www.sqlite.org/) for the lightweight database support.
+  - [Icon Packs](https://www.flaticon.com/) for providing icons used in the app.
+  
+- **Contributors**: A big thank you to everyone who has contributed code, reported issues, and suggested improvements to the app.
+
+- **Supporters**: Thanks to the developers and communities who share their knowledge, tips, and tutorials online. Your support has been invaluable in overcoming challenges.
+
+---
+
+If you'd like to add anything else, feel free to reach out or open an issue. Thank you for being part of this project!
+
+
 
