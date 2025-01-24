@@ -51,9 +51,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         databaseHelper = new DatabaseHelper(this);
         sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor1 = sharedPreferences.edit();
-        editor1.clear();
-        //editor1.apply();
 
         // Initialize UI elements
         Button newMatchButton = findViewById(R.id.newMatchButton);

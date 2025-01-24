@@ -109,7 +109,7 @@ public class MatchInfoActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
-    private boolean validateInputs() {
+    public boolean validateInputs() {
         AppCompatAutoCompleteTextView placeAutoComplete = findViewById(R.id.placeAutoCompleteEditText);
         EditText dateTimeEditText = findViewById(R.id.dateTimeEditText);
         EditText noOfOversEditText = findViewById(R.id.noOfOversEditText);
@@ -142,7 +142,7 @@ public class MatchInfoActivity extends AppCompatActivity {
         }
         return true;
     }
-    private void showToast(String message) {
+    public void showToast(String message) {
         Toast.makeText(MatchInfoActivity.this, message, Toast.LENGTH_SHORT).show();
     }
     // Method to open the Google Places Autocomplete activity

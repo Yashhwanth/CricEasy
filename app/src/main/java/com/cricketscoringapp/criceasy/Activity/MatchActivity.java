@@ -50,7 +50,6 @@ public class MatchActivity extends AppCompatActivity {
     private Button infoFragmentButton, summaryFragmentButton, scorecardFragmentButton, commentaryFragmentButton, teamsFragmentButton;
     private FloatingActionButton scoringFloatingButton;
     private ImageView shareMatchIcon;
-
     private Button inningsEndButton;
     private DatabaseHelper databaseHelper;
     private SharedPreferences sharedPreferences;
@@ -102,6 +101,7 @@ public class MatchActivity extends AppCompatActivity {
         };
         getOnBackPressedDispatcher().addCallback(this, callback);
 
+        checkForPendingDialogs();
         updateCurrentActivityInPreferences();
     }
     private void handleBackPress() {
@@ -151,7 +151,21 @@ public class MatchActivity extends AppCompatActivity {
         scoringFloatingButton.setVisibility(View.VISIBLE);
         super.onRestart();
     }
-
+    private void checkForPendingDialogs(){
+        sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+        boolean isBatterDialogPending = sharedPreferences.getBoolean("isBatterDialogPending", false);
+        boolean isBowlerDialogPending = sharedPreferences.getBoolean("isBowlerDialogPending", false);
+        if(isBatterDialogPending && isBowlerDialogPending){
+            setNewPlayer("bowler", this::rotateStrike);
+            setNewPlayer("Batter", this::checkAndHandleOverEnd);
+        }
+        else if(isBowlerDialogPending){
+            setNewPlayer("bowler", this::rotateStrike);
+        }
+        else if(isBatterDialogPending){
+            setNewPlayer("Batter", this:: checkAndHandleOverEnd);
+        }
+    }
     private void setupUI(Bundle savedInstanceState){
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         long matchId = sharedPreferences.getLong(MATCH_ID, -1);
@@ -223,7 +237,7 @@ public class MatchActivity extends AppCompatActivity {
     }
     public void openScoringPopup() {
         View dialogView = getLayoutInflater().inflate(R.layout.activity_scoring, null);
-        Button zeroScoringButton, oneScoringButton, twoScoringButton, threeScoringButton, fourScoringButton, fiveScoringButton, sixScoringButton, sevenScoringButton, eightScoringButton, byeScoringButton, legByeScoringButton, wideScoringButton, noBallScoringButton, wicketScoringButton;
+        Button zeroScoringButton, oneScoringButton, twoScoringButton, threeScoringButton, fourScoringButton, fiveScoringButton, sixScoringButton, sevenScoringButton, eightScoringButton, byeScoringButton, legByeScoringButton, wideScoringButton, noBallScoringButton, wicketScoringButton, backScoringButton;
         zeroScoringButton = dialogView.findViewById(R.id.zeroScoringButton);
         oneScoringButton = dialogView.findViewById(R.id.oneScoringButton);
         twoScoringButton = dialogView.findViewById(R.id.twoScoringButton);
@@ -238,6 +252,7 @@ public class MatchActivity extends AppCompatActivity {
         wideScoringButton = dialogView.findViewById(R.id.wideScoringButton);
         noBallScoringButton = dialogView.findViewById(R.id.noBallScoringButton);
         wicketScoringButton = dialogView.findViewById(R.id.wicketScoringButton);
+        backScoringButton = dialogView.findViewById(R.id.popupDismissButton);
         // Create the dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(dialogView);
@@ -328,6 +343,7 @@ public class MatchActivity extends AppCompatActivity {
         wicketScoringButton.setOnClickListener(view ->{
             showWicketDialog(scoringPopupDialog);
         });
+        backScoringButton.setOnClickListener(view -> scoringPopupDialog.dismiss());
     }
     private void showExtrasDialog(String ballType, AlertDialog parentDialog) {
         View extrasDialogView = getLayoutInflater().inflate(R.layout.activity_dialog_for_extras, null);
@@ -665,6 +681,19 @@ public class MatchActivity extends AppCompatActivity {
         playerBuilder.setView(playerDialogView);
         AlertDialog playerDialog = playerBuilder.create();
         playerDialog.show();
+        playerDialog.setOnShowListener(dialog -> {
+            SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            if(playerType.equals("bowler")){
+                editor.putBoolean("isBatterDialogPending", true);
+                editor.apply();
+            }
+            else{
+                editor.putBoolean("isBowlerDialogPending", true);
+                editor.apply();
+            }
+        });
+
         if (playerDialog.getWindow() != null) {
             playerDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
@@ -680,10 +709,16 @@ public class MatchActivity extends AppCompatActivity {
         submitButton.setOnClickListener(v -> {
             String playerName = String.valueOf(playerNameEditText.getText());
             updatePlayerDataInSp(playerType, playerName);
+            sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
             if (playerType.equals("bowler")) {
+                editor.putBoolean("isBatterDialogPending", false);
+                editor.apply();
                 long newBowlerId = updateNewBowlerToDB(playerName);
                 insertOver(newBowlerId);
             } else {
+                editor.putBoolean("isBatterDialogPending", false);
+                editor.apply();
                 updateNewBatsmanToDB(playerName, playerType);
             }
             playerDialog.dismiss(); // Dismiss dialog only after processing the player's input
@@ -844,7 +879,7 @@ public class MatchActivity extends AppCompatActivity {
         Intent intent = new Intent(MatchActivity.this, SelectingSrNsBowActivity.class);
         startActivity(intent);
     }
-    private void rotateStrike(int runs) {
+    public void rotateStrike(int runs) {
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         long strikerId = sharedPreferences.getLong(STRIKER_ID, -1);
@@ -879,6 +914,18 @@ public class MatchActivity extends AppCompatActivity {
                 editor.apply();
             }
         }return replacePlayer;
+    }
+    private void rotateStrike() {
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        long strikerId = sharedPreferences.getLong(STRIKER_ID, -1);
+        long nonStrikerId = sharedPreferences.getLong(NON_STRIKER_ID, -1);
+        long temp = strikerId;
+        strikerId = nonStrikerId;
+        nonStrikerId = temp;
+        editor.putLong(STRIKER_ID, strikerId);
+        editor.putLong(NON_STRIKER_ID, nonStrikerId);
+        editor.apply();
     }
     private void closeTheApp(){
         SharedPreferences.Editor editor = sharedPreferences.edit();

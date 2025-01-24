@@ -119,6 +119,7 @@
     <string name="wicketScoringButton">Wicket</string>
     <string name="deadScoringButton">Dead</string>
     <string name="undoScoringButton">Undo</string>
+    <string name="backButtonForPopup">Back</string>
     activity for extras
     <string name="hintForExtraRunsEditText">Enter Extra Runs(0 if no runs are scored)</string>
     <string name="runsFromBat">Bat</string>
