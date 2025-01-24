@@ -1,4 +1,4 @@
-# Cricket Scoring App
+# Cricket Scoring App (Android)
 
 ## Description
 
@@ -18,8 +18,8 @@ This project is a fully offline, no-login-required cricket scoring application d
    This page allows you to either **continue from where you left off** if the match was previously unfinished, or **start a new match** entirely.  
 <p float="left">
   <img display: inline; src="Screenshots/Picture1.png" width="200" />
-  <img display: inline; src="Screenshots/Picture1.png" width="200" />
-  <img display: inline; src="Screenshots/Picture1.png" width="200" />
+  <img display: inline; src="Screenshots/TeamsPage.png" width="200" />
+  <img display: inline; src="Screenshots/SelectingPlayersPage.png" width="200" />
 </p>
 
 
@@ -39,8 +39,8 @@ This project is a fully offline, no-login-required cricket scoring application d
    Access the full squad details, including player names and their roles.  
    This page gives a quick overview of the team composition for reference during the match.  
 <p float="left">
-  <img display: inline; src="Screenshots/Picture1.png" width="200" />
-  <img display: inline; src="Screenshots/Picture1.png" width="200" />
+  <img display: inline; src="Screenshots/LiveScoresPage.png" width="200" />
+  <img display: inline; src="Screenshots/SquadsPage.png" width="200" />
 </p>
 
 
