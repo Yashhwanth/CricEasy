@@ -16,28 +16,32 @@ This project is a fully offline, no-login-required cricket scoring application d
 1. **Start a New Match**  
    Begin by setting up the match details, such as the match format, total overs, and team names.  
    This page allows you to either **continue from where you left off** if the match was previously unfinished, or **start a new match** entirely.  
-   ![View Full Size](Screenshots/HomePage.jpg)
+<p float="left">
+  <img display: inline; src="Screenshots/Picture1.png" width="200" />
+  <img display: inline; src="Screenshots/Picture1.png" width="200" />
+  <img display: inline; src="Screenshots/Picture1.png" width="200" />
+</p>
+
 
 2. **Select Teams**  
    Choose the teams participating in the match.  
    This page enables you to select teams easily and proceed with match setup.  
-   ![View Full Size](Screenshots/TeamSelection.jpg)
 
 3. **Selecting Players**  
    This page takes player inputs and adds them to the squads.  
    You don't need to add all the players at the start, offering the flexibility to modify squads dynamically.  
-   ![View Full Size](Screenshots/PlayerSelection.jpg)
 
 4. **Live Scorecard**  
    View real-time updates of the match, including runs, wickets, partnerships, and ball-by-ball breakdowns.  
-   This screen provides a detailed and interactive scorecard for seamless tracking of match progress.  
-   ![View Full Size](Screenshots/LiveScore.jpg)
-
-5. **Squads**  
+   This screen provides a detailed and interactive scorecard for seamless tracking of match progress.
+   
+6. **Squads**  
    Access the full squad details, including player names and their roles.  
    This page gives a quick overview of the team composition for reference during the match.  
-   ![View Full Size](Screenshots/Squads.jpg)
-
+<p float="left">
+  <img display: inline; src="Screenshots/Picture1.png" width="200" />
+  <img display: inline; src="Screenshots/Picture1.png" width="200" />
+</p>
 
 
 
