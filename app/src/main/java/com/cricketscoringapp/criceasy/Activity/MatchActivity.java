@@ -153,17 +153,21 @@ public class MatchActivity extends AppCompatActivity {
         super.onRestart();
     }
     private void checkForPendingDialogs(){
+        Log.d(TAG, "checkForPendingDialogs: checking for pending dialogs");
         sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
         boolean isBatterDialogPending = sharedPreferences.getBoolean("isBatterDialogPending", false);
         boolean isBowlerDialogPending = sharedPreferences.getBoolean("isBowlerDialogPending", false);
         if(isBatterDialogPending && isBowlerDialogPending){
+            Log.d(TAG, "checkForPendingDialogs: both dialogs are pending");
             setNewPlayer("bowler", this::rotateStrike);
             setNewPlayer("Batter", this::checkAndHandleOverEnd);
         }
         else if(isBowlerDialogPending){
+            Log.d(TAG, "checkForPendingDialogs: bowler dialog is pending");
             setNewPlayer("bowler", this::rotateStrike);
         }
         else if(isBatterDialogPending){
+            Log.d(TAG, "checkForPendingDialogs: batter dialog is pending");
             setNewPlayer("Batter", this:: checkAndHandleOverEnd);
         }
     }
@@ -686,11 +690,13 @@ public class MatchActivity extends AppCompatActivity {
         AtomicReference<SharedPreferences> sharedPreferences = new AtomicReference<>(getSharedPreferences("match_prefs", MODE_PRIVATE));
         SharedPreferences.Editor editor1 = sharedPreferences.get().edit();
         if(playerType.equals("bowler")){
-            editor1.putBoolean("isBatterDialogPending", true);
+            Log.d(TAG, "setNewPlayer: opened  bowler dialog");
+            editor1.putBoolean("isBowlerDialogPending", true);
             editor1.apply();
         }
         else{
-            editor1.putBoolean("isBowlerDialogPending", true);
+            Log.d(TAG, "setNewPlayer: opened  batter dialog");
+            editor1.putBoolean("isBatterDialogPending", true);
             editor1.apply();
         }
 //        playerDialog.setOnShowListener(dialog -> {
@@ -719,13 +725,14 @@ public class MatchActivity extends AppCompatActivity {
         Button submitButton = playerDialogView.findViewById(R.id.submitButton);
         Button backButton = playerDialogView.findViewById(R.id.cancelButton);
         backButton.setVisibility(View.GONE);
+
         submitButton.setOnClickListener(v -> {
             String playerName = String.valueOf(playerNameEditText.getText());
             updatePlayerDataInSp(playerType, playerName);
             sharedPreferences.set(getSharedPreferences("match_prefs", MODE_PRIVATE));
             SharedPreferences.Editor editor = sharedPreferences.get().edit();
             if (playerType.equals("bowler")) {
-                editor.putBoolean("isBatterDialogPending", false);
+                editor.putBoolean("isBowlerDialogPending", false);
                 editor.apply();
                 long newBowlerId = updateNewBowlerToDB(playerName);
                 insertOver(newBowlerId);
@@ -736,6 +743,7 @@ public class MatchActivity extends AppCompatActivity {
             }
             playerDialog.dismiss(); // Dismiss dialog only after processing the player's input
         });
+
         playerDialog.setOnDismissListener(dialog -> {
             Log.d(TAG, "setNewPlayer: set on dismiss called for set new player popup");
             sharedPreferences.set(getSharedPreferences("match_prefs", MODE_PRIVATE));
