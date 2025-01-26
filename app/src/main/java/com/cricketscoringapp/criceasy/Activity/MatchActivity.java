@@ -45,6 +45,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class MatchActivity extends AppCompatActivity {
     private Button infoFragmentButton, summaryFragmentButton, scorecardFragmentButton, commentaryFragmentButton, teamsFragmentButton;
@@ -681,18 +682,30 @@ public class MatchActivity extends AppCompatActivity {
         playerBuilder.setView(playerDialogView);
         AlertDialog playerDialog = playerBuilder.create();
         playerDialog.show();
-        playerDialog.setOnShowListener(dialog -> {
-            SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            if(playerType.equals("bowler")){
-                editor.putBoolean("isBatterDialogPending", true);
-                editor.apply();
-            }
-            else{
-                editor.putBoolean("isBowlerDialogPending", true);
-                editor.apply();
-            }
-        });
+        Log.d(TAG, "setNewPlayer: inside dialog yyyyyyyyyyy set on show listener");
+        AtomicReference<SharedPreferences> sharedPreferences = new AtomicReference<>(getSharedPreferences("match_prefs", MODE_PRIVATE));
+        SharedPreferences.Editor editor1 = sharedPreferences.get().edit();
+        if(playerType.equals("bowler")){
+            editor1.putBoolean("isBatterDialogPending", true);
+            editor1.apply();
+        }
+        else{
+            editor1.putBoolean("isBowlerDialogPending", true);
+            editor1.apply();
+        }
+//        playerDialog.setOnShowListener(dialog -> {
+//            Log.d(TAG, "setNewPlayer: inside dialog yyyyyyyyyyy set on show listener");
+//            SharedPreferences sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
+//            SharedPreferences.Editor editor = sharedPreferences.edit();
+//            if(playerType.equals("bowler")){
+//                editor.putBoolean("isBatterDialogPending", true);
+//                editor.apply();
+//            }
+//            else{
+//                editor.putBoolean("isBowlerDialogPending", true);
+//                editor.apply();
+//            }
+//        });
 
         if (playerDialog.getWindow() != null) {
             playerDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -709,8 +722,8 @@ public class MatchActivity extends AppCompatActivity {
         submitButton.setOnClickListener(v -> {
             String playerName = String.valueOf(playerNameEditText.getText());
             updatePlayerDataInSp(playerType, playerName);
-            sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
+            sharedPreferences.set(getSharedPreferences("match_prefs", MODE_PRIVATE));
+            SharedPreferences.Editor editor = sharedPreferences.get().edit();
             if (playerType.equals("bowler")) {
                 editor.putBoolean("isBatterDialogPending", false);
                 editor.apply();
@@ -725,8 +738,8 @@ public class MatchActivity extends AppCompatActivity {
         });
         playerDialog.setOnDismissListener(dialog -> {
             Log.d(TAG, "setNewPlayer: set on dismiss called for set new player popup");
-            sharedPreferences = getSharedPreferences("match_prefs", MODE_PRIVATE);
-            Fragment currShowingFragment = fragmentManager.findFragmentByTag(sharedPreferences.getString("currentShowingFragment", null));
+            sharedPreferences.set(getSharedPreferences("match_prefs", MODE_PRIVATE));
+            Fragment currShowingFragment = fragmentManager.findFragmentByTag(sharedPreferences.get().getString("currentShowingFragment", null));
             if (currShowingFragment instanceof TeamsFragment) {
                 Log.d(TAG, "setNewPlayer: urgent refresh needed for teams");
                 TeamsFragment teamsFragment = (TeamsFragment) currShowingFragment;
@@ -738,7 +751,7 @@ public class MatchActivity extends AppCompatActivity {
             }
             else {
                 Log.d(TAG, "setNewPlayer: no urgent need to cache the update");
-                SharedPreferences.Editor editor = sharedPreferences.edit();
+                SharedPreferences.Editor editor = sharedPreferences.get().edit();
                 editor.putBoolean("teamsPageUpdateNeeded", true);
                 editor.putBoolean("scorecardPageUpdateNeeded", true);
                 editor.apply();

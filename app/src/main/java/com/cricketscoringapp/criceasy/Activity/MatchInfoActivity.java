@@ -115,11 +115,11 @@ public class MatchInfoActivity extends AppCompatActivity {
         EditText noOfOversEditText = findViewById(R.id.noOfOversEditText);
         RadioGroup oversTypeRadioGroup = findViewById(R.id.oversTypeRadioGroup);
         RadioGroup ballTypeRadioGroup = findViewById(R.id.ballTypeRadioGroup);
-        if (placeAutoComplete.getText().toString().trim().isEmpty()) {
-            showToast("Please enter the match location");
-            placeAutoComplete.requestFocus();
-            return false;
-        }
+//        if (placeAutoComplete.getText().toString().trim().isEmpty()) {
+//            showToast("Please enter the match location");
+//            placeAutoComplete.requestFocus();
+//            return false;
+//        }
         if (dateTimeEditText.getText().toString().trim().isEmpty()) {
             showToast("Please enter the match date and time");
             dateTimeEditText.requestFocus();
