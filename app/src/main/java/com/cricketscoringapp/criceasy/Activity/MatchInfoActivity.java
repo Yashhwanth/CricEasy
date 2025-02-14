@@ -37,6 +37,7 @@ public class MatchInfoActivity extends AppCompatActivity {
     private static final int AUTOCOMPLETE_REQUEST_CODE = 1;
     private AutoCompleteTextView placeAutoComplete;
     private EditText dateTimeEditText;
+    private EditText placeEditText;
     private Calendar calendar;
     private EditText noOfOversEditText;
     private RadioGroup oversTypeRadioGroup;
@@ -83,8 +84,8 @@ public class MatchInfoActivity extends AppCompatActivity {
         }
 
         // Initialize AutoCompleteTextView for place selection
-        placeAutoComplete = findViewById(R.id.placeAutoCompleteEditText);
-        placeAutoComplete.setOnClickListener(v -> openAutocompleteActivity());
+        placeEditText = findViewById(R.id.placeAutoCompleteEditText);
+        //placeAutoComplete.setOnClickListener(v -> openAutocompleteActivity());
 
         // Initialize EditText for date and time selection
         dateTimeEditText = findViewById(R.id.dateTimeEditText);
@@ -110,16 +111,16 @@ public class MatchInfoActivity extends AppCompatActivity {
         startActivity(intent);
     }
     public boolean validateInputs() {
-        AppCompatAutoCompleteTextView placeAutoComplete = findViewById(R.id.placeAutoCompleteEditText);
+        placeEditText = findViewById(R.id.placeAutoCompleteEditText);
         EditText dateTimeEditText = findViewById(R.id.dateTimeEditText);
         EditText noOfOversEditText = findViewById(R.id.noOfOversEditText);
         RadioGroup oversTypeRadioGroup = findViewById(R.id.oversTypeRadioGroup);
         RadioGroup ballTypeRadioGroup = findViewById(R.id.ballTypeRadioGroup);
-//        if (placeAutoComplete.getText().toString().trim().isEmpty()) {
-//            showToast("Please enter the match location");
-//            placeAutoComplete.requestFocus();
-//            return false;
-//        }
+        if (placeEditText.getText().toString().trim().isEmpty()) {
+            showToast("Please enter the match location");
+            placeEditText.requestFocus();
+            return false;
+        }
         if (dateTimeEditText.getText().toString().trim().isEmpty()) {
             showToast("Please enter the match date and time");
             dateTimeEditText.requestFocus();
@@ -201,7 +202,7 @@ public class MatchInfoActivity extends AppCompatActivity {
         String matchType = getRadioButtonText(oversTypeRadioGroup);
         String noOfOvers = noOfOversEditText.getText().toString().trim();
         String ballType = getRadioButtonText(ballTypeRadioGroup);
-        String place = placeAutoComplete.getText().toString().trim();
+        String place = placeEditText.getText().toString().trim();
         String dateTime = dateTimeEditText.getText().toString().trim();
         int isCompleted = 0;
         Log.d(TAG, "saveMatchInfoToDatabase: " + currentMatchId);

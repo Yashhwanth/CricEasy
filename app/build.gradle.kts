@@ -59,11 +59,11 @@ dependencies {
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.junit.jupiter.engine)
     testImplementation(libs.mockito.inline)  // For mocking final methods
-        implementation(libs.core) // or the latest version
-        implementation(libs.junit.v115) // JUnit extension
-        implementation(libs.runner) // Test runner
-        implementation(libs.rules) // Test rules
-        implementation(libs.espresso.core.v350) // Espresso for UI tests
-        testImplementation(libs.junit) // JUnit for unit tests
+    implementation(libs.core) // or the latest version
+    implementation(libs.junit.v115) // JUnit extension
+    implementation(libs.runner) // Test runner
+    implementation(libs.rules) // Test rules
+    implementation(libs.espresso.core.v350) // Espresso for UI tests
+    testImplementation(libs.junit) // JUnit for unit tests
 
 }

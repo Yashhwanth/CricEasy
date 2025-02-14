@@ -74,6 +74,23 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.396" />
 
+    <EditText
+        android:id="@+id/placeAutoCompleteEditText"
+        android:layout_width="343dp"
+        android:layout_height="50dp"
+        android:autofillHints="phone"
+        android:hint="@string/placeEditText"
+        android:inputType="text"
+        android:padding="16dp"
+        android:textColor="@color/black"
+        android:textColorHint="#707070"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.514"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.696" />
+
     <TextView
         android:id="@+id/typeOfBallTextView"
         style="@style/BaseTextView"
@@ -134,21 +151,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.614" />
 
-    <androidx.appcompat.widget.AppCompatAutoCompleteTextView
-        android:id="@+id/placeAutoCompleteEditText"
-        android:layout_width="343dp"
-        android:layout_height="50dp"
-        android:focusable="false"
-        android:hint="@string/placeEditText"
-        android:padding="16dp"
-        android:textColor="@color/black"
-        android:textColorHint="#707070"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.514"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.696" />
 
     <TextView
         android:id="@+id/dateTimeTextView"
